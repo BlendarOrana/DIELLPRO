@@ -1,9 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-// Mock store for demo
 import { useAppStore } from '../store'; // Import the real store
-
 
 // Constants for styling and behavior
 const PATH_WIDTH = 40;
@@ -258,6 +255,8 @@ function UnlockScreen() {
                 )}
               </svg>
             </motion.div>
+
+            {/* --- FIX START --- */}
             {/* Draggable Handle: Only render if the path points exist to prevent initial flicker */}
             {pathData.points.length > 0 && (
               <motion.div
@@ -269,7 +268,7 @@ function UnlockScreen() {
                   y: currentPos.y - HANDLE_SIZE / 2,
                   touchAction: 'none'
                 }}
-               animate={isComplete ? {
+                animate={isComplete ? {
                   scale: 1.8,
                   filter: 'brightness(5) drop-shadow(0 0 40px #facc15)'
                 } : {
@@ -280,8 +279,7 @@ function UnlockScreen() {
                   x: { type: 'spring', stiffness: 3000, damping: 50 },
                   y: { type: 'spring', stiffness: 3000, damping: 50 },
                   scale: { duration: isComplete ? 0.2 : 0.3, ease: "easeOut" },
-                 filter: { duration: isComplete ? 0.2 : 0.5, ease: "easeOut" }
-
+                  filter: { duration: isComplete ? 0.2 : 0.5, ease: "easeOut" }
                 }}
                 onPointerDown={handlePointerDown}
                 whileHover={!isComplete ? { scale: 1.1 } : {}}
@@ -329,7 +327,7 @@ function UnlockScreen() {
                         width: isComplete ? '20px' : '16px',
                         height: isComplete ? '20px' : '16px',
                         left: '50%',
-                        top: isComplete ? 'calc(50% + 5px)' : 'calc(50% + 3px)',
+                      top: isComplete ? 'calc(50% + 5px)' : 'calc(50% + 3px)',
                         transform: 'translate(-50%, -50%)',
                         backgroundColor: lightingIntensity > 0.2 ? `rgba(250, 204, 21, ${Math.min(lightingIntensity, 1)})` : 'rgba(100,100,100,0.6)',
                         boxShadow: isComplete ? `0 0 25px rgba(250, 204, 21, 0.9), 0 0 50px rgba(249, 115, 22, 0.7)` : lightingIntensity > 0.4 ? `0 0 15px rgba(250, 204, 21, ${Math.min(lightingIntensity, 0.8)})` : 'none'
@@ -340,11 +338,11 @@ function UnlockScreen() {
                   <AnimatePresence>
                     {isComplete && (
                       <>
-                        {/* OPTIMIZED: Main burst using transform and opacity only */}
                         <motion.div
                           className="absolute inset-0 rounded-full pointer-events-none"
                           style={{
                             background: 'radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(250,204,21,0.9) 30%, rgba(249,115,22,0.6) 60%, transparent 100%)',
+                            boxShadow: '0 0 100px rgba(255,255,255,0.8), 0 0 200px rgba(250,204,21,0.6)'
                           }}
                           initial={{ scale: 0, opacity: 0 }}
                           animate={{ 
@@ -358,11 +356,11 @@ function UnlockScreen() {
                           }}
                         />
                         
-                        {/* OPTIMIZED: Secondary flash using transform and opacity only */}
                         <motion.div
                           className="absolute inset-0 rounded-full pointer-events-none"
                           style={{
                             background: 'rgba(255,255,255,1)',
+                            boxShadow: '0 0 150px rgba(255,255,255,1), 0 0 300px rgba(250,204,21,0.8)'
                           }}
                           initial={{ scale: 0, opacity: 0 }}
                           animate={{ 
@@ -381,6 +379,7 @@ function UnlockScreen() {
                 </div>
               </motion.div>
             )}
+            {/* --- FIX END --- */}
 
           </motion.div>
         )}
@@ -402,7 +401,7 @@ function UnlockScreen() {
               {/* This div can be used for warp effects if needed */}
             </motion.div>
 
-            {/* OPTIMIZED: Particle Burst Effect using transform and opacity only */}
+            {/* Particle Burst Effect */}
             {[...Array(12)].map((_, i) => (
               <motion.div
                 key={i}
