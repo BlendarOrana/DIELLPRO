@@ -346,7 +346,7 @@ function MainContent() {
           )}
 
           {showContactForm && (
-            <div className="w-full max-w-md sm:max-w-xl mx-auto transform transition-all duration-500 ease-out opacity-0 translate-x-2 animate-[slideInFromRight_0.6s_ease-out_forwards]">
+            <div className="w-full max-w-md sm:max-w-xl mx-auto transform transition-all duration-500 ease-out opacity-0 translate-x-1 animate-[slideInFromRight_0.6s_ease-out_forwards]">
               <div className="rounded-lg border border-amber-400/30 bg-black/60 shadow-2xl shadow-orange-500/20 backdrop-blur-lg overflow-hidden relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-amber-400/10 via-transparent to-amber-400/10 animate-[genesisRing_8s_linear_infinite] pointer-events-none"></div>
                 <div className="flex items-center gap-2 border-b border-amber-400/30 bg-black/40 p-2 sm:p-3 relative z-10">
