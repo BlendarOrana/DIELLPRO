@@ -1,0 +1,285 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@layer components {
+  /* ==================== YOUR EXISTING FORM STYLES ==================== */
+  .form-input {
+    @apply w-full bg-black/50 border border-amber-400/30 rounded-md px-3 py-2 text-slate-200 font-mono placeholder-slate-400/70 transition-colors duration-300;
+    @apply focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-orange-500/50;
+  }
+  
+  .btn-form {
+    @apply py-2 rounded-md font-mono transition-all duration-300 border;
+  }
+  
+  .btn-confirm {
+    @apply bg-orange-500/20 text-amber-300 border-orange-500/50;
+    @apply hover:bg-orange-500/30 hover:shadow-[0_0_20px_rgba(249,115,22,0.4)];
+  }
+  
+  .btn-abort {
+    @apply bg-slate-500/20 text-slate-300 border-slate-500/50;
+    @apply hover:bg-slate-500/30;
+  }
+
+  /* ==================== NEW COMPONENT CLASSES ==================== */
+  
+  /* Warp arrival effect */
+  .warp-arrival {
+    @apply absolute inset-0 z-50 pointer-events-none;
+    background-color: white;
+    animation: fadeFromWhite 1.5s ease-out 0.2s forwards;
+    opacity: 1;
+  }
+
+  /* Background reveal */
+  .background-reveal {
+    @apply absolute top-0 left-0 h-full w-full z-0;
+    animation: revealBackground 2s ease-out 0.5s both;
+  }
+
+  /* Terminal entrance */
+  .terminal-entrance {
+    @apply transform transition-all duration-700 ease-out opacity-0 translate-y-8;
+    animation: slideInUp 1s ease-out 2.2s forwards;
+  }
+
+  /* Contact form entrance */
+  .contact-form-entrance {
+    @apply transform transition-all duration-500 ease-out opacity-0 translate-x-8;
+    animation: slideInFromRight 0.5s ease-out forwards;
+  }
+
+  /* Button entrance */
+  .button-entrance {
+    @apply opacity-0 translate-y-4;
+    animation: fadeInUp 0.6s ease-out forwards;
+  }
+
+  /* Terminal dots */
+  .terminal-dot {
+    @apply h-3 w-3 rounded-full animate-pulse;
+  }
+
+  /* Scanline container */
+  .scanline-container {
+    @apply absolute inset-0 pointer-events-none opacity-20;
+  }
+
+  .scanline {
+    @apply w-full h-px bg-gradient-to-r from-transparent via-amber-400/50 to-transparent;
+    animation: scanline 4s linear infinite;
+    position: absolute;
+  }
+
+  /* ==================== SUCCESS MODAL ==================== */
+  .success-modal {
+    animation: successModalIn 0.5s ease-out forwards;
+    max-width: 400px;
+    width: 90%;
+  }
+
+  .success-checkmark {
+    @apply relative mx-auto;
+    width: 80px;
+    height: 80px;
+  }
+
+  .checkmark-circle {
+    @apply relative;
+    width: 80px;
+    height: 80px;
+    border: 3px solid #22c55e;
+    border-radius: 50%;
+    animation: glowPulse 2s ease-in-out infinite;
+  }
+
+  .checkmark-circle::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(34, 197, 94, 0.1) 0%, transparent 70%);
+  }
+
+  .checkmark-stem,
+  .checkmark-kick {
+    @apply absolute bg-green-400;
+    transform-origin: left top;
+    border-radius: 2px;
+  }
+
+  .checkmark-stem {
+    top: 32px;
+    left: 28px;
+    width: 3px;
+    height: 15px;
+    transform: rotate(45deg);
+    animation: checkmarkDraw 0.3s ease-out 0.3s both;
+  }
+
+  .checkmark-kick {
+    top: 40px;
+    left: 20px;
+    width: 3px;
+    height: 8px;
+    transform: rotate(-45deg);
+    animation: checkmarkDraw 0.3s ease-out 0.1s both;
+  }
+}
+
+/* ==================== ANIMATIONS (Outside @layer) ==================== */
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scanline {
+  0% { 
+    top: 0; 
+    opacity: 0; 
+  }
+  50% { 
+    opacity: 1; 
+  }
+  100% { 
+    top: 100%; 
+    opacity: 0; 
+  }
+}
+
+@keyframes fadeFromWhite {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes revealBackground {
+  from {
+    opacity: 0;
+    transform: scale(1.1);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes successModalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes checkmarkDraw {
+  0% {
+    stroke-dashoffset: 100;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes checkmarkCircle {
+  0% {
+    stroke-dashoffset: 166;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(34, 197, 94, 0.6);
+  }
+}
+
+/* ==================== RESPONSIVE IMPROVEMENTS ==================== */
+
+@media (max-width: 640px) {
+  .terminal-entrance {
+    @apply max-w-full mx-2;
+  }
+  
+  .contact-form-entrance {
+    @apply max-w-full mx-2;
+  }
+  
+  .success-modal {
+    @apply mx-4 p-6;
+  }
+}
+
+/* ==================== ACCESSIBILITY IMPROVEMENTS ==================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .warp-arrival,
+  .background-reveal,
+  .terminal-entrance,
+  .contact-form-entrance,
+  .button-entrance,
+  .scanline,
+  .success-modal,
+  .checkmark-stem,
+  .checkmark-kick {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  
+  .terminal-dot {
+    animation: none !important;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: light) {
+  .success-modal {
+    @apply bg-white/90 border-green-600/50;
+  }
+}
