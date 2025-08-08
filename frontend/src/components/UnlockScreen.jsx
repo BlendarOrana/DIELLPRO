@@ -213,11 +213,7 @@ function UnlockScreen() {
                     <stop offset="0%" stopColor="#f97316" />
                     <stop offset="100%" stopColor="#facc15" />
                   </linearGradient>
-                  <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stopColor="rgba(250,204,21,0.8)" stopOpacity={finalBurst} />
-                    <stop offset="50%" stopColor="rgba(249,115,22,0.4)" stopOpacity={finalBurst * 0.6} />
-                    <stop offset="100%" stopColor="rgba(250,204,21,0)" stopOpacity="0" />
-                  </radialGradient>
+
                 </defs>
 
                 {/* Background Path */}
@@ -249,8 +245,7 @@ function UnlockScreen() {
                     cx={pathData.points[pathData.points.length - 1].x}
                     cy={pathData.points[pathData.points.length - 1].y}
                     r="100"
-                    fill="url(#centerGlow)"
-                    opacity={finalBurst}
+           
                   />
                 )}
               </svg>
@@ -330,7 +325,6 @@ function UnlockScreen() {
                       top: isComplete ? 'calc(50% + 5px)' : 'calc(50% + 3px)',
                         transform: 'translate(-50%, -50%)',
                         backgroundColor: lightingIntensity > 0.2 ? `rgba(250, 204, 21, ${Math.min(lightingIntensity, 1)})` : 'rgba(100,100,100,0.6)',
-                        boxShadow: isComplete ? `0 0 25px rgba(250, 204, 21, 0.9), 0 0 50px rgba(249, 115, 22, 0.7)` : lightingIntensity > 0.4 ? `0 0 15px rgba(250, 204, 21, ${Math.min(lightingIntensity, 0.8)})` : 'none'
                       }}
                     />
                   </div>
@@ -360,7 +354,6 @@ function UnlockScreen() {
                           className="absolute inset-0 rounded-full pointer-events-none"
                           style={{
                             background: 'rgba(255,255,255,1)',
-                            boxShadow: '0 0 150px rgba(255,255,255,1), 0 0 300px rgba(250,204,21,0.8)'
                           }}
                           initial={{ scale: 0, opacity: 0 }}
                           animate={{ 
