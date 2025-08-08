@@ -288,18 +288,7 @@ function UnlockScreen() {
                       transform: isComplete ? 'scale(1.2)' : 'scale(1)'
                     }}
                   >
-                    {isComplete && (
-                      <div
-                        className="absolute rounded-full transition-all duration-500 ease-out"
-                        style={{
-                          width: '120%',
-                          height: '120%',
-                          borderColor: `rgba(250, 204, 21, 0.6)`,
-                          background: 'transparent',
-                          animation: 'pulse 1s ease-in-out infinite alternate'
-                        }}
-                      />
-                    )}
+      
                   
                     {[...Array(8)].map((_, i) => (
                       <div
@@ -377,6 +366,35 @@ function UnlockScreen() {
         )}
       </AnimatePresence>
 
+      <AnimatePresence>
+        {isComplete && pathData.points.length > 0 && (
+          <>
+        
+
+            {[...Array(12)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute pointer-events-none rounded-full"
+                style={{
+                  top: currentPos.y,
+                  left: currentPos.x,
+                  width: 4,
+                  height: 4,
+                  backgroundColor: 'rgba(250,204,21,0.8)'
+                }}
+                initial={{ scale: 0, opacity: 1, x: 0, y: 0 }}
+                animate={{
+                  scale: [1, 0],
+                  opacity: [1, 0],
+                  x: Math.cos((i * 30) * Math.PI / 180) * 150,
+                  y: Math.sin((i * 30) * Math.PI / 180) * 150
+                }}
+                transition={{ duration: 1, ease: "easeOut", delay: 0.1 }}
+              />
+            ))}
+          </>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
