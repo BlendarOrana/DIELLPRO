@@ -408,7 +408,7 @@ function UnlockScreen() {
                                 background: 'radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(250,204,21,0.6) 20%, transparent 50%)',
                                 filter: 'blur(1px) brightness(5)',
                               }}
-                              initial={{ scale: 0, //opacity: 0 
+                              initial={{ scale: 0, opacity: 0 
                                 }}
                               animate={{ 
                                 scale: [0, 4, 6, 10, 15], 
@@ -433,7 +433,7 @@ function UnlockScreen() {
                                 opacity: [0, 1, 1, 0] 
                               }}
                               transition={{ 
-                                duration: 0.4, 
+                                duration: 0.6, 
                                 ease: "easeOut",
                                 times: [0, 0.2, 0.8, 1]
                               }}
