@@ -2,8 +2,101 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    
+    <!-- Favicon and Icons -->
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    
+    <!-- Viewport and Mobile Optimization -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Mobile Web App Tags -->
+    <meta name="apple-mobile-web-app-title" content="DIELL">
+    <meta name="application-name" content="DIELL">
+    
+    <!-- Theme Colors -->
+    <meta name="theme-color" content="#000000">
+    <meta name="msapplication-TileColor" content="#000000">
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="DIELL - Innovative software solutions and cutting-edge technology development. Professional tech company delivering custom software, mobile apps, and digital transformation services.">
+    <meta name="keywords" content="software solutions, tech company, software development, mobile app development, web development, digital solutions, custom software, technology services, IT consulting, software engineering, app development, digital transformation, tech innovation, programming services, software design">
+    <meta name="author" content="DIELL">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="DIELL">
+    <meta property="og:description" content="Innovative software solutions and cutting-edge technology development. Professional tech company delivering custom software, mobile apps, and digital transformation services.">
+    <meta property="og:url" content="https://diell.com">
+    <meta property="og:site_name" content="DIELL">
+    <meta property="og:image" content="/og-image.png">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="DIELL">
+    <meta name="twitter:description" content="Innovative software solutions and cutting-edge technology development.">
+    <meta name="twitter:image" content="/twitter-image.png">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "DIELL",
+      "url": "https://diell.com",
+      "description": "Professional software solutions and technology development company",
+      "sameAs": []
+    }
+    </script>
+    
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Prevent FOUC (Flash of Unstyled Content) -->
+    <style>
+      /* Basic mobile optimizations */
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #000000;
+        color: #ffffff;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      
+      #root {
+        min-height: 100vh;
+      }
+      
+      /* Loading spinner */
+      .loading {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9999;
+      }
+      
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(255, 255, 255, 0.1);
+        border-top: 4px solid #ffffff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+    
     <title>DIELL</title>
   </head>
   <body>
