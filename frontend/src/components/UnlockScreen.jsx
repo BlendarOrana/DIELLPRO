@@ -251,7 +251,6 @@ function UnlockScreen() {
               </svg>
             </motion.div>
 
-            {/* --- FIX START --- */}
             {/* Draggable Handle: Only render if the path points exist to prevent initial flicker */}
             {pathData.points.length > 0 && (
               <motion.div
@@ -378,46 +377,6 @@ function UnlockScreen() {
         )}
       </AnimatePresence>
 
-      <AnimatePresence>
-        {isComplete && pathData.points.length > 0 && (
-          <>
-            {/* Warp Speed Light Streaks Overlay */}
-            <motion.div
-              className="absolute inset-0 pointer-events-none z-30"
-              style={{
-                  transformOrigin: `${currentPos.x}px ${currentPos.y}px`
-              }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3, delay: 0.3 }}
-            >
-              {/* This div can be used for warp effects if needed */}
-            </motion.div>
-
-            {[...Array(12)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute pointer-events-none rounded-full"
-                style={{
-                  top: currentPos.y,
-                  left: currentPos.x,
-                  width: 4,
-                  height: 4,
-                  backgroundColor: 'rgba(250,204,21,0.8)'
-                }}
-                initial={{ scale: 0, opacity: 1, x: 0, y: 0 }}
-                animate={{
-                  scale: [1, 0],
-                  opacity: [1, 0],
-                  x: Math.cos((i * 30) * Math.PI / 180) * 150,
-                  y: Math.sin((i * 30) * Math.PI / 180) * 150
-                }}
-                transition={{ duration: 1, ease: "easeOut", delay: 0.1 }}
-              />
-            ))}
-          </>
-        )}
-      </AnimatePresence>
     </motion.div>
   );
 }
