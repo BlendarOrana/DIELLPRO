@@ -6,7 +6,7 @@ import { useAppStore } from '../store'; // Import the real store
 const PATH_WIDTH = 40;
 const HANDLE_SIZE = PATH_WIDTH * 1.5;
 const DRAG_SENSITIVITY = 80;
-const PATH_POINTS_COUNT = 800;
+const PATH_POINTS_COUNT = 400;
 const SPIRAL_TURNS = 2.5;
 
 function UnlockScreen() {
@@ -401,7 +401,6 @@ function UnlockScreen() {
               {/* This div can be used for warp effects if needed */}
             </motion.div>
 
-            {/* Particle Burst Effect */}
             {[...Array(12)].map((_, i) => (
               <motion.div
                 key={i}
