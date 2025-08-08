@@ -401,7 +401,7 @@ function UnlockScreen() {
                               }}
                             />
                             
-                            {/* Additional glow layer to simulate box-shadow effect */}
+                            {/* Additional glow layer to simulate box-shadow effect
                             <motion.div
                               className="absolute inset-0 rounded-full pointer-events-none"
                               style={{
@@ -420,7 +420,7 @@ function UnlockScreen() {
                                 times: [0, 0.1, 0.3, 0.7, 1]
                               }}
                             />
-                            
+                             */}
                             {/* Core white flash - matches your second motion.div exactly */}
                             <motion.div
                               className="absolute inset-0 rounded-full pointer-events-none"
@@ -433,7 +433,7 @@ function UnlockScreen() {
                                 opacity: [0, 1, 1, 0] 
                               }}
                               transition={{ 
-                                duration: 0.3, 
+                                duration: 0.4, 
                                 ease: "easeOut",
                                 times: [0, 0.2, 0.8, 1]
                               }}
