@@ -433,7 +433,7 @@ function UnlockScreen() {
                                 opacity: [0, 1, 1, 0] 
                               }}
                               transition={{ 
-                                duration: 0.5, 
+                                duration: 0.3, 
                                 ease: "easeOut",
                                 times: [0, 0.2, 0.8, 1]
                               }}
