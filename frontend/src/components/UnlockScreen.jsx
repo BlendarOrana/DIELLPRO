@@ -386,7 +386,7 @@ function UnlockScreen() {
                               className="absolute inset-0 rounded-full pointer-events-none"
                               style={{
                                 background: 'radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(250,204,21,0.9) 30%, rgba(249,115,22,0.6) 60%, transparent 100%)',
-                                filter: 'blur(0.5px) brightness(5) ', // Subtle blur instead of heavy box-shadow
+                                filter: 'blur(0.5px) ', // Subtle blur instead of heavy box-shadow
                               }}
                               initial={{ scale: 0, opacity: 0 }}
                               animate={{ 
