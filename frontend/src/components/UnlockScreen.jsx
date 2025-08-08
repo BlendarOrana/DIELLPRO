@@ -402,7 +402,7 @@ function UnlockScreen() {
                             />
                             
                             {/* Additional glow layer to simulate box-shadow effect */}
-                            <motion.div
+                            {/* <motion.div
                               className="absolute inset-0 rounded-full pointer-events-none"
                               style={{
                                 background: 'radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(250,204,21,0.6) 20%, transparent 50%)',
@@ -419,10 +419,10 @@ function UnlockScreen() {
                                 ease: "easeOut",
                                 times: [0, 0.1, 0.3, 0.7, 1]
                               }}
-                            />
+                            /> */}
                             
                             {/* Core white flash - matches your second motion.div exactly */}
-                            <motion.div
+                            {/* <motion.div
                               className="absolute inset-0 rounded-full pointer-events-none"
                               style={{
                                 background: 'rgba(255,255,255,1)',
@@ -437,7 +437,7 @@ function UnlockScreen() {
                                 ease: "easeOut",
                                 times: [0, 0.2, 0.8, 1]
                               }}
-                            />
+                            /> */}
                           </>
                         )}
                       </>
