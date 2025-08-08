@@ -28,6 +28,25 @@ function UnlockScreen() {
   const [isDragging, setIsDragging] = useState(false);
   const [isUnlocking, setIsUnlocking] = useState(false);
 
+  // Mobile detection
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      const userAgent = navigator.userAgent.toLowerCase();
+      const isMobileUA = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
+      const isSmallScreen = window.innerWidth <= 768;
+      const hasTouchSupport = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      
+      setIsMobile(isMobileUA || (isSmallScreen && hasTouchSupport));
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const isComplete = progressValue >= 99.5;
 
   // Auto-unlock when complete
@@ -186,7 +205,6 @@ function UnlockScreen() {
   const currentPos = pathData.points[currentPointIndex] || { x: 0, y: 0 };
   const normalizedProgress = progressValue / 100;
   const lightingIntensity = isComplete ? 2.5 : Math.min(normalizedProgress * 1.5, 1);
-  const finalBurst = isComplete ? 1 : 0;
 
   return (
     <motion.div
@@ -320,47 +338,112 @@ function UnlockScreen() {
                   <AnimatePresence>
                     {isComplete && (
                       <>
-                        <motion.div
-                          className="absolute inset-0 rounded-full pointer-events-none"
-                          style={{
-                            background: 'radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(250,204,21,0.9) 30%, rgba(249,115,22,0.6) 60%, transparent 100%)',
-                            boxShadow: '0 0 100px rgba(255,255,255,0.8), 0 0 200px rgba(250,204,21,0.6)'
-                          }}
-                          initial={{ scale: 0, opacity: 0 }}
-                          animate={{ 
-                            scale: [0, 3, 5, 8, 12], 
-                            opacity: [0, 1, 0.8, 0.3, 0] 
-                          }}
-                          transition={{ 
-                            duration: 0.6, 
-                            ease: "easeOut",
-                            times: [0, 0.1, 0.3, 0.7, 1]
-                          }}
-                        />
-                        
-                        <motion.div
-                          className="absolute inset-0 rounded-full pointer-events-none"
-                          style={{
-                            background: 'rgba(255,255,255,1)',
-                          }}
-                          initial={{ scale: 0, opacity: 0 }}
-                          animate={{ 
-                            scale: [0, 1, 2, 0], 
-                            opacity: [0, 1, 1, 0] 
-                          }}
-                          transition={{ 
-                            duration: 0.4, 
-                            ease: "easeOut",
-                            times: [0, 0.2, 0.8, 1]
-                          }}
-                        />
+                        {/* Desktop effects - heavy box-shadow */}
+                        {!isMobile && (
+                          <>
+                            <motion.div
+                              className="absolute inset-0 rounded-full pointer-events-none"
+                              style={{
+                                background: 'radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(250,204,21,0.9) 30%, rgba(249,115,22,0.6) 60%, transparent 100%)',
+                                boxShadow: '0 0 100px rgba(255,255,255,0.8), 0 0 200px rgba(250,204,21,0.6)'
+                              }}
+                              initial={{ scale: 0, opacity: 0 }}
+                              animate={{ 
+                                scale: [0, 3, 5, 8, 12], 
+                                opacity: [0, 1, 0.8, 0.3, 0] 
+                              }}
+                              transition={{ 
+                                duration: 0.6, 
+                                ease: "easeOut",
+                                times: [0, 0.1, 0.3, 0.7, 1]
+                              }}
+                            />
+                            
+                            <motion.div
+                              className="absolute inset-0 rounded-full pointer-events-none"
+                              style={{
+                                background: 'rgba(255,255,255,1)',
+                              }}
+                              initial={{ scale: 0, opacity: 0 }}
+                              animate={{ 
+                                scale: [0, 1, 2, 0], 
+                                opacity: [0, 1, 1, 0] 
+                              }}
+                              transition={{ 
+                                duration: 0.4, 
+                                ease: "easeOut",
+                                times: [0, 0.2, 0.8, 1]
+                              }}
+                            />
+                          </>
+                        )}
+
+                        {/* Mobile effects - optimized with blur instead of box-shadow */}
+                        {isMobile && (
+                          <>
+                            {/* Main expanding effect */}
+                            <motion.div
+                              className="absolute inset-0 rounded-full pointer-events-none"
+                              style={{
+                                background: 'radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(250,204,21,0.9) 30%, rgba(249,115,22,0.6) 60%, transparent 100%)',
+                                filter: 'blur(0.5px)', // Subtle blur instead of heavy box-shadow
+                              }}
+                              initial={{ scale: 0, opacity: 0 }}
+                              animate={{ 
+                                scale: [0, 3, 5, 8, 12], 
+                                opacity: [0, 1, 0.8, 0.3, 0] 
+                              }}
+                              transition={{ 
+                                duration: 0.6, 
+                                ease: "easeOut",
+                                times: [0, 0.1, 0.3, 0.7, 1]
+                              }}
+                            />
+                            
+                            {/* Additional glow layer to simulate box-shadow effect */}
+                            <motion.div
+                              className="absolute inset-0 rounded-full pointer-events-none"
+                              style={{
+                                background: 'radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(250,204,21,0.6) 20%, transparent 50%)',
+                                filter: 'blur(1px)',
+                              }}
+                              initial={{ scale: 0, opacity: 0 }}
+                              animate={{ 
+                                scale: [0, 4, 6, 10, 15], 
+                                opacity: [0, 0.8, 0.6, 0.2, 0] 
+                              }}
+                              transition={{ 
+                                duration: 0.6, 
+                                ease: "easeOut",
+                                times: [0, 0.1, 0.3, 0.7, 1]
+                              }}
+                            />
+                            
+                            {/* Core white flash - matches your second motion.div exactly */}
+                            <motion.div
+                              className="absolute inset-0 rounded-full pointer-events-none"
+                              style={{
+                                background: 'rgba(255,255,255,1)',
+                              }}
+                              initial={{ scale: 0, opacity: 0 }}
+                              animate={{ 
+                                scale: [0, 1, 2, 0], 
+                                opacity: [0, 1, 1, 0] 
+                              }}
+                              transition={{ 
+                                duration: 0.4, 
+                                ease: "easeOut",
+                                times: [0, 0.2, 0.8, 1]
+                              }}
+                            />
+                          </>
+                        )}
                       </>
                     )}
                   </AnimatePresence>
                 </div>
               </motion.div>
             )}
-            {/* --- FIX END --- */}
 
           </motion.div>
         )}
@@ -369,8 +452,6 @@ function UnlockScreen() {
       <AnimatePresence>
         {isComplete && pathData.points.length > 0 && (
           <>
-        
-
             {[...Array(12)].map((_, i) => (
               <motion.div
                 key={i}
