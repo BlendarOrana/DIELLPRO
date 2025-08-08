@@ -282,7 +282,7 @@ function UnlockScreen() {
                 }}
                 animate={isComplete ? {
                   scale: 1.8,
-                  filter: 'brightness(5) '
+                  // filter: 'brightness(5) '
                 } : {
                   scale: 1,
                   filter: 'brightness(1)'
