@@ -422,7 +422,7 @@ function UnlockScreen() {
                             />
                              */}
                             {/* Core white flash - matches your second motion.div exactly */}
-                            <motion.div
+                            {/* <motion.div
                               className="absolute inset-0 rounded-full pointer-events-none"
                               style={{
                                 background: 'rgba(255,255,255,1)',
@@ -437,7 +437,7 @@ function UnlockScreen() {
                                 ease: "easeOut",
                                 times: [0, 0.2, 0.8, 1]
                               }}
-                            />
+                            /> */}
                           </>
                         )}
                       </>
