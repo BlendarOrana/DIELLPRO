@@ -391,7 +391,8 @@ function UnlockScreen() {
                               initial={{ scale: 0, opacity: 0 }}
                               animate={{ 
                                 scale: [0, 3, 5, 8, 12], 
-                                opacity: [0, 1, 0.8, 0.3, 0] 
+                                opacity: [0, 1, 0.8, 0.3, 0] ,
+                                 filter: 'brightness(5)'
                               }}
                               transition={{ 
                                 duration: 0.6, 
