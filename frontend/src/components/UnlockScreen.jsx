@@ -388,8 +388,7 @@ function UnlockScreen() {
                                 background: 'radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(250,204,21,0.9) 30%, rgba(249,115,22,0.6) 60%, transparent 100%)',
                                 filter: 'blur(0.5px) ', // Subtle blur instead of heavy box-shadow
                               }}
-                              initial={{ scale: 0, //opacity: 0*
-                                 }}
+                              initial={{ scale: 0, opacity: 0 }}
                               animate={{ 
                                 scale: [0, 3, 5, 8, 12], 
                                 opacity: [0, 1, 0.8, 0.3, 0] ,
@@ -409,7 +408,8 @@ function UnlockScreen() {
                                 background: 'radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(250,204,21,0.6) 20%, transparent 50%)',
                                 filter: 'blur(1px) brightness(5)',
                               }}
-                              initial={{ scale: 0, opacity: 0 }}
+                              initial={{ scale: 0, //opacity: 0 
+                                }}
                               animate={{ 
                                 scale: [0, 4, 6, 10, 15], 
                                 opacity: [0, 0.8, 0.6, 0.2, 0] 
