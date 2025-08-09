@@ -386,12 +386,13 @@ function UnlockScreen() {
                               className="absolute inset-0 rounded-full pointer-events-none"
                               style={{
                                 background: 'radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(250,204,21,0.9) 30%, rgba(249,115,22,0.6) 60%, transparent 100%)',
-                                filter: 'blur(0.5px)', // Subtle blur instead of heavy box-shadow
+                                filter: 'blur(0.5px) ', // Subtle blur instead of heavy box-shadow
                               }}
                               initial={{ scale: 0, opacity: 0 }}
                               animate={{ 
                                 scale: [0, 3, 5, 8, 12], 
-                                opacity: [0, 1, 0.8, 0.3, 0]
+                                opacity: [0, 1, 0.8, 0.3, 0] ,
+                                 filter: 'brightness(5)'
                               }}
                               transition={{ 
                                 duration: 0.6, 
@@ -399,6 +400,8 @@ function UnlockScreen() {
                                 times: [0, 0.1, 0.3, 0.7, 1]
                               }}
                             />
+                            
+                  
                           </>
                         )}
                       </>
