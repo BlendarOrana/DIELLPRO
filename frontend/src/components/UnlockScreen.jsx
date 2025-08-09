@@ -255,7 +255,7 @@ function UnlockScreen() {
                   strokeDashoffset={pathLength * (1 - normalizedProgress)}
                   style={{
                     transition: 'none',
-                    filter: isComplete ? 'brightness(1.5) drop-shadow(0 0 20px #facc15)' : 'none'
+                    // filter: isComplete ? 'brightness(1.5) drop-shadow(0 0 20px #facc15)' : 'none'
                   }}
                 />
                 {isComplete && pathData.points.length > 0 && (
@@ -401,43 +401,7 @@ function UnlockScreen() {
                               }}
                             />
                             
-                            {/* Additional glow layer to simulate box-shadow effect */}
-                            {/* <motion.div
-                              className="absolute inset-0 rounded-full pointer-events-none"
-                              style={{
-                                background: 'radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(250,204,21,0.6) 20%, transparent 50%)',
-                                filter: 'blur(1px) brightness(5)',
-                              }}
-                              initial={{ scale: 0, //opacity: 0 
-                                }}
-                              animate={{ 
-                                scale: [0, 4, 6, 10, 15], 
-                                opacity: [0, 0.8, 0.6, 0.2, 0] 
-                              }}
-                              transition={{ 
-                                duration: 0.6, 
-                                ease: "easeOut",
-                                times: [0, 0.1, 0.3, 0.7, 1]
-                              }}
-                            /> */}
-                            
-                            {/* Core white flash - matches your second motion.div exactly */}
-                            {/* <motion.div
-                              className="absolute inset-0 rounded-full pointer-events-none"
-                              style={{
-                                background: 'rgba(255,255,255,1)',
-                              }}
-                              initial={{ scale: 0, opacity: 0 }}
-                              animate={{ 
-                                scale: [0, 1, 2, 0], 
-                                opacity: [0, 1, 1, 0] 
-                              }}
-                              transition={{ 
-                                duration: 0.4, 
-                                ease: "easeOut",
-                                times: [0, 0.2, 0.8, 1]
-                              }}
-                            /> */}
+                  
                           </>
                         )}
                       </>
