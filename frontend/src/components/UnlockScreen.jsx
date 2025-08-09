@@ -222,8 +222,8 @@ function UnlockScreen() {
             {/* Main Spiral Container */}
             <motion.div
               className="absolute top-0 left-0 h-full w-full"
-              // animate={isComplete ? { opacity: 0 } : { opacity: 1 }}
-              // transition={{ duration: 0.5, ease: "easeOut" }}
+              animate={isComplete ? { opacity: 0 } : { opacity: 1 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
             >
               <svg className="absolute top-0 left-0 h-full w-full pointer-events-none">
                 <defs>
