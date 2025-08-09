@@ -222,8 +222,8 @@ function UnlockScreen() {
             {/* Main Spiral Container */}
             <motion.div
               className="absolute top-0 left-0 h-full w-full"
-              animate={isComplete ? { opacity: 0 } : { opacity: 1 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
+              // animate={isComplete ? { opacity: 0 } : { opacity: 1 }}
+              // transition={{ duration: 0.5, ease: "easeOut" }}
             >
               <svg className="absolute top-0 left-0 h-full w-full pointer-events-none">
                 <defs>
@@ -255,7 +255,7 @@ function UnlockScreen() {
                   strokeDashoffset={pathLength * (1 - normalizedProgress)}
                   style={{
                     transition: 'none',
-                    // filter: isComplete ? 'brightness(1.5) drop-shadow(0 0 20px #facc15)' : 'none'
+                    filter: isComplete ? 'brightness(1.5) drop-shadow(0 0 20px #facc15)' : 'none'
                   }}
                 />
                 {isComplete && pathData.points.length > 0 && (
