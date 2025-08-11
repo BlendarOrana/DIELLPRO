@@ -291,7 +291,7 @@ const lightingIntensity = isComplete ? 2.5 : Math.min(normalizedProgress * 1.5, 
   y: { type: 'spring', stiffness: 3000, damping: 50 },
   scale: { duration: isComplete ? 0.2 : 0.3, ease: "easeOut" },
   filter: { 
-    duration: isComplete ? (isMobile ? 1.5 : 0.2) : 0.5, 
+    duration: isComplete ? (isMobile ? 2.0 : 0.2) : 0.5, 
     ease: "easeOut" 
   }
 }}
