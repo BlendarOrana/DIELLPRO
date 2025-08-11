@@ -204,8 +204,7 @@ function UnlockScreen() {
   const currentPointIndex = getCurrentPointIndex();
   const currentPos = pathData.points[currentPointIndex] || { x: 0, y: 0 };
   const normalizedProgress = progressValue / 100;
-  const lightingIntensity = isComplete ? 2.5 : Math.min(normalizedProgress * 1.5, 1);
-
+const lightingIntensity = isComplete ? 1 : Math.min(normalizedProgress * 1.5, 1);
   return (
     <motion.div
       ref={containerRef}
@@ -291,7 +290,7 @@ function UnlockScreen() {
                   x: { type: 'spring', stiffness: 3000, damping: 50 },
                   y: { type: 'spring', stiffness: 3000, damping: 50 },
                   scale: { duration: isComplete ? 0.2 : 0.3, ease: "easeOut" },
-                  filter: { duration: isComplete ? 0.5 : 0.5, ease: "easeOut" }
+                  filter: { duration: isComplete ? 0.2 : 0.5, ease: "easeOut" }
                 }}
                 onPointerDown={handlePointerDown}
                 whileHover={!isComplete ? { scale: 1.1 } : {}}
