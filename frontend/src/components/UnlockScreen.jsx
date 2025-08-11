@@ -204,8 +204,7 @@ function UnlockScreen() {
   const currentPointIndex = getCurrentPointIndex();
   const currentPos = pathData.points[currentPointIndex] || { x: 0, y: 0 };
   const normalizedProgress = progressValue / 100;
-  const lightingIntensity = isComplete ? 1 : Math.min(normalizedProgress * 1.5, 1);
-
+const lightingIntensity = isComplete ? 2.5 : Math.min(normalizedProgress * 1.5, 1);
   return (
     <motion.div
       ref={containerRef}
@@ -282,13 +281,16 @@ function UnlockScreen() {
                 }}
                 animate={isComplete ? {
                   scale: 1.8,
+                  filter: 'brightness(5) '
                 } : {
                   scale: 1,
+                  filter: 'brightness(1)'
                 }}
                 transition={{
                   x: { type: 'spring', stiffness: 3000, damping: 50 },
                   y: { type: 'spring', stiffness: 3000, damping: 50 },
                   scale: { duration: isComplete ? 0.2 : 0.3, ease: "easeOut" },
+                  filter: { duration: isComplete ? 0.2 : 0.5, ease: "easeOut" }
                 }}
                 onPointerDown={handlePointerDown}
                 whileHover={!isComplete ? { scale: 1.1 } : {}}
@@ -313,11 +315,7 @@ function UnlockScreen() {
                           height: isComplete ? '12px' : '8px',
                           transform: `rotate(${i * 45}deg) translateY(-${PATH_WIDTH * 0.4}px)`,
                           backgroundColor: lightingIntensity > 0.3 ? `rgba(250, 204, 21, ${Math.min(lightingIntensity, 1)})` : 'rgba(100,100,100,0.6)',
-                          // Conditionally apply box-shadow only on desktop
-                          boxShadow: !isMobile ? (
-                            isComplete ? `0 0 15px rgba(250, 204, 21, ${lightingIntensity})` : 
-                            lightingIntensity > 0.5 ? `0 0 10px rgba(250, 204, 21, ${lightingIntensity})` : 'none'
-                          ) : 'none',
+                          boxShadow: isComplete ? `0 0 15px rgba(250, 204, 21, ${lightingIntensity})` : lightingIntensity > 0.5 ? `0 0 10px rgba(250, 204, 21, ${lightingIntensity})` : 'none',
                           transition: 'all 0.3s ease-out'
                         }}
                       />
@@ -379,27 +377,29 @@ function UnlockScreen() {
                           </>
                         )}
 
-                        {/* Mobile effects - no heavy effects to prevent flashing */}
+                        {/* Mobile effects - optimized with blur instead of box-shadow */}
                         {isMobile && (
                           <>
-                            {/* Simplified mobile effect without heavy shadows or brightness */}
+                            {/* Main expanding effect */}
                             <motion.div
                               className="absolute inset-0 rounded-full pointer-events-none"
                               style={{
-                                background: 'radial-gradient(circle, rgba(250,204,21,0.6) 0%, rgba(249,115,22,0.4) 50%, transparent 100%)',
-                                // No box-shadow on mobile to prevent flashing
+                                background: 'radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(250,204,21,0.9) 30%, rgba(249,115,22,0.6) 60%, transparent 100%)',
+                                filter: 'blur(0.5px) ', // Subtle blur instead of heavy box-shadow
                               }}
                               initial={{ scale: 0, opacity: 0 }}
                               animate={{ 
-                                scale: [0, 2, 4, 6], 
-                                opacity: [0, 0.8, 0.4, 0] 
+                                scale: [0, 3, 5, 8, 12], 
+                                opacity: [0, 1, 0.8, 0.3, 0] ,
                               }}
                               transition={{ 
                                 duration: 0.6, 
                                 ease: "easeOut",
-                                times: [0, 0.2, 0.6, 1]
+                                times: [0, 0.1, 0.3, 0.7, 1]
                               }}
                             />
+                            
+                  
                           </>
                         )}
                       </>
