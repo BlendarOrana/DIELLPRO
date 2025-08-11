@@ -27,7 +27,7 @@ const SuccessDisplay = ({ message, onClose }) => (
     </h3>
 
     <p className="text-slate-300 font-mono text-xs sm:text-sm max-w-sm px-4">
-     Thanks for reaching out!
+Thanks for reaching out to us! We'll be in touch soon.
     </p>
 
     <div className="pt-4 w-full">
