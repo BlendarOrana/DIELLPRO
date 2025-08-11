@@ -425,7 +425,7 @@ const lightingIntensity = isComplete ? 2.5 : Math.min(normalizedProgress * 1.5, 
                   left: currentPos.x,
                   width: 4,
                   height: 4,
-                  backgroundColor: 'rgba(250,204,21,0.8)'
+                  // backgroundColor: 'rgba(250,204,21,0.8)'
                 }}
                 initial={{ scale: 0, opacity: 1, x: 0, y: 0 }}
                 animate={{
