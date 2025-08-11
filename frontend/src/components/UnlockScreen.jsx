@@ -282,7 +282,7 @@ function UnlockScreen() {
                 }}
                 animate={isComplete ? {
                   scale: 1.8,
-                  filter: 'brightness(5) '
+                  // filter: 'brightness(5) '
                 } : {
                   scale: 1,
                   filter: 'brightness(1)'
@@ -291,7 +291,7 @@ function UnlockScreen() {
                   x: { type: 'spring', stiffness: 3000, damping: 50 },
                   y: { type: 'spring', stiffness: 3000, damping: 50 },
                   scale: { duration: isComplete ? 0.2 : 0.3, ease: "easeOut" },
-                  filter: { duration: isComplete ? 0.2 : 0.5, ease: "easeOut" }
+                  // filter: { duration: isComplete ? 0.2 : 0.5, ease: "easeOut" }
                 }}
                 onPointerDown={handlePointerDown}
                 whileHover={!isComplete ? { scale: 1.1 } : {}}
