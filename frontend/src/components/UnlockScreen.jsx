@@ -281,17 +281,20 @@ const lightingIntensity = isComplete ? 2.5 : Math.min(normalizedProgress * 1.5, 
                 }}
                 animate={isComplete ? {
                   scale: 1.8,
-                  // filter: 'brightness(5) '
+                  filter: 'brightness(5) '
                 } : {
                   scale: 1,
                   filter: 'brightness(1)'
                 }}
-                transition={{
-                  x: { type: 'spring', stiffness: 3000, damping: 50 },
-                  y: { type: 'spring', stiffness: 3000, damping: 50 },
-                  scale: { duration: isComplete ? 0.2 : 0.3, ease: "easeOut" },
-                  filter: { duration: isComplete ? 0.2 : 0.5, ease: "easeOut" }
-                }}
+               transition={{
+  x: { type: 'spring', stiffness: 3000, damping: 50 },
+  y: { type: 'spring', stiffness: 3000, damping: 50 },
+  scale: { duration: isComplete ? 0.2 : 0.3, ease: "easeOut" },
+  filter: { 
+    duration: isComplete ? (isMobile ? 1.5 : 0.2) : 0.5, 
+    ease: "easeOut" 
+  }
+}}
                 onPointerDown={handlePointerDown}
                 whileHover={!isComplete ? { scale: 1.1 } : {}}
                 whileTap={!isComplete ? { scale: 1.2 } : {}}
