@@ -204,7 +204,7 @@ function UnlockScreen() {
   const currentPointIndex = getCurrentPointIndex();
   const currentPos = pathData.points[currentPointIndex] || { x: 0, y: 0 };
   const normalizedProgress = progressValue / 100;
-const lightingIntensity = isComplete ? 1 : Math.min(normalizedProgress * 1.5, 1);
+const lightingIntensity = isComplete ? 2.5 : Math.min(normalizedProgress * 1.5, 1);
   return (
     <motion.div
       ref={containerRef}
@@ -384,7 +384,7 @@ const lightingIntensity = isComplete ? 1 : Math.min(normalizedProgress * 1.5, 1)
                             <motion.div
                               className="absolute inset-0 rounded-full pointer-events-none"
                               style={{
-                                background: 'radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(250,204,21,0.9) 30%, rgba(249,115,22,0.6) 60%, transparent 100%)',
+                                // background: 'radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(250,204,21,0.9) 30%, rgba(249,115,22,0.6) 60%, transparent 100%)',
                                 filter: 'blur(0.5px) ', // Subtle blur instead of heavy box-shadow
                               }}
                               initial={{ scale: 0, opacity: 0 }}
