@@ -1,0 +1,6 @@
+
+User-agent: *
+Allow: /
+
+# Location of the sitemap file
+Sitemap: https://diell.pro/sitemap.xml
