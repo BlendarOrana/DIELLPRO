@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '../store'; // Import the real store
+import { DiellLogo } from 'diell-logo';
 
 // Constants for styling and behavior
 const PATH_WIDTH = 40;
@@ -204,7 +205,22 @@ function UnlockScreen() {
   const currentPointIndex = getCurrentPointIndex();
   const currentPos = pathData.points[currentPointIndex] || { x: 0, y: 0 };
   const normalizedProgress = progressValue / 100;
-const lightingIntensity = isComplete ? 2.5 : Math.min(normalizedProgress * 1.5, 1);
+  const lightingIntensity = isComplete ? 2.5 : Math.min(normalizedProgress * 1.5, 1);
+
+  // Calculate dynamic color for DiellLogo based on progress
+  const getLogoColor = () => {
+    if (isComplete) return '#ffffff'; // White when complete
+    if (lightingIntensity > 0.3) {
+      // Interpolate between gray and yellow based on lighting intensity
+      const intensity = Math.min(lightingIntensity, 1);
+      const red = Math.floor(100 + (250 - 100) * intensity);
+      const green = Math.floor(100 + (204 - 100) * intensity);
+      const blue = Math.floor(100 + (21 - 100) * intensity);
+      return `rgb(${red}, ${green}, ${blue})`;
+    }
+    return 'rgba(100,100,100,0.6)'; // Gray when inactive
+  };
+
   return (
     <motion.div
       ref={containerRef}
@@ -268,7 +284,7 @@ const lightingIntensity = isComplete ? 2.5 : Math.min(normalizedProgress * 1.5, 
               </svg>
             </motion.div>
 
-            {/* Draggable Handle: Only render if the path points exist to prevent initial flicker */}
+            {/* Draggable Handle with DiellLogo: Only render if the path points exist to prevent initial flicker */}
             {pathData.points.length > 0 && (
               <motion.div
                 className="absolute flex items-center justify-center"
@@ -299,43 +315,13 @@ const lightingIntensity = isComplete ? 2.5 : Math.min(normalizedProgress * 1.5, 
                 whileHover={!isComplete ? { scale: 1.1 } : {}}
                 whileTap={!isComplete ? { scale: 1.2 } : {}}
               >
-                {/* Handle's visual elements */}
-                <div className="relative w-full h-full">
-                  <div
-                    className="absolute inset-0 rounded-full flex items-center justify-center transition-all duration-300 ease-out"
-                    style={{
-                      borderColor: lightingIntensity > 0.3 ? `rgba(250, 204, 21, ${Math.min(lightingIntensity, 1)})` : 'rgba(100,100,100,0.6)',
-                      transform: isComplete ? 'scale(1.2)' : 'scale(1)'
-                    }}
-                  >
-      
-                  
-                    {[...Array(8)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="absolute w-1 origin-bottom"
-                        style={{
-                          height: isComplete ? '12px' : '8px',
-                          transform: `rotate(${i * 45}deg) translateY(-${PATH_WIDTH * 0.4}px)`,
-                          backgroundColor: lightingIntensity > 0.3 ? `rgba(250, 204, 21, ${Math.min(lightingIntensity, 1)})` : 'rgba(100,100,100,0.6)',
-                          boxShadow: isComplete ? `0 0 15px rgba(250, 204, 21, ${lightingIntensity})` : lightingIntensity > 0.5 ? `0 0 10px rgba(250, 204, 21, ${lightingIntensity})` : 'none',
-                          transition: 'all 0.3s ease-out'
-                        }}
-                      />
-                    ))}
-                    
-                    <div
-                      className="absolute rounded-full transition-all duration-300 ease-out"
-                      style={{
-                        width: isComplete ? '20px' : '16px',
-                        height: isComplete ? '20px' : '16px',
-                        left: '50%',
-                      top: isComplete ? 'calc(50% + 5px)' : 'calc(50% + 3px)',
-                        transform: 'translate(-50%, -50%)',
-                        backgroundColor: lightingIntensity > 0.2 ? `rgba(250, 204, 21, ${Math.min(lightingIntensity, 1)})` : 'rgba(100,100,100,0.6)',
-                      }}
-                    />
-                  </div>
+                {/* DiellLogo as the handle */}
+                <div className="relative w-full h-full flex items-center justify-center">
+                  <DiellLogo
+                    size={80}
+                    primaryColor={getLogoColor()}
+                    text=""
+                  />
                   
                   <AnimatePresence>
                     {isComplete && (
@@ -401,8 +387,6 @@ const lightingIntensity = isComplete ? 2.5 : Math.min(normalizedProgress * 1.5, 
                                 times: [0, 0.1, 0.3, 0.7, 1]
                               }}
                             />
-                            
-                  
                           </>
                         )}
                       </>
