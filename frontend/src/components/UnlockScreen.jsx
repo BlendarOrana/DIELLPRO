@@ -55,7 +55,7 @@ function UnlockScreen() {
     if (isComplete && !isUnlocking) {
       setIsUnlocking(true);
       setIsDragging(false); // Stop dragging immediately
-      // Adjusted timeout to match the full duration of the completion animation.
+      // Keep the full duration for all effects to complete
       setTimeout(() => unlock(), 2500);
     }
   }, [isComplete, isUnlocking, unlock]);
@@ -209,7 +209,7 @@ function UnlockScreen() {
 
   // Calculate dynamic color for DiellLogo based on progress
   const getLogoColor = () => {
-    if (isComplete) return '#ffffff'; // White when complete
+    if (isComplete) return '#fbbf24'; // Keep the yellow color when complete
     if (lightingIntensity > 0.3) {
       // Interpolate between gray and yellow based on lighting intensity
       const intensity = Math.min(lightingIntensity, 1);
@@ -218,7 +218,7 @@ function UnlockScreen() {
       const blue = Math.floor(100 + (21 - 100) * intensity);
       return `rgb(${red}, ${green}, ${blue})`;
     }
-    return 'rgba(100,100,100,0.6)'; // Gray when inactive
+    return '#646464'; // Gray when inactive (solid color instead of rgba)
   };
 
   return (
@@ -238,7 +238,7 @@ function UnlockScreen() {
             <motion.div
               className="absolute top-0 left-0 h-full w-full"
               animate={isComplete ? { opacity: 0 } : { opacity: 1 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
             >
               <svg className="absolute top-0 left-0 h-full w-full pointer-events-none">
                 <defs>
@@ -289,15 +289,15 @@ function UnlockScreen() {
               <motion.div
                 className="absolute flex items-center justify-center"
                 style={{
-                  width: HANDLE_SIZE,
-                  height: HANDLE_SIZE,
-                  x: currentPos.x - HANDLE_SIZE / 2,
-                  y: currentPos.y - HANDLE_SIZE / 2,
+                  width: 80,
+                  height: 80,
+                  x: currentPos.x - 40,
+                  y: currentPos.y - 40,
                   touchAction: 'none'
                 }}
                 animate={isComplete ? {
                   scale: 1.8,
-                  filter: 'brightness(5) '
+                  filter: ['brightness(1)', 'brightness(3)', 'brightness(1)']
                 } : {
                   scale: 1,
                   filter: 'brightness(1)'
@@ -307,8 +307,9 @@ function UnlockScreen() {
   y: { type: 'spring', stiffness: 3000, damping: 50 },
   scale: { duration: isComplete ? 0.2 : 0.3, ease: "easeOut" },
   filter: { 
-    duration: isComplete ? (isMobile ? 2.5 : 0.2) : 0.5, 
-    ease: "easeOut" 
+    duration: isComplete ? 2.0 : 0.5, 
+    ease: "easeOut",
+    times: isComplete ? [0, 0.1, 1] : undefined
   }
 }}
                 onPointerDown={handlePointerDown}
@@ -321,6 +322,7 @@ function UnlockScreen() {
                     size={80}
                     primaryColor={getLogoColor()}
                     text=""
+                    showText={false}
                   />
                   
                   <AnimatePresence>
@@ -366,7 +368,6 @@ function UnlockScreen() {
                           </>
                         )}
 
-                        {/* Mobile effects - optimized with blur instead of box-shadow */}
                         {isMobile && (
                           <>
                             {/* Main expanding effect */}
