@@ -489,53 +489,34 @@ useEffect(() => {
 // Add this to your DiellPage component, replacing or adding to your existing useEffect hooks
 
 useEffect(() => {
-    let touchStartX = 0;
     let touchStartY = 0;
-    let touchStartTime = 0;
-    let lastTouchX = 0;
     let lastTouchY = 0;
-    let touchVelocityX = 0;
-    let touchVelocityY = 0;
     let isTrackingTouch = false;
-    let touchMoveCount = 0;
     
     const handleTouchStart = (e) => {
         if (isTransitioning) return;
         
         const touch = e.touches[0];
-        touchStartX = touch.clientX;
         touchStartY = touch.clientY;
-        lastTouchX = touch.clientX;
         lastTouchY = touch.clientY;
-        touchStartTime = Date.now();
-        touchVelocityX = 0;
-        touchVelocityY = 0;
         isTrackingTouch = true;
-        touchMoveCount = 0;
     };
     
     const handleTouchMove = (e) => {
         if (!isTrackingTouch || isTransitioning) return;
         
         const touch = e.touches[0];
-        const currentX = touch.clientX;
         const currentY = touch.clientY;
-        const deltaX = currentX - lastTouchX;
         const deltaY = currentY - lastTouchY;
-        
-        // Calculate velocity for momentum-based transitions
-        touchVelocityX = deltaX;
-        touchVelocityY = deltaY;
-        touchMoveCount++;
         
         if (isHorizontalMode) {
             // Prevent default scrolling behavior in horizontal mode
             e.preventDefault();
             
-            // Apply horizontal scrolling (inverted for natural touch feel)
-            const scrollSensitivity = 1.2;
+            // Use vertical swipes to control horizontal scrolling (like mouse wheel)
+            const scrollSensitivity = 2.0;
             targetScrollX.current = Math.max(0, 
-                Math.min(targetScrollX.current - (deltaX * scrollSensitivity), totalHorizontalWidth)
+                Math.min(targetScrollX.current - deltaY * scrollSensitivity, totalHorizontalWidth)
             );
         } else {
             // In vertical mode, let native scrolling handle most of the work
@@ -547,7 +528,6 @@ useEffect(() => {
             }
         }
         
-        lastTouchX = currentX;
         lastTouchY = currentY;
     };
     
@@ -555,33 +535,19 @@ useEffect(() => {
         if (!isTrackingTouch || isTransitioning) return;
         
         const touch = e.changedTouches[0];
-        const endX = touch.clientX;
         const endY = touch.clientY;
-        const deltaX = endX - touchStartX;
-        const deltaY = endY - touchStartY;
-        const touchDuration = Date.now() - touchStartTime;
-        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        
-        // Determine if this was a swipe gesture
-        const isSwipe = distance > 50 && touchDuration < 500 && touchMoveCount > 5;
-        const swipeVelocity = distance / touchDuration;
+        const totalDeltaY = endY - touchStartY;
         
         if (isHorizontalMode) {
-            // Handle transition from horizontal to vertical mode
-            const isAtEnd = targetScrollX.current >= totalHorizontalWidth * 0.95;
-            const isSwipeUp = deltaY < -30 && Math.abs(deltaY) > Math.abs(deltaX);
-            const hasUpwardVelocity = touchVelocityY < -5;
-            
-            // Transition conditions: at end of horizontal scroll AND (swipe up OR strong upward velocity)
-            if (isAtEnd && (isSwipeUp || hasUpwardVelocity)) {
-                // Ensure we're at the very end
+            // Check if we're at the end and user swiped up (like wheel scroll down)
+            if (targetScrollX.current >= totalHorizontalWidth && totalDeltaY < -10) {
                 targetScrollX.current = totalHorizontalWidth;
                 setIsTransitioning(true);
                 
-                // Start transition to vertical mode
+                // Start the transition to vertical mode
                 setTimeout(() => setIsHorizontalMode(false), 200);
                 
-                // === FAST FALL ANIMATION (same as wheel) === //
+                // === FAST FALL ANIMATION === //
                 setTimeout(() => {
                     const container = verticalContentRef.current;
                     if (!container) return;
@@ -610,25 +576,14 @@ useEffect(() => {
                     
                     requestAnimationFrame(animateFall);
                 }, 400);
-            } else if (swipeVelocity > 0.5) {
-                // Apply momentum scrolling for fast swipes
-                const momentum = Math.min(swipeVelocity * 100, screenW * 0.5);
-                const direction = deltaX > 0 ? 1 : -1;
-                targetScrollX.current = Math.max(0, 
-                    Math.min(targetScrollX.current - (momentum * direction), totalHorizontalWidth)
-                );
             }
         } else {
             // Handle transition from vertical to horizontal mode
             const container = verticalContentRef.current;
             if (!container) return;
             
-            const isAtTop = container.scrollTop <= 5; // Small tolerance
-            const isSwipeDown = deltaY > 50 && Math.abs(deltaY) > Math.abs(deltaX);
-            const hasDownwardVelocity = touchVelocityY > 10;
-            
-            // Transition conditions: at top of vertical scroll AND (swipe down OR strong downward velocity)
-            if (isAtTop && (isSwipeDown || hasDownwardVelocity)) {
+            // Check if we're at the top and user swiped down (like wheel scroll up)
+            if (container.scrollTop <= 0 && totalDeltaY > 10) {
                 container.scrollTo({ top: 0, behavior: 'auto' });
                 setIsTransitioning(true);
                 setIsHorizontalMode(true);
@@ -639,27 +594,20 @@ useEffect(() => {
         isTrackingTouch = false;
     };
     
-    // Prevent context menu on long press (optional, for better UX)
-    const handleContextMenu = (e) => {
-        e.preventDefault();
-    };
-    
     const node = pageContainerRef.current;
     if (!node) return;
     
     // Add touch event listeners
-    node.addEventListener('touchstart', handleTouchStart, { passive: false });
+    node.addEventListener('touchstart', handleTouchStart, { passive: true });
     node.addEventListener('touchmove', handleTouchMove, { passive: false });
     node.addEventListener('touchend', handleTouchEnd, { passive: true });
-    node.addEventListener('contextmenu', handleContextMenu);
     
     return () => {
         node.removeEventListener('touchstart', handleTouchStart);
         node.removeEventListener('touchmove', handleTouchMove);
         node.removeEventListener('touchend', handleTouchEnd);
-        node.removeEventListener('contextmenu', handleContextMenu);
     };
-}, [isHorizontalMode, isTransitioning, totalHorizontalWidth, screenW]);
+}, [isHorizontalMode, isTransitioning, totalHorizontalWidth]);
 
     // Vertical scroll progress tracker
     useEffect(() => {
