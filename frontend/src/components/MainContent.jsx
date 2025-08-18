@@ -1,616 +1,725 @@
-import { useState, useEffect } from 'react';
-import { useAppStore } from '../store'; // Adjust path as needed
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion'; // Added for animations
+import { DiellLogo } from 'diell-logo'; // Assuming this is your logo component
+import VerticalContent from './VerticalContent'; // This remains untouched
+import {
+    Laptop,
+    WandSparkles,
+    MoveUpRight,
+    Sun,
+    Moon,
+    Bell,
+    Settings,
+    User,
+    Heart,
+    MessageCircle,
+    Share,
+    Play,
+    Pause,
+    SkipForward,
+    Volume2,
+    Wifi,
+    Battery,
+    Signal
+} from 'lucide-react';
 
-const SuccessDisplay = ({ message, onClose }) => (
-  <div className="flex flex-col items-center justify-center text-center py-4 space-y-5 opacity-0 animate-[successFadeIn_0.8s_ease-out_forwards]">
-    
-    <div className="relative h-20 w-20 sm:h-28 sm:w-28">
-      {/* Genesis energy ring */}
-      <div className="absolute inset-0 rounded-full bg-gradient-to-r from-green-400/20 to-emerald-400/20 animate-spin-slow blur-sm"></div>
-      
-      <svg className="w-full h-full relative z-10" viewBox="0 0 100 100">
-        {/* Glowing circle that draws in */}
-        <circle 
-          className="success-circle" 
-          cx="50" cy="50" r="48"
-        />
-        {/* Checkmark path that draws in after the circle */}
-        <path 
-          className="success-checkmark" 
-          d="M30 52l14 14 26-26"
-        />
-      </svg>
-    </div>
 
-    <h3 className="text-lg sm:text-xl font-bold text-green-400 font-mono tracking-wider pt-2 drop-shadow-[0_0_8px_rgba(74,222,128,0.8)]">
-      Message sent
-    </h3>
 
-    <p className="text-slate-300 font-mono text-xs sm:text-sm max-w-sm px-4">
-Thanks for reaching out to us! We'll be in touch soon.
-    </p>
 
-    <div className="pt-4 w-full">
-      <button
-        onClick={onClose}
-        className="btn-form btn-confirm w-full max-w-xs mx-auto font-bold text-xs sm:text-sm tracking-wider !border-green-500/50 !text-green-300 !bg-green-500/20 hover:!bg-green-500/30 hover:!shadow-[0_0_20px_rgba(74,222,128,0.4)]"
-      >
-        _ACKNOWLEDGE & CLOSE
-      </button>
-    </div>
-  </div>
+
+
+
+
+// --- HELPER & DECORATIVE COMPONENTS --- //
+const TechStackCarousel = () => {
+    const skills = [
+        { text: 'React', color: '#61DAFB' },
+        { text: 'Framer Motion', color: '#BB44B3' },
+        { text: 'TypeScript', color: '#3178C6' },
+        { text: 'Tailwind CSS', color: '#38BDF8' },
+        { text: 'DaisyUI', color: '#fbbf24' },
+    ];
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentIndex(prev => (prev + 1) % skills.length);
+        }, 2500);
+        return () => clearInterval(interval);
+    }, [skills.length]);
+
+    return (
+        <div className="mt-8 flex flex-wrap gap-3" aria-label="Our Tech Stack">
+            {skills.map((skill, index) => {
+                const isActive = index === currentIndex;
+                return (
+                    <div
+                        key={skill.text}
+                        className="font-mono text-sm font-bold h-10 flex items-center justify-center px-4 rounded-full border transition-all duration-500"
+                        style={{
+                            color: isActive ? '#0a0a0a' : skill.color,
+                            backgroundColor: isActive ? skill.color : 'rgba(255, 255, 255, 0.05)',
+                            borderColor: skill.color,
+                            boxShadow: isActive ? `0 0 20px ${skill.color}` : 'none',
+                        }}
+                    >
+                        <span>{skill.text}</span>
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
+
+
+// --- REFACTORED AUTOMATED MULTI-DEMO SHOWCASE --- //
+
+// Animation variants for Framer Motion
+const demoVariants = {
+    initial: { opacity: 0, x: 50, scale: 0.98 },
+    animate: { opacity: 1, x: 0, scale: 1 },
+    exit: { opacity: 0, x: -50, scale: 0.98 },
+};
+const transition = { type: 'spring', stiffness: 300, damping: 30, duration: 0.6 };
+
+// Individual Demo Components for clarity and separation of concerns
+const ThemeDemo = ({ theme, isDarkMode, setIsDarkMode }) => (
+    <motion.div variants={demoVariants} initial="initial" animate="animate" exit="exit" transition={transition} className={`w-full h-full p-6 space-y-4 ${theme.text}`}>
+        <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold">Settings</h3>
+            <motion.div
+                className={`relative w-14 h-8 rounded-full cursor-pointer flex items-center transition-colors duration-500 ${isDarkMode ? 'bg-yellow-500 justify-end' : 'bg-neutral-300 justify-start'}`}
+                onClick={() => setIsDarkMode(!isDarkMode)}
+            >
+                <motion.div layout transition={{ type: 'spring', stiffness: 700, damping: 30 }} className={`w-6 h-6 m-1 rounded-full shadow-lg flex items-center justify-center ${isDarkMode ? 'bg-neutral-900' : 'bg-white'}`}>
+                    <AnimatePresence mode="wait" initial={false}>
+                        {isDarkMode ?
+                            <motion.div key="moon" initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }}><Moon size={14} /></motion.div> :
+                            <motion.div key="sun" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -20, opacity: 0 }}><Sun size={14} /></motion.div>
+                        }
+                    </AnimatePresence>
+                </motion.div>
+            </motion.div>
+        </div>
+        <div className={`p-4 rounded-xl transition-colors duration-500 ${theme.cardBg}`}>
+            <div className="flex items-center gap-3">
+                <User className={theme.subText} size={20} />
+                <div>
+                    <p className="font-medium">Dark Mode</p>
+                    <p className={`text-sm ${theme.subText}`}>Automatically switches themes</p>
+                </div>
+            </div>
+        </div>
+    </motion.div>
 );
 
-function MainContent() {
-  const [showContactForm, setShowContactForm] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [displayedText, setDisplayedText] = useState('');
-  const [showCursor, setShowCursor] = useState(true);
-  const [showButton, setShowButton] = useState(false);
-  const [isTyping, setIsTyping] = useState(true);
-  const [isMobile, setIsMobile] = useState(false); // New state for mobile detection
-  
-  // Form state
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: ''
-  });
+const MusicPlayerDemo = ({ isPlaying, setIsPlaying, progress }) => (
+    <motion.div variants={demoVariants} initial="initial" animate="animate" exit="exit" transition={transition} className="w-full h-full p-6 space-y-4 text-white">
+        <div className="text-center">
+            <motion.div animate={{ scale: isPlaying ? 1.05 : 1, transition: { duration: 1.5, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' } }} className="w-32 h-32 mx-auto bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl mb-4 flex items-center justify-center shadow-2xl">
+                <div className="w-20 h-20 bg-white/20 rounded-xl backdrop-blur-sm"></div>
+            </motion.div>
+            <h3 className="text-xl font-bold">Midnight Vibes</h3>
+            <p className="text-neutral-400">Lo-Fi Beats</p>
+        </div>
+        <div className="space-y-3">
+            <div className="w-full bg-neutral-700 rounded-full h-1.5"><motion.div className="bg-yellow-500 h-1.5 rounded-full" style={{ width: `${progress}%` }} /></div>
+            <div className="flex items-center justify-center gap-6">
+                <SkipForward size={24} className="rotate-180 text-neutral-400" />
+                <motion.button whileTap={{ scale: 0.9 }} className="w-14 h-14 bg-yellow-500 rounded-full flex items-center justify-center focus:outline-none" onClick={() => setIsPlaying(!isPlaying)}>
+                    {isPlaying ? <Pause size={22} className="text-black" /> : <Play size={22} className="text-black ml-1" />}
+                </motion.button>
+                <SkipForward size={24} className="text-neutral-400" />
+            </div>
+        </div>
+    </motion.div>
+);
 
-  // Get store functions and state
-  const { sendEmail, isLoading, error, successMessage, resetFormStatus } = useAppStore();
+const SocialFeedDemo = ({ isLiked, likes }) => (
+    <motion.div variants={demoVariants} initial="initial" animate="animate" exit="exit" transition={transition} className="w-full h-full p-6 space-y-4 text-white">
+        <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500"></div>
+            <div><p className="font-semibold">Alex Designer</p><p className="text-sm text-neutral-400">2 minutes ago</p></div>
+        </div>
+        <div className="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 p-4 rounded-xl"><p className="mb-3">Just shipped our new dashboard redesign! ✨ The animations turned out incredible.</p>
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                    <motion.button className={`flex items-center gap-2 transition-colors duration-300 ${isLiked ? 'text-red-500' : 'text-neutral-400'}`} animate={{ scale: isLiked ? [1, 1.3, 1] : 1 }} transition={{ duration: 0.4 }}>
+                        <Heart size={18} className={isLiked ? 'fill-current' : ''} /> <span className="text-sm">{likes}</span>
+                    </motion.button>
+                    <button className="flex items-center gap-2 text-neutral-400"><MessageCircle size={18} /> <span className="text-sm">23</span></button>
+                </div>
+                <button className="text-neutral-400"><Share size={18} /></button>
+            </div>
+        </div>
+    </motion.div>
+);
 
-  // High-tech Genesis typewriter sequence
-  const typewriterSteps = [
-    { 
-      text: '> Diell.', 
-      delay: 1200,
-      color: '#f59e0b',
-      effect: 'genesis-glow'
-    },
-    { 
-      text: ' We engineer digital solutions.', 
-      delay: 1200,
-      color: '#e2e8f0',
-      append: true,
-      effect: 'data-stream'
-    },
-    { 
-      text: '\n> From high-performance backends to intuitive user interfaces.', 
-      delay: 1400,
-      color: '#e2e8f0',
-      append: true,
-    },
-    { 
-      text: '\n\n> What can we build for you?', 
-      delay: 2000,
-      color: '#f59e0b',
-      append: true,
-    }
-  ];
+const DashboardDemo = ({ isDarkMode }) => (
+    <motion.div variants={demoVariants} initial="initial" animate="animate" exit="exit" transition={transition} className="w-full h-full p-6 space-y-4 text-white">
+        <h3 className={`text-lg font-semibold mb-4 transition-colors duration-500 ${isDarkMode ? 'text-white' : 'text-neutral-900'}`}>Analytics Dashboard</h3>
+        <div className="grid grid-cols-2 gap-3">
+            {/* --- REVENUE CARD --- */}
+            <div className={`p-3 rounded-xl transition-colors duration-500 ${isDarkMode ? 'bg-gradient-to-br from-green-500/20 to-emerald-500/20' : 'bg-green-100'}`}>
+                <p className={`text-sm ${isDarkMode ? 'text-neutral-300' : 'text-green-800/80'}`}>Revenue</p>
+                <p className={`text-2xl font-bold ${isDarkMode ? 'text-green-400' : 'text-green-700'}`}>$12.4k</p>
+                <p className={`text-xs font-medium ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>+12%</p>
+            </div>
+             {/* --- USERS CARD --- */}
+            <div className={`p-3 rounded-xl transition-colors duration-500 ${isDarkMode ? 'bg-gradient-to-br from-blue-500/20 to-cyan-500/20' : 'bg-blue-100'}`}>
+                <p className={`text-sm ${isDarkMode ? 'text-neutral-300' : 'text-blue-800/80'}`}>Users</p>
+                <p className={`text-2xl font-bold ${isDarkMode ? 'text-blue-400' : 'text-blue-700'}`}>2.1k</p>
+                <p className={`text-xs font-medium ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>+8%</p>
+            </div>
+        </div>
+        <div className={`p-4 rounded-xl transition-colors duration-500 ${isDarkMode ? 'bg-neutral-800/50' : 'bg-neutral-100'}`}>
+            <motion.div variants={{ animate: { transition: { staggerChildren: 0.07 } } }} className="flex items-end gap-1.5 h-20">
+                {[40, 65, 30, 80, 55, 90, 45, 75].map((height, i) => (
+                    <motion.div 
+                      key={i} 
+                      variants={{ initial: { height: '0%' }, animate: { height: `${height}%` } }} 
+                      transition={{ type: 'spring', stiffness: 200, damping: 20 }} 
+                      className={`rounded-t-sm flex-1 transition-colors duration-500 ${isDarkMode ? 'bg-yellow-500/60' : 'bg-yellow-400'}`} 
+                    />
+                ))}
+            </motion.div>
+        </div>
+    </motion.div>
+);
 
-  // New effect to check for mobile device on component mount
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-        setIsMobile(window.innerWidth < 768); // Using 768px as a threshold for mobile
-    }
-  }, []);
+const NotificationsDemo = ({ notifications }) => (
+    <motion.div variants={demoVariants} initial="initial" animate="animate" exit="exit" transition={transition} className="w-full h-full p-6 space-y-3 text-white">
+        <div className="flex items-center gap-2 mb-4"><Bell size={20} className="text-yellow-500" /><h3 className="text-lg font-semibold">Notifications</h3></div>
+        <motion.div variants={{ animate: { transition: { staggerChildren: 0.2 } } }} className="space-y-2 max-h-64 overflow-hidden">
+            {notifications.map((notif) => (
+                <motion.div key={notif.id} variants={{ initial: { opacity: 0, x: 50 }, animate: { opacity: 1, x: 0 } }} transition={{ type: 'spring', stiffness: 200, damping: 25 }} className="bg-neutral-800/70 p-3 rounded-lg border-l-4 border-yellow-500">
+                    <p className="text-sm">{notif.message}</p><p className="text-xs text-neutral-400">Just now</p>
+                </motion.div>
+            ))}
+        </motion.div>
+    </motion.div>
+);
 
-  useEffect(() => {
-    // A little bugfix to ensure success doesn't prevent future form clears
-    if(successMessage && !isLoading) {
-        setFormData({ name: '', email: '', message: '' });
-    }
-  }, [successMessage, isLoading])
-
-  // Modified typewriter effect with mobile detection
-  useEffect(() => {
-    // Add delay before starting the first typewriter step
-    const startDelay = currentStep === 0 ? 3000 : 0; // 3 second delay for first step
+const ShowcaseNode = ({ isVisible }) => {
+    const [isDarkMode, setIsDarkMode] = useState(true);
+    const [currentDemoIndex, setCurrentDemoIndex] = useState(0);
+    const [notifications, setNotifications] = useState([]);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const [likes, setLikes] = useState(127);
+    const [isLiked, setIsLiked] = useState(false);
+    const [batteryLevel, setBatteryLevel] = useState(85);
+    const [signalStrength, setSignalStrength] = useState(4);
     
-    const startTyping = () => {
-      // ** NEW LOGIC: Mobile device detection **
-      // If on a mobile device and we've reached the part to be skipped,
-      // display the text instantly instead of typing it.
-      if (isMobile && currentStep === 2) {
-        const instantText = '\n> From high-performance backends to intuitive user interfaces.' + '\n\n> What can we build for you?';
-        
-        setDisplayedText(prev => prev + instantText);
-        setIsTyping(false); // Stop the cursor
-        
-        // After a delay to allow reading the text, show the button
-        setTimeout(() => setShowButton(true), 2000); 
-        return; // End the sequence here for mobile
-      }
+    const demos = ['theme-toggle', 'music-player', 'social-feed', 'dashboard', 'notifications'];
+    const currentDemo = demos[currentDemoIndex];
 
-      // ** ORIGINAL LOGIC **
-      if (currentStep >= typewriterSteps.length) {
-        setIsTyping(false);
-        setTimeout(() => setShowButton(true), 500);
-        return;
-      }
-
-      const step = typewriterSteps[currentStep];
-      let currentText = step.append ? displayedText : '';
-      let i = 0;
-      
-      const typeInterval = setInterval(() => {
-        if (i < step.text.length) {
-          currentText += step.text[i];
-          setDisplayedText(currentText);
-          i++;
-        } else {
-          clearInterval(typeInterval);
-          // Only set isTyping to false if this is the last step AND we're done typing
-          if (currentStep === typewriterSteps.length - 1) {
-            setTimeout(() => {
-              setIsTyping(false);
-            }, step.delay);
-          }
-          setTimeout(() => {
-            setCurrentStep(prev => prev + 1);
-          }, step.delay);
+    // Auto-cycle through demos with improved timing
+    useEffect(() => {
+        if (!isVisible) return;
+        const interval = setInterval(() => {
+            setCurrentDemoIndex(prev => (prev + 1) % demos.length);
+        }, 5500); // Increased duration for better viewing
+        return () => clearInterval(interval);
+    }, [isVisible, demos.length]);
+    
+    // Manage state resets and timed actions for each demo
+    useEffect(() => {
+        const resetAll = () => {
+            setIsPlaying(false);
+            setProgress(0);
+            setIsLiked(false);
+            setLikes(127);
+            setNotifications([]);
+        };
+        
+        resetAll();
+        
+        switch (currentDemo) {
+            case 'theme-toggle':
+                setTimeout(() => setIsDarkMode(prev => !prev), 2500);
+                break;
+            case 'music-player':
+                setTimeout(() => setIsPlaying(true), 1000);
+                break;
+            case 'social-feed':
+                setTimeout(() => { setIsLiked(true); setLikes(128); }, 2500);
+                break;
+            case 'notifications':
+                const notificationMessages = ['New message from Sarah', 'Payment received $250', 'System update available'];
+                notificationMessages.forEach((message, index) => {
+                    setTimeout(() => {
+                        setNotifications(prev => [...prev, { id: Date.now() + index, message }]);
+                    }, (index + 1) * 900);
+                });
+                break;
+            default: break;
         }
-      }, 35); // Slightly faster for more fluid typing
 
-      return () => clearInterval(typeInterval);
+    }, [currentDemo]);
+    
+    // Music player progress animation
+    useEffect(() => {
+        if (!isPlaying || currentDemo !== 'music-player') return;
+        const interval = setInterval(() => setProgress(p => (p >= 100 ? 0 : p + 1.5)), 100);
+        return () => clearInterval(interval);
+    }, [isPlaying, currentDemo]);
+
+    // Simulate battery drain and signal changes
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setBatteryLevel(prev => (prev <= 20 ? 95 : prev - 1));
+            setSignalStrength(prev => Math.max(1, Math.min(4, prev + (Math.random() > 0.5 ? 1 : -1))));
+        }, 5000);
+        return () => clearInterval(interval);
+    }, []);
+
+    const theme = isDarkMode ? { bg: 'bg-neutral-900', cardBg: 'bg-neutral-800', text: 'text-white', subText: 'text-neutral-300' }
+                              : { bg: 'bg-green-300', cardBg: 'bg-neutral-100', text: 'text-neutral-900', subText: 'text-neutral-600' };
+
+    const demoComponents = {
+        'theme-toggle': <ThemeDemo theme={theme} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />,
+        'music-player': <MusicPlayerDemo isPlaying={isPlaying} setIsPlaying={setIsPlaying} progress={progress} />,
+        'social-feed': <SocialFeedDemo isLiked={isLiked} likes={likes} />,
+        'dashboard': <DashboardDemo isDarkMode={isDarkMode} />,
+        'notifications': <NotificationsDemo notifications={notifications} />,
     };
 
-    const timeoutId = setTimeout(startTyping, startDelay);
-    return () => clearTimeout(timeoutId);
-  }, [currentStep, isMobile]); // Added isMobile to dependency array
-
-  // Enhanced cursor blinking effect
-  useEffect(() => {
-    const cursorInterval = setInterval(() => {
-      setShowCursor(prev => !prev);
-    }, 500);
-    return () => clearInterval(cursorInterval);
-  }, []);
-
-  // Handle form input changes
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    // Basic validation
-    if (!formData.name || !formData.email || !formData.message) {
-      return;
-    }
-
-    await sendEmail(formData);
-  };
-
-  // Handle closing the contact form & success message
-  const handleCloseForm = () => {
-    setShowContactForm(false);
-    resetFormStatus(); // This will clear successMessage and error
-  };
-
-  const formatText = (text) => {
-    const lines = text.split('\n');
-    return lines.map((line, index) => {
-      // Enhanced styling for "Diell" with genesis glow
-      if (line.includes('> Diell.')) {
-        return (
-          <span key={index} className="relative inline-block">
-            <span className="text-amber-400 text-lg sm:text-xl font-bold tracking-widest">
-              {line}
-            </span>
-            <span className="absolute -inset-2 bg-gradient-to-r from-amber-400/30 to-orange-400/30 blur-lg -z-10 animate-[genesisRing_4s_linear_infinite]"></span>
-            {index < lines.length - 1 ? '\n' : ''}
-          </span>
-        );
-      }
-      // Enhanced styling for "What can we build for you?" with gradual transition and intense pulse
-      if (line.includes('What can we build for you?')) {
-        return (
-          <span key={index} className="relative inline-block">
-            <span className="text-slate-300 animate-[gradualGoldenTransition_4s_ease-in-out_forwards] text-base sm:text-lg  tracking-wide">
-              {line}
-            </span>
-          </span>
-        );
-      }
-      // Data stream effect for technical lines
-      if (line.includes('high-performance') || line.includes('digital solutions')) {
-        return (
-          <span key={index} className="relative">
-            <span className="text-slate-300  ">
-              {line}
-            </span>
-            {index < lines.length - 1 ? '\n' : ''}
-          </span>
-        );
-      }
-      return (
-        <span key={index} className="text-slate-300">
-          {line}{index < lines.length - 1 ? '\n' : ''}
-        </span>
-      );
-    });
-  };
-
-  return (
-    <>
-      {/* Enhanced Custom animations with high-tech genesis effects */}
-      <style jsx>{`
-        @keyframes slideInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes slideInFromRight {
-          from {
-            opacity: 0;
-            transform: translateX(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-        
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes scanline {
-          0% { top: 0; opacity: 0; }
-          50% { opacity: 1; }
-          100% { top: 100%; opacity: 0; }
-        }
-
-        @keyframes fadeFromWhite {
-          from {
-            opacity: 1;
-          }
-          to {
-            opacity: 0;
-          }
-        }
-
-        @keyframes revealBackground {
-          from {
-            opacity: 0;
-            transform: scale(1.1);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-        
-        /* Genesis High-Tech Effects */
-        @keyframes genesisGlow {
-          0%, 100% { 
-            filter: drop-shadow(0 0 12px rgba(251, 191, 36, 1)) drop-shadow(0 0 24px rgba(251, 191, 36, 0.5));
-            transform: scale(1);
-          }
-          50% { 
-            filter: drop-shadow(0 0 20px rgba(251, 191, 36, 1)) drop-shadow(0 0 40px rgba(251, 191, 36, 0.8));
-            transform: scale(1.02);
-          }
-        }
-        
-        @keyframes gradualGoldenTransition {
-          0% { 
-            color: #e2e8f0;
-            filter: drop-shadow(0 0 4px rgba(148, 163, 184, 0.6));
-          }
-          50% { 
-            color: #fbbf24;
-            filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.8));
-          }
-          100% { 
-            color: #f59e0b;
-            filter: drop-shadow(0 0 16px rgba(251, 191, 36, 1));
-          }
-        }
-        
-  
-          50% { 
-            filter: drop-shadow(0 0 32px rgba(251, 191, 36, 1)) drop-shadow(0 0 64px rgba(251, 191, 36, 0.6));
-            transform: scale(1.05);
-          }
-        }
-        
-        @keyframes dataStream {
-          0%, 100% { opacity: 0.8; }
-          50% { opacity: 1; filter: drop-shadow(0 0 8px rgba(148, 163, 184, 0.8)); }
-        }
-        
-        @keyframes matrixRain {
-          0% { transform: translateY(-10px); opacity: 0; }
-          50% { opacity: 1; }
-          100% { transform: translateY(10px); opacity: 0; }
-        }
-        
-        /* Success animations */
-        .success-circle {
-          stroke: #4ade80;
-          stroke-width: 3;
-          fill: none;
-          stroke-dasharray: 302;
-          stroke-dashoffset: 302;
-          animation: drawCircle 0.8s cubic-bezier(0.65, 0, 0.45, 1) forwards;
-          filter: drop-shadow(0 0 15px rgba(74, 222, 128, 0.8));
-        }
-        .success-checkmark {
-          stroke: #4ade80;
-          stroke-width: 4;
-          fill: none;
-          stroke-linecap: round;
-          stroke-linejoin: round;
-          stroke-dasharray: 60;
-          stroke-dashoffset: 60;
-          animation: drawCheckmark 0.5s cubic-bezier(0.65, 0, 0.45, 1) 0.7s forwards;
-        }
-        @keyframes drawCircle {
-          to { stroke-dashoffset: 0; }
-        }
-        @keyframes drawCheckmark {
-          to { stroke-dashoffset: 0; }
-        }
-        @keyframes successFadeIn {
-          to { opacity: 1; }
-        }
-        
-        /* Spinning animation for energy ring */
-        @keyframes spin-slow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        .animate-spin-slow {
-          animation: spin-slow 8s linear infinite;
-        }
-      `}</style>
-
-      <div className="relative h-screen w-screen overflow-hidden bg-gray-900">
-        {/* WARP ARRIVAL - Black Screen Fade Out */}
-        <div 
-          className="absolute inset-0 z-50 pointer-events-none"
-          style={{
-            backgroundColor: 'black',
-            animation: 'fadeFromWhite 1.8s ease-out 0.2s forwards',
-            opacity: 1
-          }}
-        />
-
-        {/* Video background & warm overlay with reveal animation */}
-        <div 
-          className="absolute top-0 left-0 h-full w-full z-0"
-          style={{
-            animation: 'revealBackground 2.2s ease-out 0.5s both'
-          }}
+    return (
+        <div
+            className="w-full h-full max-w-2xl max-h-[450px] bg-black/30 backdrop-blur-md rounded-xl border border-neutral-800 shadow-2xl overflow-hidden transition-all duration-1000"
+            style={{
+                boxShadow: isVisible ? `0 0 40px -10px var(--color-frontend)` : '0 0 20px -10px var(--color-frontend)',
+                transform: isVisible ? 'scale(1)' : 'scale(0.95)',
+                opacity: isVisible ? 1 : 0.8,
+            }}
         >
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute top-0 left-0 h-full w-full object-cover"
-            poster="/path-to-your-poster-image.jpg"
-          >
-            <source src="/bg.webm" type="video/webm" />
-            <source src="/bg.mp4" type="video/mp4" /> 
-          </video>
-          <div className="absolute top-0 left-0 h-full w-full bg-gradient-to-t from-black/85 via-black/65 to-orange-950/25" />
-          
-          {/* Genesis particle overlay */}
-          <div className="absolute top-0 left-0 h-full w-full opacity-30">
-            <div className="absolute top-1/4 left-1/4 w-1 h-1 bg-amber-400 rounded-full animate-[matrixRain_3s_linear_infinite]"></div>
-            <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-amber-400 rounded-full animate-[matrixRain_4s_linear_infinite_1s]"></div>
-            <div className="absolute bottom-1/4 left-1/2 w-1 h-1 bg-amber-400 rounded-full animate-[matrixRain_5s_linear_infinite_2s]"></div>
-          </div>
-        </div>
-
-        <div className="relative z-20 flex h-full w-full items-center justify-center p-3 sm:p-4">
-
-          {/* Main Terminal Modal with enhanced entrance delay */}
-          {!showContactForm && (
-            <div
-              className="w-full max-w-xs sm:max-w-4xl transform transition-all duration-700 ease-out opacity-0 translate-y-8"
-              style={{
-                animation: 'slideInUp 1.2s ease-out 2.5s forwards'
-              }}
-            >
-              <div className="rounded-lg border border-amber-400/30 bg-black/60 shadow-2xl shadow-orange-500/20 backdrop-blur-lg overflow-hidden relative">
-                {/* Genesis energy border */}
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-400/10 via-transparent to-amber-400/10 animate-[genesisRing_6s_linear_infinite] pointer-events-none"></div>
-                
-                {/* Modal Header */}
-                <div className="flex items-center gap-2 border-b border-amber-400/30 bg-black/40 p-2 sm:p-3 relative z-10">
-                  <div className="h-2 w-2 sm:h-3 sm:w-3 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]"></div>
-                  <div className="h-2 w-2 sm:h-3 sm:w-3 rounded-full bg-yellow-500 animate-pulse shadow-[0_0_8px_rgba(234,179,8,0.8)]" style={{animationDelay: '0.3s'}}></div>
-                  <div className="h-2 w-2 sm:h-3 sm:w-3 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.8)]" style={{animationDelay: '0.6s'}}></div>
-                  <p className="ml-auto text-xs text-slate-400 font-mono tracking-wider hidden sm:block">/genesis/core/identity.sys</p>
+            {/* Phone Header */}
+            <div className="h-9 bg-neutral-900/90 flex items-center justify-between px-4 border-b border-neutral-700">
+                <div className="flex gap-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500/70 hover:bg-red-500"></div>
+                    <div className="w-3 h-3 rounded-full bg-yellow-500/70 hover:bg-yellow-500"></div>
+                    <div className="w-3 h-3 rounded-full bg-green-500/70 hover:bg-green-500"></div>
                 </div>
-
-                {/* Modal Content with Genesis Typewriter */}
-                <div className="p-4 sm:p-8 font-mono text-xs sm:text-base leading-relaxed relative">
-                  {/* Enhanced scanline effect */}
-                  <div className="absolute inset-0 pointer-events-none opacity-40">
-                    <div 
-                      className="w-full h-px bg-gradient-to-r from-transparent via-amber-400/80 to-transparent animate-[scanline_3s_linear_infinite]"
-                    />
-                  </div>
-
-                  {/* Genesis energy field */}
-                  <div className="absolute inset-2 sm:inset-4 bg-gradient-to-br from-amber-400/5 to-orange-400/5 rounded blur-xl pointer-events-none"></div>
-
-                  <pre className="whitespace-pre-wrap relative z-20 min-h-[180px] sm:min-h-[240px] leading-6 sm:leading-8">
-                    {formatText(displayedText)}
-                    {isTyping && showCursor && (
-                      <span className="text-amber-400 text-lg sm:text-xl font-bold">█</span>
-                    )}
-                  </pre>
-
-                  {/* Contact Button with Genesis styling */}
-                  {showButton && (
-                    <div className="mt-6 sm:mt-8 opacity-0 translate-y-4 animate-[fadeInUp_0.8s_ease-out_forwards] relative z-20">
-                      <button
-                        onClick={() => setShowContactForm(true)}
-                        className="btn-form btn-confirm px-4 sm:px-6 py-2 sm:py-3 font-bold text-xs sm:text-sm tracking-widest hover:scale-105 relative overflow-hidden group shadow-[0_0_20px_rgba(251,191,36,0.3)] hover:shadow-[0_0_30px_rgba(251,191,36,0.6)] w-full sm:w-auto"
-                      >
-                        <span className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-orange-400/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
-                        <span className="flex items-center justify-center gap-2 sm:gap-3 relative z-10">
-                          _INITIATE_CONNECTION
-                          <span className="group-hover:translate-x-2 transition-transform duration-300 text-base sm:text-lg">→</span>
-                        </span>
-                      </button>
+                <div className="flex items-center gap-2 text-xs text-neutral-400">
+                    <div className="flex items-end gap-0.5">
+                        {[...Array(4)].map((_, i) => (
+                           <div key={i} className={`w-1 rounded-sm transition-all ${ i < signalStrength ? 'bg-yellow-500' : 'bg-neutral-600'}`} style={{ height: `${(i + 1) * 2 + 2}px` }} />
+                        ))}
                     </div>
-                  )}
+                    <Wifi size={12} />
+                    <div className="flex items-center gap-1"><Battery size={12} /> <span>{batteryLevel}%</span></div>
                 </div>
-              </div>
             </div>
-          )}
 
-          {showContactForm && (
-            <div className="w-full max-w-sm sm:max-w-xl mx-auto transform transition-all duration-500 ease-out opacity-0 translate-x-1 animate-[slideInFromRight_0.6s_ease-out_forwards]">
-              <div className="rounded-lg border border-amber-400/30 bg-black/60 shadow-2xl shadow-orange-500/20 backdrop-blur-lg overflow-hidden relative">
-                {/* Genesis energy border */}
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-400/10 via-transparent to-amber-400/10 animate-[genesisRing_8s_linear_infinite] pointer-events-none"></div>
-                
-                {/* Modal Header */}
-                <div className="flex items-center gap-2 border-b border-amber-400/30 bg-black/40 p-2 sm:p-3 relative z-10">
-                  <div className="h-2 w-2 sm:h-3 sm:w-3 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]"></div>
-                  <div className="h-2 w-2 sm:h-3 sm:w-3 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.8)]"></div>
-                  <div className="h-2 w-2 sm:h-3 sm:w-3 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.8)]"></div>
-                  <p className="ml-auto text-xs text-slate-400 font-mono tracking-wider hidden sm:block">/genesis/comms/secure_channel</p>
-                </div>
-
-                <div className="p-3 sm:p-8 relative z-10">
-                  {successMessage ? (
-                    <SuccessDisplay 
-                      message={successMessage} 
-                      onClose={handleCloseForm}
-                    />
-                  ) : (
-                    <form className="space-y-3 sm:space-y-5" onSubmit={handleSubmit} noValidate>
-                      <InputField 
-                        label="[Your name]" 
-                        type="text" 
-                        name="name"
-                        placeholder="Your designation..." 
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        disabled={isLoading}
-                      />
-                      
-                      <InputField 
-                        label="[Email]" 
-                        type="email" 
-                        name="email"
-                        placeholder="contact@domain.com" 
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        disabled={isLoading}
-                      />
-                      
-                      <TextareaField 
-                        label="[Message]" 
-                        name="message"
-                        placeholder="Transmit your vision. What digital reality shall we engineer?" 
-                        value={formData.message}
-                        onChange={handleInputChange}
-                        disabled={isLoading}
-                      />
-                      
-                      <div className="space-y-2 sm:space-y-0 sm:flex sm:gap-4 pt-3 sm:pt-6">
-                        <button 
-                          type="submit"
-                          disabled={isLoading || !formData.name || !formData.email || !formData.message}
-                          className="btn-form btn-confirm w-full sm:flex-1 px-3 sm:px-4 py-2 sm:py-3 font-bold text-xs sm:text-sm tracking-wider hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-[0_0_15px_rgba(251,191,36,0.3)] hover:shadow-[0_0_25px_rgba(251,191,36,0.5)]"
-                        >
-                          {isLoading ? 'TRANSMITTING_SIGNAL...' : 'Contact Us '}
-                        </button>
-                        <button 
-                          type="button"
-                          onClick={handleCloseForm}
-                          disabled={isLoading}
-                          className="btn-form btn-abort w-full sm:flex-1 px-3 sm:px-4 py-2 sm:py-3 font-bold text-xs sm:text-sm tracking-wider hover:scale-105 disabled:opacity-50"
-                        >
-                          TERMINATE_LINK
-                        </button>
-                      </div>
-                      {error && (
-                         <p className="text-red-400 font-mono text-xs pt-3 text-center animate-pulse drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]">{error}</p>
-                      )}
-                    </form>
-                  )}
-                </div>
-              </div>
+            {/* Demo Content */}
+            <div className={`h-full transition-colors duration-700 ${theme.bg}`}>
+                <AnimatePresence mode="wait">
+                    {demoComponents[currentDemo]}
+                </AnimatePresence>
             </div>
-          )}
+            
+            {/* Demo indicator dots */}
+            <div className="absolute  bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+                {demos.map((_, index) => (
+                    <div key={index} className={`h-2  rounded-full transition-all duration-500 ${currentDemoIndex === index ? 'bg-yellow-500 w-6' : 'bg-neutral-600 w-2'}`} />
+                ))}
+            </div>
         </div>
-      </div>
-    </>
-  );
-}
+    );
+};
 
-// Enhanced Input Components with Genesis styling
-const InputField = ({ label, type, name, placeholder, value, onChange, disabled }) => (
-  <div className="group relative">
-    <label className="block text-amber-400 font-mono text-xs mb-2 sm:mb-3 group-focus-within:text-orange-400 transition-colors duration-300 tracking-wider drop-shadow-[0_0_4px_rgba(251,191,36,0.6)]">
-      {label}
-    </label>
-    <div className="relative">
-      <input 
-        type={type} 
-        name={name}
-        className="form-input relative z-10 bg-black/40 border border-amber-400/30 focus:border-amber-400/60 focus:shadow-[0_0_15px_rgba(251,191,36,0.3)] transition-all duration-300 text-sm"
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        disabled={disabled}
-        required
-      />
-      <div className="absolute inset-0 bg-gradient-to-r from-amber-400/5 to-orange-400/5 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none rounded"></div>
-    </div>
-  </div>
-);
 
-const TextareaField = ({ label, name, placeholder, value, onChange, disabled }) => (
-  <div className="group relative">
-    <label className="block text-amber-400 font-mono text-xs mb-2 sm:mb-3 group-focus-within:text-orange-400 transition-colors duration-300 tracking-wider drop-shadow-[0_0_4px_rgba(251,191,36,0.6)]">
-      {label}
-    </label>
-    <div className="relative">
-      <textarea 
-        rows={4}
-        name={name}
-        className="form-input resize-none relative z-10 bg-black/40 border border-amber-400/30 focus:border-amber-400/60 focus:shadow-[0_0_15px_rgba(251,191,36,0.3)] transition-all duration-300 text-sm"
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        disabled={disabled}
-        required
-      />
-      <div className="absolute inset-0 bg-gradient-to-r from-amber-400/5 to-orange-400/5 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none rounded"></div>
-    </div>
-  </div>
-);
+// --- STYLING & PAGE HELPERS --- //
+const GlobalStyles = () => ( <style>{`:root { --color-frontend: #fbbf24; --color-backend: #22c55e; --color-grid-frontend: rgba(251, 191, 36, 0.08); --color-grid-backend: rgba(34, 197, 94, 0.08); --color-text-main: #EAEAEA; --color-text-subtle: #A0A0A0; } html, body { margin: 0; padding: 0; overflow: hidden; background-color: #000; color: var(--color-text-main); font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; } .scroll-container { height: 100vh; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth; } .scroll-container::-webkit-scrollbar { display: none; } @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } } .animate-fade-in { animation: fadeIn 1s ease-out forwards; }`}</style> );
+const AnimatedContent = ({ scrollX, trigger, children, className = '' }) => { const isVisible = scrollX >= trigger; return ( <div className={`transition-all duration-700 ease-out ${className}`} style={{ opacity: isVisible ? 1 : 0, transform: `translateY(${isVisible ? 0 : '20px'})` }} > {children} </div> ); };
+const InfoNode = ({ scrollX, trigger, Icon, title, text, color }) => { const screenW = window.innerWidth; const isVisible = scrollX >= trigger; const nodeCenter = trigger + screenW / 2; const distanceFromCenter = nodeCenter - scrollX; const parallax = -distanceFromCenter * 0.1; const scale = 1 - Math.min(Math.abs(distanceFromCenter) / screenW, 0.2); return ( <div className="w-screen h-screen flex items-center justify-center font-sans px-8"> <div className="text-center transition-all duration-700 ease-out flex flex-col items-center gap-4" style={{ opacity: isVisible ? 1 : 0, transform: `translateY(${parallax}px) scale(${scale})` }} > <div className="rounded-full p-4 border-2" style={{ borderColor: color, boxShadow: `0 0 30px ${color}` }}> <Icon size={40} color={color} /> </div> <h2 className="text-5xl font-bold tracking-tight mt-4" style={{ color: color }}>{title}</h2> <p className="text-xl text-neutral-400 max-w-lg mt-2">{text}</p> </div> </div> ); };
 
-export default MainContent;
+// === PROGRESSBAR FIX STARTS HERE === //
+const ProgressBar = ({ isHorizontalMode, progress }) => {
+    // The target color changes based on the scrolling mode (horizontal vs. vertical)
+    const targetColor = isHorizontalMode ? 'var(--color-frontend)' : 'var(--color-backend)';
+    // Ensure the progress value is clamped between 0 and 1 to prevent visual bugs
+    const safeProgress = Math.max(0, Math.min(progress, 1));
+
+    // Using Framer Motion's motion.div allows us to animate properties performantly
+    // and with physics-based transitions for a much smoother, more responsive feel.
+    return (
+        <div className="fixed bottom-0 left-0 w-full h-1 bg-neutral-900 z-50">
+            <motion.div
+                className="h-full origin-left w-full" // `origin-left` makes the bar grow from the left side.
+                initial={false} // We don't need an animation when the component first loads.
+                animate={{
+                    // We animate `scaleX` instead of `width`. It's much better for performance.
+                    scaleX: safeProgress,
+                    // Animate the background color for a smooth transition between modes.
+                    backgroundColor: targetColor,
+                    // Animating the boxShadow as a string provides a smooth glow color change.
+                    boxShadow: `0 0 10px ${targetColor}, 0 0 20px ${targetColor}`,
+                }}
+                transition={{
+                    // Use different transition types for different properties for the best effect.
+                    scaleX: {
+                        type: 'spring',     // A spring physics animation for the bar's length.
+                        stiffness: 100,     // How "strong" the spring is.
+                        damping: 25,        // How much friction is applied (less bounce).
+                        restDelta: 0.001,   // When the animation is considered complete.
+                    },
+                    // For color changes, a simple "tween" (ease-in-out) feels better than a spring.
+                    backgroundColor: { type: 'tween', duration: 0.5, ease: 'easeIn' },
+                    boxShadow: { type: 'tween', duration: 0.5, ease: 'easeIn' },
+                }}
+            />
+        </div>
+    );
+};
+// === PROGRESSBAR FIX ENDS HERE === //
+
+
+// --- MAIN PAGE COMPONENT (UNCHANGED) --- //
+const DiellPage = () => {
+    const [scrollPosition, setScrollPosition] = useState(0);
+    const [verticalScrollProgress, setVerticalScrollProgress] = useState(0);
+    const [isHorizontalMode, setIsHorizontalMode] = useState(true);
+    const [isTransitioning, setIsTransitioning] = useState(false);
+    const pageContainerRef = useRef(null);
+    const horizontalContentRef = useRef(null);
+    const verticalContentRef = useRef(null);
+    const animationFrameId = useRef(null);
+    const currentScrollX = useRef(0);
+    const targetScrollX = useRef(0);
+    const screenW = window.innerWidth;
+    const numHorizontalSections = 3;
+    const totalHorizontalWidth = screenW * (numHorizontalSections - 1);
+
+    
+
+    // Smooth scroll animation loop
+    useEffect(() => {
+        const smoothScrollLoop = () => {
+            const easing = 0.1;
+            currentScrollX.current += (targetScrollX.current - currentScrollX.current) * easing;
+            if (Math.abs(targetScrollX.current - currentScrollX.current) < 0.5) {
+                currentScrollX.current = targetScrollX.current;
+            }
+            setScrollPosition(currentScrollX.current);
+            if (horizontalContentRef.current) {
+                horizontalContentRef.current.style.transform = `translateX(-${currentScrollX.current}px)`;
+            }
+            animationFrameId.current = requestAnimationFrame(smoothScrollLoop);
+        };
+        animationFrameId.current = requestAnimationFrame(smoothScrollLoop);
+        return () => cancelAnimationFrame(animationFrameId.current);
+    }, []);
+
+    // Wheel event listener for navigation and transitions
+// Replace the existing wheel event handler in your DiellPage component with this enhanced version
+
+useEffect(() => {
+    const handleWheel = (e) => {
+        if (isHorizontalMode) e.preventDefault();
+        if (isTransitioning) return;
+        const delta = e.deltaY;
+        
+        if (isHorizontalMode) {
+            targetScrollX.current = Math.max(0, Math.min(targetScrollX.current + delta, totalHorizontalWidth));
+            
+            if (targetScrollX.current >= totalHorizontalWidth && delta > 0) {
+                targetScrollX.current = totalHorizontalWidth;
+                setIsTransitioning(true);
+                
+                // Start the transition to vertical mode
+                setTimeout(() => setIsHorizontalMode(false), 200);
+                
+                // === NEW FAST FALL ANIMATION === //
+                setTimeout(() => {
+                    const container = verticalContentRef.current;
+                    if (!container) return;
+                    
+                    // Reset to top before starting the fall animation
+                    container.scrollTo({ top: 0, behavior: 'auto' });
+                    
+                    // Fast fall animation parameters
+                    const fallDuration = 1200; // 1.2 seconds
+                    const fallDistance = window.innerHeight * 5.5;
+                    const startTime = Date.now();
+                    
+                    const animateFall = () => {
+                        const elapsed = Date.now() - startTime;
+                        const progress = Math.min(elapsed / fallDuration, 1);
+                        
+                        // Use easeOutCubic for a more natural fall feeling
+                        const easeOutCubic = 1 - Math.pow(1 - progress, 3);
+                        const currentScrollTop = easeOutCubic * fallDistance;
+                        
+                        container.scrollTop = currentScrollTop;
+                        
+                        if (progress < 1) {
+                            requestAnimationFrame(animateFall);
+                        } else {
+                            // Animation complete - user now has control
+                            setIsTransitioning(false);
+                        }
+                    };
+                    
+                    // Start the fall animation
+                    requestAnimationFrame(animateFall);
+                }, 400); // Start fall after vertical section is visible
+            }
+        } else {
+            const container = verticalContentRef.current;
+            if (!container) return;
+            
+            if (delta < 0 && container.scrollTop <= 0) {
+                e.preventDefault();
+                container.scrollTo({ top: 0, behavior: 'auto' });
+                setIsTransitioning(true);
+                setIsHorizontalMode(true);
+                setTimeout(() => setIsTransitioning(false), 1200);
+            }
+        }
+    };
+    
+    const node = pageContainerRef.current;
+    if (!node) return;
+    node.addEventListener('wheel', handleWheel, { passive: false });
+    return () => node.removeEventListener('wheel', handleWheel);
+}, [isHorizontalMode, isTransitioning, totalHorizontalWidth]);
+
+// Add this to your DiellPage component, replacing or adding to your existing useEffect hooks
+
+useEffect(() => {
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchStartTime = 0;
+    let lastTouchX = 0;
+    let lastTouchY = 0;
+    let touchVelocityX = 0;
+    let touchVelocityY = 0;
+    let isTrackingTouch = false;
+    let touchMoveCount = 0;
+    
+    const handleTouchStart = (e) => {
+        if (isTransitioning) return;
+        
+        const touch = e.touches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        lastTouchX = touch.clientX;
+        lastTouchY = touch.clientY;
+        touchStartTime = Date.now();
+        touchVelocityX = 0;
+        touchVelocityY = 0;
+        isTrackingTouch = true;
+        touchMoveCount = 0;
+    };
+    
+    const handleTouchMove = (e) => {
+        if (!isTrackingTouch || isTransitioning) return;
+        
+        const touch = e.touches[0];
+        const currentX = touch.clientX;
+        const currentY = touch.clientY;
+        const deltaX = currentX - lastTouchX;
+        const deltaY = currentY - lastTouchY;
+        
+        // Calculate velocity for momentum-based transitions
+        touchVelocityX = deltaX;
+        touchVelocityY = deltaY;
+        touchMoveCount++;
+        
+        if (isHorizontalMode) {
+            // Prevent default scrolling behavior in horizontal mode
+            e.preventDefault();
+            
+            // Apply horizontal scrolling (inverted for natural touch feel)
+            const scrollSensitivity = 1.2;
+            targetScrollX.current = Math.max(0, 
+                Math.min(targetScrollX.current - (deltaX * scrollSensitivity), totalHorizontalWidth)
+            );
+        } else {
+            // In vertical mode, let native scrolling handle most of the work
+            // We only need to detect swipe up at the top to return to horizontal
+            const container = verticalContentRef.current;
+            if (container && container.scrollTop <= 0 && deltaY > 0) {
+                // User is swiping down at the top - prevent native scroll
+                e.preventDefault();
+            }
+        }
+        
+        lastTouchX = currentX;
+        lastTouchY = currentY;
+    };
+    
+    const handleTouchEnd = (e) => {
+        if (!isTrackingTouch || isTransitioning) return;
+        
+        const touch = e.changedTouches[0];
+        const endX = touch.clientX;
+        const endY = touch.clientY;
+        const deltaX = endX - touchStartX;
+        const deltaY = endY - touchStartY;
+        const touchDuration = Date.now() - touchStartTime;
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        
+        // Determine if this was a swipe gesture
+        const isSwipe = distance > 50 && touchDuration < 500 && touchMoveCount > 5;
+        const swipeVelocity = distance / touchDuration;
+        
+        if (isHorizontalMode) {
+            // Handle transition from horizontal to vertical mode
+            const isAtEnd = targetScrollX.current >= totalHorizontalWidth * 0.95;
+            const isSwipeUp = deltaY < -30 && Math.abs(deltaY) > Math.abs(deltaX);
+            const hasUpwardVelocity = touchVelocityY < -5;
+            
+            // Transition conditions: at end of horizontal scroll AND (swipe up OR strong upward velocity)
+            if (isAtEnd && (isSwipeUp || hasUpwardVelocity)) {
+                // Ensure we're at the very end
+                targetScrollX.current = totalHorizontalWidth;
+                setIsTransitioning(true);
+                
+                // Start transition to vertical mode
+                setTimeout(() => setIsHorizontalMode(false), 200);
+                
+                // === FAST FALL ANIMATION (same as wheel) === //
+                setTimeout(() => {
+                    const container = verticalContentRef.current;
+                    if (!container) return;
+                    
+                    container.scrollTo({ top: 0, behavior: 'auto' });
+                    
+                    const fallDuration = 1200;
+                    const fallDistance = window.innerHeight * 5.5;
+                    const startTime = Date.now();
+                    
+                    const animateFall = () => {
+                        const elapsed = Date.now() - startTime;
+                        const progress = Math.min(elapsed / fallDuration, 1);
+                        
+                        const easeOutCubic = 1 - Math.pow(1 - progress, 3);
+                        const currentScrollTop = easeOutCubic * fallDistance;
+                        
+                        container.scrollTop = currentScrollTop;
+                        
+                        if (progress < 1) {
+                            requestAnimationFrame(animateFall);
+                        } else {
+                            setIsTransitioning(false);
+                        }
+                    };
+                    
+                    requestAnimationFrame(animateFall);
+                }, 400);
+            } else if (swipeVelocity > 0.5) {
+                // Apply momentum scrolling for fast swipes
+                const momentum = Math.min(swipeVelocity * 100, screenW * 0.5);
+                const direction = deltaX > 0 ? 1 : -1;
+                targetScrollX.current = Math.max(0, 
+                    Math.min(targetScrollX.current - (momentum * direction), totalHorizontalWidth)
+                );
+            }
+        } else {
+            // Handle transition from vertical to horizontal mode
+            const container = verticalContentRef.current;
+            if (!container) return;
+            
+            const isAtTop = container.scrollTop <= 5; // Small tolerance
+            const isSwipeDown = deltaY > 50 && Math.abs(deltaY) > Math.abs(deltaX);
+            const hasDownwardVelocity = touchVelocityY > 10;
+            
+            // Transition conditions: at top of vertical scroll AND (swipe down OR strong downward velocity)
+            if (isAtTop && (isSwipeDown || hasDownwardVelocity)) {
+                container.scrollTo({ top: 0, behavior: 'auto' });
+                setIsTransitioning(true);
+                setIsHorizontalMode(true);
+                setTimeout(() => setIsTransitioning(false), 1200);
+            }
+        }
+        
+        isTrackingTouch = false;
+    };
+    
+    // Prevent context menu on long press (optional, for better UX)
+    const handleContextMenu = (e) => {
+        e.preventDefault();
+    };
+    
+    const node = pageContainerRef.current;
+    if (!node) return;
+    
+    // Add touch event listeners
+    node.addEventListener('touchstart', handleTouchStart, { passive: false });
+    node.addEventListener('touchmove', handleTouchMove, { passive: false });
+    node.addEventListener('touchend', handleTouchEnd, { passive: true });
+    node.addEventListener('contextmenu', handleContextMenu);
+    
+    return () => {
+        node.removeEventListener('touchstart', handleTouchStart);
+        node.removeEventListener('touchmove', handleTouchMove);
+        node.removeEventListener('touchend', handleTouchEnd);
+        node.removeEventListener('contextmenu', handleContextMenu);
+    };
+}, [isHorizontalMode, isTransitioning, totalHorizontalWidth, screenW]);
+
+    // Vertical scroll progress tracker
+    useEffect(() => {
+        const container = verticalContentRef.current;
+        if (isHorizontalMode || !container) return;
+        const handleVerticalScroll = () => {
+            const firstChild = container.firstChild; if(!firstChild) return;
+            const totalContentHeight = firstChild.scrollHeight;
+            const totalScrollableHeight = totalContentHeight - container.offsetHeight;
+            const effectiveScrollTop = Math.max(0, container.scrollTop - window.innerHeight);
+            const effectiveScrollableHeight = totalScrollableHeight - window.innerHeight;
+            setVerticalScrollProgress(effectiveScrollableHeight > 0 ? Math.min(effectiveScrollTop / effectiveScrollableHeight, 1) : 1);
+        }
+        container.addEventListener('scroll', handleVerticalScroll);
+        return () => container.removeEventListener('scroll', handleVerticalScroll);
+    }, [isHorizontalMode]);
+
+    const horizontalProgress = scrollPosition / totalHorizontalWidth;
+    const currentProgress = isHorizontalMode ? horizontalProgress : verticalScrollProgress;
+    const isShowcaseVisible = scrollPosition > screenW * 0.4 && scrollPosition < screenW * 1.6;
+
+    return (
+        <>
+            <GlobalStyles />
+            <div ref={pageContainerRef} className="fixed top-0 left-0 w-full h-full overflow-hidden">
+                <div className='absolute top-0 left-0 w-full h-full grid-background-frontend transition-transform duration-1000' style={{ transform: isHorizontalMode ? 'translateY(0%)' : 'translateY(-100%)', transitionTimingFunction: 'cubic-bezier(0.7, 0, 0.3, 1)' }}>
+                    <div ref={horizontalContentRef} className="flex absolute top-0 left-0" style={{ width: `${numHorizontalSections * 100}vw`, height: '100vh' }}>
+                        
+                        <section className="w-screen h-screen flex flex-col items-center justify-center text-center font-sans p-8">
+                            <div style={{ filter: 'drop-shadow(0 0 35px var(--color-frontend))' }}> <DiellLogo size={250} text='' PrimaryColor="var(--color-frontend)" /> </div>
+                            <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                                <h1 className="text-7xl font-bold tracking-tighter mt-8 text-[var(--color-frontend)]" style={{ textShadow: '0 0 20px rgba(251, 191, 36, 0.3)'}} > Diell </h1>
+                                <p className="text-2xl mt-3 text-neutral-400"> <span className='text-[#fbbf24]'>//</span> Building The Exceptional.</p>
+                            </div>
+                        </section>
+            
+                        <section className="w-screen h-screen flex items-center justify-center p-8 lg:p-16">
+                            <div className="grid lg:grid-cols-2 gap-16 items-center w-full max-w-7xl mx-auto">
+                                <AnimatedContent scrollX={scrollPosition} trigger={screenW * 0.7} className="font-sans">
+                                    <h2 className="text-5xl font-bold tracking-tight text-white">We Craft. We Engineer.</h2>
+                                    <p className="text-xl text-neutral-400 mt-4 max-w-lg"> We specialize in creating bespoke, high-performance web applications. From interactive UIs to complex data-driven platforms, we transform ambitious ideas into flawless digital realities. </p>
+                                    <TechStackCarousel />
+                                </AnimatedContent>
+                                <div className="flex items-center justify-center">
+                                    <ShowcaseNode isVisible={isShowcaseVisible} />
+                                </div>
+                            </div>
+                        </section>
+
+                        <InfoNode scrollX={scrollPosition} trigger={screenW * 1.5} Icon={WandSparkles} title="Design-Driven Engineering." text="Our process lives at the intersection of creative design and technical precision. We build interfaces that are not only beautiful and intuitive but also robust, scalable, and a pleasure to use." color="var(--color-frontend)" />
+                    </div>
+                </div>
+
+                <div ref={verticalContentRef} className="absolute top-0 left-0 w-full h-full scroll-container" style={{ transform: isHorizontalMode ? 'translateY(100%)' : 'translateY(0%)', transition: 'transform 1.0s cubic-bezier(0.7, 0, 0.3, 1)'}} >
+                    <VerticalContent />
+                </div>
+            </div>
+            <ProgressBar isHorizontalMode={isHorizontalMode} progress={currentProgress} />
+        </>
+    );
+};
+
+export default DiellPage;

@@ -5,7 +5,7 @@ import axiosInstance from './lib/axios.js'; // Make sure the path is correct
 
 export const useAppStore = create((set) => ({
   // You can keep this if you still need it
-  isUnlocked: false,
+  isUnlocked: true,
   unlock: () => set({ isUnlocked: true }),
 
   // New state for form handling
