@@ -84,29 +84,29 @@ const transition = { type: 'spring', stiffness: 300, damping: 30, duration: 0.6 
 
 // Individual Demo Components for clarity and separation of concerns
 const ThemeDemo = ({ theme, isDarkMode, setIsDarkMode }) => (
-    <motion.div variants={demoVariants} initial="initial" animate="animate" exit="exit" transition={transition} className={`w-full h-full p-6 space-y-4 ${theme.text}`}>
+    <motion.div variants={demoVariants} initial="initial" animate="animate" exit="exit" transition={transition} className={`w-full h-full p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 ${theme.text}`}>
         <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold">Settings</h3>
+            <h3 className="text-base sm:text-lg font-semibold">Settings</h3>
             <motion.div
-                className={`relative w-14 h-8 rounded-full cursor-pointer flex items-center transition-colors duration-500 ${isDarkMode ? 'bg-yellow-500 justify-end' : 'bg-neutral-300 justify-start'}`}
+                className={`relative w-12 h-6 sm:w-14 sm:h-8 rounded-full cursor-pointer flex items-center transition-colors duration-500 ${isDarkMode ? 'bg-yellow-500 justify-end' : 'bg-neutral-300 justify-start'}`}
                 onClick={() => setIsDarkMode(!isDarkMode)}
             >
-                <motion.div layout transition={{ type: 'spring', stiffness: 700, damping: 30 }} className={`w-6 h-6 m-1 rounded-full shadow-lg flex items-center justify-center ${isDarkMode ? 'bg-neutral-900' : 'bg-white'}`}>
+                <motion.div layout transition={{ type: 'spring', stiffness: 700, damping: 30 }} className={`w-5 h-5 sm:w-6 sm:h-6 m-0.5 sm:m-1 rounded-full shadow-lg flex items-center justify-center ${isDarkMode ? 'bg-neutral-900' : 'bg-white'}`}>
                     <AnimatePresence mode="wait" initial={false}>
                         {isDarkMode ?
-                            <motion.div key="moon" initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }}><Moon size={14} /></motion.div> :
-                            <motion.div key="sun" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -20, opacity: 0 }}><Sun size={14} /></motion.div>
+                            <motion.div key="moon" initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }}><Moon size={12} className="sm:w-3.5 sm:h-3.5" /></motion.div> :
+                            <motion.div key="sun" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -20, opacity: 0 }}><Sun size={12} className="sm:w-3.5 sm:h-3.5" /></motion.div>
                         }
                     </AnimatePresence>
                 </motion.div>
             </motion.div>
         </div>
-        <div className={`p-4 rounded-xl transition-colors duration-500 ${theme.cardBg}`}>
-            <div className="flex items-center gap-3">
-                <User className={theme.subText} size={20} />
+        <div className={`p-3 sm:p-4 rounded-xl transition-colors duration-500 ${theme.cardBg}`}>
+            <div className="flex items-center gap-2 sm:gap-3">
+                <User className={theme.subText} size={16} />
                 <div>
-                    <p className="font-medium">Dark Mode</p>
-                    <p className={`text-sm ${theme.subText}`}>Automatically switches themes</p>
+                    <p className="font-medium text-sm sm:text-base">Dark Mode</p>
+                    <p className={`text-xs sm:text-sm ${theme.subText}`}>Automatically switches themes</p>
                 </div>
             </div>
         </div>
@@ -114,26 +114,27 @@ const ThemeDemo = ({ theme, isDarkMode, setIsDarkMode }) => (
 );
 
 const MusicPlayerDemo = ({ isPlaying, setIsPlaying, progress }) => (
-    <motion.div variants={demoVariants} initial="initial" animate="animate" exit="exit" transition={transition} className="w-full h-full p-6 space-y-4 text-white">
+    <motion.div variants={demoVariants} initial="initial" animate="animate" exit="exit" transition={transition} className="w-full h-full p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 text-white">
         <div className="text-center">
-            <motion.div animate={{ scale: isPlaying ? 1.05 : 1, transition: { duration: 1.5, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' } }} className="w-32 h-32 mx-auto bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl mb-4 flex items-center justify-center shadow-2xl">
-                <div className="w-20 h-20 bg-white/20 rounded-xl backdrop-blur-sm"></div>
+            <motion.div animate={{ scale: isPlaying ? 1.05 : 1, transition: { duration: 1.5, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' } }} className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 mx-auto bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl lg:rounded-2xl mb-3 sm:mb-4 flex items-center justify-center shadow-2xl">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-20 lg:h-20 bg-white/20 rounded-lg lg:rounded-xl backdrop-blur-sm"></div>
             </motion.div>
-            <h3 className="text-xl font-bold">Midnight Vibes</h3>
-            <p className="text-neutral-400">Lo-Fi Beats</p>
+            <h3 className="text-base sm:text-lg lg:text-xl font-bold">Midnight Vibes</h3>
+            <p className="text-neutral-400 text-sm sm:text-base">Lo-Fi Beats</p>
         </div>
-        <div className="space-y-3">
-            <div className="w-full bg-neutral-700 rounded-full h-1.5"><motion.div className="bg-yellow-500 h-1.5 rounded-full" style={{ width: `${progress}%` }} /></div>
-            <div className="flex items-center justify-center gap-6">
-                <SkipForward size={24} className="rotate-180 text-neutral-400" />
-                <motion.button whileTap={{ scale: 0.9 }} className="w-14 h-14 bg-yellow-500 rounded-full flex items-center justify-center focus:outline-none" onClick={() => setIsPlaying(!isPlaying)}>
-                    {isPlaying ? <Pause size={22} className="text-black" /> : <Play size={22} className="text-black ml-1" />}
+        <div className="space-y-2 sm:space-y-3">
+            <div className="w-full bg-neutral-700 rounded-full h-1 sm:h-1.5"><motion.div className="bg-yellow-500 h-1 sm:h-1.5 rounded-full" style={{ width: `${progress}%` }} /></div>
+            <div className="flex items-center justify-center gap-4 sm:gap-6">
+                <SkipForward size={20} className="sm:w-6 sm:h-6 rotate-180 text-neutral-400" />
+                <motion.button whileTap={{ scale: 0.9 }} className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-yellow-500 rounded-full flex items-center justify-center focus:outline-none" onClick={() => setIsPlaying(!isPlaying)}>
+                    {isPlaying ? <Pause size={18} className="sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-black" /> : <Play size={18} className="sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-black ml-0.5" />}
                 </motion.button>
-                <SkipForward size={24} className="text-neutral-400" />
+                <SkipForward size={20} className="sm:w-6 sm:h-6 text-neutral-400" />
             </div>
         </div>
     </motion.div>
 );
+
 
 const SocialFeedDemo = ({ isLiked, likes }) => (
     <motion.div variants={demoVariants} initial="initial" animate="animate" exit="exit" transition={transition} className="w-full h-full p-6 space-y-4 text-white">
@@ -214,6 +215,7 @@ const ShowcaseNode = ({ isVisible }) => {
     const demos = ['theme-toggle', 'music-player', 'social-feed', 'dashboard', 'notifications'];
     const currentDemo = demos[currentDemoIndex];
 
+    // ... (keep all your existing useEffect hooks - they don't need changes)
     // Auto-cycle through demos with improved timing
     useEffect(() => {
         if (!isVisible) return;
@@ -287,28 +289,28 @@ const ShowcaseNode = ({ isVisible }) => {
 
     return (
         <div
-            className="w-full h-full max-w-2xl max-h-[450px] bg-black/30 backdrop-blur-md rounded-xl border border-neutral-800 shadow-2xl overflow-hidden transition-all duration-1000"
+            className="w-full h-full max-w-sm sm:max-w-md lg:max-w-2xl max-h-[300px] sm:max-h-[350px] lg:max-h-[450px] bg-black/30 backdrop-blur-md rounded-xl border border-neutral-800 shadow-2xl overflow-hidden transition-all duration-1000 mx-auto"
             style={{
                 boxShadow: isVisible ? `0 0 40px -10px var(--color-frontend)` : '0 0 20px -10px var(--color-frontend)',
                 transform: isVisible ? 'scale(1)' : 'scale(0.95)',
                 opacity: isVisible ? 1 : 0.8,
             }}
         >
-            {/* Phone Header */}
-            <div className="h-9 bg-neutral-900/90 flex items-center justify-between px-4 border-b border-neutral-700">
-                <div className="flex gap-2">
-                    <div className="w-3 h-3 rounded-full bg-red-500/70 hover:bg-red-500"></div>
-                    <div className="w-3 h-3 rounded-full bg-yellow-500/70 hover:bg-yellow-500"></div>
-                    <div className="w-3 h-3 rounded-full bg-green-500/70 hover:bg-green-500"></div>
+            {/* Phone Header - Made responsive */}
+            <div className="h-8 sm:h-9 bg-neutral-900/90 flex items-center justify-between px-3 sm:px-4 border-b border-neutral-700">
+                <div className="flex gap-1.5 sm:gap-2">
+                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500/70 hover:bg-red-500"></div>
+                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500/70 hover:bg-yellow-500"></div>
+                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500/70 hover:bg-green-500"></div>
                 </div>
-                <div className="flex items-center gap-2 text-xs text-neutral-400">
+                <div className="flex items-center gap-1.5 sm:gap-2 text-xs text-neutral-400">
                     <div className="flex items-end gap-0.5">
                         {[...Array(4)].map((_, i) => (
-                           <div key={i} className={`w-1 rounded-sm transition-all ${ i < signalStrength ? 'bg-yellow-500' : 'bg-neutral-600'}`} style={{ height: `${(i + 1) * 2 + 2}px` }} />
+                           <div key={i} className={`w-0.5 sm:w-1 rounded-sm transition-all ${ i < signalStrength ? 'bg-yellow-500' : 'bg-neutral-600'}`} style={{ height: `${(i + 1) * 1.5 + 2}px` }} />
                         ))}
                     </div>
-                    <Wifi size={12} />
-                    <div className="flex items-center gap-1"><Battery size={12} /> <span>{batteryLevel}%</span></div>
+                    <Wifi size={10} className="sm:w-3 sm:h-3" />
+                    <div className="flex items-center gap-1"><Battery size={10} className="sm:w-3 sm:h-3" /> <span className="text-xs">{batteryLevel}%</span></div>
                 </div>
             </div>
 
@@ -319,10 +321,10 @@ const ShowcaseNode = ({ isVisible }) => {
                 </AnimatePresence>
             </div>
             
-            {/* Demo indicator dots */}
-            <div className="absolute  bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+            {/* Demo indicator dots - Made responsive */}
+            <div className="absolute bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 sm:gap-2">
                 {demos.map((_, index) => (
-                    <div key={index} className={`h-2  rounded-full transition-all duration-500 ${currentDemoIndex === index ? 'bg-yellow-500 w-6' : 'bg-neutral-600 w-2'}`} />
+                    <div key={index} className={`h-1.5 sm:h-2 rounded-full transition-all duration-500 ${currentDemoIndex === index ? 'bg-yellow-500 w-4 sm:w-6' : 'bg-neutral-600 w-1.5 sm:w-2'}`} />
                 ))}
             </div>
         </div>
