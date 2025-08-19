@@ -495,23 +495,21 @@ useEffect(() => {
     let lastTouchY = 0;
     let isTrackingTouch = false;
     
-    // Safari viewport height fix
+    // Safari viewport height fix - use CSS viewport units approach
     const getSafeViewportHeight = () => {
-        // Use visualViewport API if available (Safari 13+)
-        if (window.visualViewport) {
-            return window.visualViewport.height;
-        }
-        
-        // Fallback for older Safari versions
-        // Check if we're in Safari mobile
+        // For Safari mobile, use the stable small viewport height equivalent
         const isSafari = /Safari/.test(navigator.userAgent) && /iPhone|iPad/.test(navigator.userAgent);
         
         if (isSafari) {
-            // Safari mobile: use document.documentElement.clientHeight for more accurate height
-            return document.documentElement.clientHeight;
+            // Mimic 100svh behavior: use the smaller of current viewport or screen height
+            const currentViewport = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+            const screenHeight = screen.height;
+            
+            // Safari's small viewport is typically screen height minus ~140px for UI chrome
+            const safariSmallViewport = Math.min(currentViewport, screenHeight - 140);
+            return safariSmallViewport;
         }
         
-        // Other browsers: use window.innerHeight
         return window.innerHeight;
     };
     
@@ -652,6 +650,7 @@ useEffect(() => {
         }
     };
 }, [isHorizontalMode, isTransitioning, totalHorizontalWidth]);
+
 
     // Vertical scroll progress tracker
     useEffect(() => {
