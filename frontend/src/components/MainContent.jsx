@@ -646,18 +646,24 @@ useEffect(() => {
                             </div>
                         </section>
             
-                        <section className="w-screen h-screen flex items-center justify-center p-8 lg:p-16">
-                            <div className="grid lg:grid-cols-2 gap-16 items-center w-full max-w-7xl mx-auto">
-                                <AnimatedContent scrollX={scrollPosition} trigger={screenW * 0.7} className="font-sans">
-                                    <h2 className="text-5xl font-bold tracking-tight text-white">We Craft. We Engineer.</h2>
-                                    <p className="text-xl text-neutral-400 mt-4 max-w-lg"> We specialize in creating bespoke, high-performance web applications. From interactive UIs to complex data-driven platforms, we transform ambitious ideas into flawless digital realities. </p>
-                                    <TechStackCarousel />
-                                </AnimatedContent>
-                                <div className="flex items-center justify-center">
-                                    <ShowcaseNode isVisible={isShowcaseVisible} />
-                                </div>
-                            </div>
-                        </section>
+                   <section className="w-screen h-screen flex items-center justify-center p-4 sm:p-8 lg:p-16" style={{ minHeight: '100dvh' }}>
+    <div className="grid lg:grid-cols-2 gap-6 lg:gap-16 items-center w-full max-w-7xl mx-auto py-8 sm:py-0">
+        <AnimatedContent scrollX={scrollPosition} trigger={screenW * 0.7} className="font-sans order-2 lg:order-1">
+            <h2 className="text-2xl sm:text-3xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
+                We Craft. We Engineer.
+            </h2>
+            <p className="text-base sm:text-lg lg:text-xl text-neutral-400 mt-3 sm:mt-4 max-w-lg leading-relaxed"> 
+                We specialize in creating bespoke, high-performance web applications. From interactive UIs to complex data-driven platforms, we transform ambitious ideas into flawless digital realities. 
+            </p>
+            <div className="mt-4 sm:mt-6">
+                <TechStackCarousel />
+            </div>
+        </AnimatedContent>
+        <div className="flex items-center justify-center order-1 lg:order-2 min-h-[220px] sm:min-h-[280px] lg:min-h-0">
+            <ShowcaseNode isVisible={isShowcaseVisible} />
+        </div>
+    </div>
+</section>
 
                         <InfoNode scrollX={scrollPosition} trigger={screenW * 1.5} Icon={WandSparkles} title="Design-Driven Engineering." text="Our process lives at the intersection of creative design and technical precision. We build interfaces that are not only beautiful and intuitive but also robust, scalable, and a pleasure to use." color="var(--color-frontend)" />
                     </div>
