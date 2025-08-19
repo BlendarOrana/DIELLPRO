@@ -495,6 +495,26 @@ useEffect(() => {
     let lastTouchY = 0;
     let isTrackingTouch = false;
     
+    // Safari viewport height fix
+    const getSafeViewportHeight = () => {
+        // Use visualViewport API if available (Safari 13+)
+        if (window.visualViewport) {
+            return window.visualViewport.height;
+        }
+        
+        // Fallback for older Safari versions
+        // Check if we're in Safari mobile
+        const isSafari = /Safari/.test(navigator.userAgent) && /iPhone|iPad/.test(navigator.userAgent);
+        
+        if (isSafari) {
+            // Safari mobile: use document.documentElement.clientHeight for more accurate height
+            return document.documentElement.clientHeight;
+        }
+        
+        // Other browsers: use window.innerHeight
+        return window.innerHeight;
+    };
+    
     const handleTouchStart = (e) => {
         if (isTransitioning) return;
         
@@ -549,7 +569,7 @@ useEffect(() => {
                 // Start the transition to vertical mode
                 setTimeout(() => setIsHorizontalMode(false), 200);
                 
-                // === FAST FALL ANIMATION === //
+                // === FAST FALL ANIMATION WITH SAFARI FIX === //
                 setTimeout(() => {
                     const container = verticalContentRef.current;
                     if (!container) return;
@@ -557,7 +577,9 @@ useEffect(() => {
                     container.scrollTo({ top: 0, behavior: 'auto' });
                     
                     const fallDuration = 1200;
-                    const fallDistance = window.innerHeight * 5.5;
+                    // Use safe viewport height for Safari
+                    const viewportHeight = getSafeViewportHeight();
+                    const fallDistance = viewportHeight * 5.5;
                     const startTime = Date.now();
                     
                     const animateFall = () => {
@@ -596,6 +618,17 @@ useEffect(() => {
         isTrackingTouch = false;
     };
     
+    // Listen for viewport changes (Safari address bar hide/show)
+    const handleViewportChange = () => {
+        // Force a small delay to let Safari settle
+        setTimeout(() => {
+            if (window.visualViewport) {
+                // Update any height-dependent calculations here if needed
+                console.log('Viewport height changed:', window.visualViewport.height);
+            }
+        }, 100);
+    };
+    
     const node = pageContainerRef.current;
     if (!node) return;
     
@@ -604,10 +637,19 @@ useEffect(() => {
     node.addEventListener('touchmove', handleTouchMove, { passive: false });
     node.addEventListener('touchend', handleTouchEnd, { passive: true });
     
+    // Listen for viewport changes (Safari)
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', handleViewportChange);
+    }
+    
     return () => {
         node.removeEventListener('touchstart', handleTouchStart);
         node.removeEventListener('touchmove', handleTouchMove);
         node.removeEventListener('touchend', handleTouchEnd);
+        
+        if (window.visualViewport) {
+            window.visualViewport.removeEventListener('resize', handleViewportChange);
+        }
     };
 }, [isHorizontalMode, isTransitioning, totalHorizontalWidth]);
 
