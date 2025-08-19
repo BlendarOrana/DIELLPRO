@@ -646,7 +646,7 @@ useEffect(() => {
                             </div>
                         </section>
             
- <section className="w-screen h-screen flex items-center justify-center p-4 sm:p-8 lg:p-16" style={{ minHeight: '100dvh' }}>
+<section className="w-screen h-screen flex items-center justify-center p-4 sm:p-8 lg:p-16" style={{ minHeight: '100dvh' }}>
     <div className="grid lg:grid-cols-2 gap-6 lg:gap-16 items-center w-full max-w-7xl mx-auto py-8 sm:py-0">
         <AnimatedContent scrollX={scrollPosition} trigger={screenW * 0.7} className="font-sans order-2 lg:order-1">
             <h2 className="text-2xl sm:text-3xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
