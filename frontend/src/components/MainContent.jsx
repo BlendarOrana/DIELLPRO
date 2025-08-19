@@ -49,27 +49,34 @@ const TechStackCarousel = () => {
     }, [skills.length]);
 
     return (
-        <div className="mt-8 flex flex-wrap gap-3" aria-label="Our Tech Stack">
+        <div className="mt-8 flex flex-wrap gap-3 items-center" aria-label="Our Tech Stack">
             {skills.map((skill, index) => {
                 const isActive = index === currentIndex;
                 return (
                     <div
                         key={skill.text}
-                        className="font-mono text-sm font-bold h-10 flex items-center justify-center px-4 rounded-full border transition-all duration-500"
+                        className="font-mono text-sm font-bold h-10 flex items-center justify-center px-4 rounded-full border transition-colors duration-300 relative"
                         style={{
                             color: isActive ? '#0a0a0a' : skill.color,
-                            backgroundColor: isActive ? skill.color : 'rgba(255, 255, 255, 0.05)',
                             borderColor: skill.color,
-                            boxShadow: isActive ? `0 0 20px ${skill.color}` : 'none',
                         }}
                     >
-                        <span>{skill.text}</span>
+                        {isActive && (
+                            <motion.div
+                                layoutId="active-skill-highlight"
+                                className="absolute inset-0 rounded-full"
+                                style={{ backgroundColor: skill.color, boxShadow: `0 0 20px ${skill.color}` }}
+                                transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                            />
+                        )}
+                        <span className="relative z-10">{skill.text}</span>
                     </div>
                 );
             })}
         </div>
     );
 };
+
 
 
 // --- REFACTORED AUTOMATED MULTI-DEMO SHOWCASE --- //
@@ -206,7 +213,7 @@ const ShowcaseNode = ({ isVisible }) => {
     const [notifications, setNotifications] = useState([]);
     const [isPlaying, setIsPlaying] = useState(false);
     const [progress, setProgress] = useState(0);
-    const [likes, setLikes] = useState(127);
+    const [likes, setLikes] = useState(665);
     const [isLiked, setIsLiked] = useState(false);
     const [batteryLevel, setBatteryLevel] = useState(85);
     const [signalStrength, setSignalStrength] = useState(4);
@@ -229,7 +236,7 @@ const ShowcaseNode = ({ isVisible }) => {
             setIsPlaying(false);
             setProgress(0);
             setIsLiked(false);
-            setLikes(127);
+            setLikes(665);
             setNotifications([]);
         };
         
@@ -243,7 +250,7 @@ const ShowcaseNode = ({ isVisible }) => {
                 setTimeout(() => setIsPlaying(true), 1000);
                 break;
             case 'social-feed':
-                setTimeout(() => { setIsLiked(true); setLikes(128); }, 2500);
+                setTimeout(() => { setIsLiked(true); setLikes(666); }, 2500);
                 break;
             case 'notifications':
                 const notificationMessages = ['New message from Sarah', 'Payment received $250', 'System update available'];
