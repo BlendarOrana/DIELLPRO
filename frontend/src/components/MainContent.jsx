@@ -414,8 +414,6 @@ const DiellPage = () => {
         return () => cancelAnimationFrame(animationFrameId.current);
     }, []);
 
-    // Wheel event listener for navigation and transitions
-// Replace the existing wheel event handler in your DiellPage component with this enhanced version
 
 useEffect(() => {
     const handleWheel = (e) => {
@@ -488,30 +486,11 @@ useEffect(() => {
     return () => node.removeEventListener('wheel', handleWheel);
 }, [isHorizontalMode, isTransitioning, totalHorizontalWidth]);
 
-// Add this to your DiellPage component, replacing or adding to your existing useEffect hooks
 
 useEffect(() => {
     let touchStartY = 0;
     let lastTouchY = 0;
     let isTrackingTouch = false;
-    
-    // Safari viewport height fix - use CSS viewport units approach
-    const getSafeViewportHeight = () => {
-        // For Safari mobile, use the stable small viewport height equivalent
-        const isSafari = /Safari/.test(navigator.userAgent) && /iPhone|iPad/.test(navigator.userAgent);
-        
-        if (isSafari) {
-            // Mimic 100svh behavior: use the smaller of current viewport or screen height
-            const currentViewport = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-            const screenHeight = screen.height;
-            
-            // Safari's small viewport is typically screen height minus ~140px for UI chrome
-            const safariSmallViewport = Math.min(currentViewport, screenHeight - 140);
-            return safariSmallViewport;
-        }
-        
-        return window.innerHeight;
-    };
     
     const handleTouchStart = (e) => {
         if (isTransitioning) return;
@@ -567,7 +546,7 @@ useEffect(() => {
                 // Start the transition to vertical mode
                 setTimeout(() => setIsHorizontalMode(false), 200);
                 
-                // === FAST FALL ANIMATION WITH SAFARI FIX === //
+                // === FAST FALL ANIMATION === //
                 setTimeout(() => {
                     const container = verticalContentRef.current;
                     if (!container) return;
@@ -575,9 +554,7 @@ useEffect(() => {
                     container.scrollTo({ top: 0, behavior: 'auto' });
                     
                     const fallDuration = 1200;
-                    // Use safe viewport height for Safari
-                    const viewportHeight = getSafeViewportHeight();
-                    const fallDistance = viewportHeight * 5.5;
+                    const fallDistance = window.innerHeight * 5.5;
                     const startTime = Date.now();
                     
                     const animateFall = () => {
@@ -616,17 +593,6 @@ useEffect(() => {
         isTrackingTouch = false;
     };
     
-    // Listen for viewport changes (Safari address bar hide/show)
-    const handleViewportChange = () => {
-        // Force a small delay to let Safari settle
-        setTimeout(() => {
-            if (window.visualViewport) {
-                // Update any height-dependent calculations here if needed
-                console.log('Viewport height changed:', window.visualViewport.height);
-            }
-        }, 100);
-    };
-    
     const node = pageContainerRef.current;
     if (!node) return;
     
@@ -635,22 +601,12 @@ useEffect(() => {
     node.addEventListener('touchmove', handleTouchMove, { passive: false });
     node.addEventListener('touchend', handleTouchEnd, { passive: true });
     
-    // Listen for viewport changes (Safari)
-    if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', handleViewportChange);
-    }
-    
     return () => {
         node.removeEventListener('touchstart', handleTouchStart);
         node.removeEventListener('touchmove', handleTouchMove);
         node.removeEventListener('touchend', handleTouchEnd);
-        
-        if (window.visualViewport) {
-            window.visualViewport.removeEventListener('resize', handleViewportChange);
-        }
     };
 }, [isHorizontalMode, isTransitioning, totalHorizontalWidth]);
-
 
     // Vertical scroll progress tracker
     useEffect(() => {
