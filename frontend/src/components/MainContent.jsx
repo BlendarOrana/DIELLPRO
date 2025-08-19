@@ -49,34 +49,27 @@ const TechStackCarousel = () => {
     }, [skills.length]);
 
     return (
-        <div className="mt-8 flex flex-wrap gap-3 items-center" aria-label="Our Tech Stack">
+        <div className="mt-8 flex flex-wrap gap-3" aria-label="Our Tech Stack">
             {skills.map((skill, index) => {
                 const isActive = index === currentIndex;
                 return (
                     <div
                         key={skill.text}
-                        className="font-mono text-sm font-bold h-10 flex items-center justify-center px-4 rounded-full border transition-colors duration-300 relative"
+                        className="font-mono text-sm font-bold h-10 flex items-center justify-center px-4 rounded-full border transition-all duration-500"
                         style={{
                             color: isActive ? '#0a0a0a' : skill.color,
+                            backgroundColor: isActive ? skill.color : 'rgba(255, 255, 255, 0.05)',
                             borderColor: skill.color,
+                            boxShadow: isActive ? `0 0 20px ${skill.color}` : 'none',
                         }}
                     >
-                        {isActive && (
-                            <motion.div
-                                layoutId="active-skill-highlight"
-                                className="absolute inset-0 rounded-full"
-                                style={{ backgroundColor: skill.color, boxShadow: `0 0 20px ${skill.color}` }}
-                                transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-                            />
-                        )}
-                        <span className="relative z-10">{skill.text}</span>
+                        <span>{skill.text}</span>
                     </div>
                 );
             })}
         </div>
     );
 };
-
 
 
 // --- REFACTORED AUTOMATED MULTI-DEMO SHOWCASE --- //
