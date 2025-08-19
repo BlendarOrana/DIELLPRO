@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo, memo, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion'; // Added for animations
 import { DiellLogo } from 'diell-logo'; // Assuming this is your logo component
-import VerticalContent from './VerticalContent'; // This remains untouched
 import {
     Laptop,
     WandSparkles,
@@ -23,34 +22,51 @@ import {
     Signal
 } from 'lucide-react';
 
+// === LAZY LOADED COMPONENTS === //
+const VerticalContent = lazy(() => import('./VerticalContent'));
 
+// === STATIC DATA (moved outside components) === //
+const TECH_SKILLS = [
+    { text: 'React', color: '#61DAFB' },
+    { text: 'Framer Motion', color: '#BB44B3' },
+    { text: 'TypeScript', color: '#3178C6' },
+    { text: 'Tailwind CSS', color: '#38BDF8' },
+    { text: 'DaisyUI', color: '#fbbf24' },
+];
 
+const DEMO_NAMES = ['theme-toggle', 'music-player', 'social-feed', 'dashboard', 'notifications'];
 
+const NOTIFICATION_MESSAGES = ['New message from Sarah', 'Payment received $250', 'System update available'];
 
+// Animation variants (static)
+const DEMO_VARIANTS = {
+    initial: { opacity: 0, x: 50, scale: 0.98 },
+    animate: { opacity: 1, x: 0, scale: 1 },
+    exit: { opacity: 0, x: -50, scale: 0.98 },
+};
 
+const DEMO_TRANSITION = { type: 'spring', stiffness: 300, damping: 30, duration: 0.6 };
 
+// === THEME CONFIGURATIONS === //
+const THEMES = {
+    dark: { bg: 'bg-neutral-900', cardBg: 'bg-neutral-800', text: 'text-white', subText: 'text-neutral-300' },
+    light: { bg: 'bg-green-300', cardBg: 'bg-neutral-100', text: 'text-neutral-900', subText: 'text-neutral-600' }
+};
 
-// --- HELPER & DECORATIVE COMPONENTS --- //
-const TechStackCarousel = () => {
-    const skills = [
-        { text: 'React', color: '#61DAFB' },
-        { text: 'Framer Motion', color: '#BB44B3' },
-        { text: 'TypeScript', color: '#3178C6' },
-        { text: 'Tailwind CSS', color: '#38BDF8' },
-        { text: 'DaisyUI', color: '#fbbf24' },
-    ];
+// === HELPER & DECORATIVE COMPONENTS === //
+const TechStackCarousel = memo(() => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setCurrentIndex(prev => (prev + 1) % skills.length);
+            setCurrentIndex(prev => (prev + 1) % TECH_SKILLS.length);
         }, 2500);
         return () => clearInterval(interval);
-    }, [skills.length]);
+    }, []);
 
     return (
         <div className="mt-8 flex flex-wrap gap-3" aria-label="Our Tech Stack">
-            {skills.map((skill, index) => {
+            {TECH_SKILLS.map((skill, index) => {
                 const isActive = index === currentIndex;
                 return (
                     <div
@@ -69,22 +85,11 @@ const TechStackCarousel = () => {
             })}
         </div>
     );
-};
+});
 
-
-// --- REFACTORED AUTOMATED MULTI-DEMO SHOWCASE --- //
-
-// Animation variants for Framer Motion
-const demoVariants = {
-    initial: { opacity: 0, x: 50, scale: 0.98 },
-    animate: { opacity: 1, x: 0, scale: 1 },
-    exit: { opacity: 0, x: -50, scale: 0.98 },
-};
-const transition = { type: 'spring', stiffness: 300, damping: 30, duration: 0.6 };
-
-// Individual Demo Components for clarity and separation of concerns
-const ThemeDemo = ({ theme, isDarkMode, setIsDarkMode }) => (
-    <motion.div variants={demoVariants} initial="initial" animate="animate" exit="exit" transition={transition} className={`w-full h-full p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 ${theme.text}`}>
+// === MEMOIZED DEMO COMPONENTS === //
+const ThemeDemo = memo(({ theme, isDarkMode, setIsDarkMode }) => (
+    <motion.div variants={DEMO_VARIANTS} initial="initial" animate="animate" exit="exit" transition={DEMO_TRANSITION} className={`w-full h-full p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 ${theme.text}`}>
         <div className="flex items-center justify-between">
             <h3 className="text-base sm:text-lg font-semibold">Settings</h3>
             <motion.div
@@ -111,10 +116,10 @@ const ThemeDemo = ({ theme, isDarkMode, setIsDarkMode }) => (
             </div>
         </div>
     </motion.div>
-);
+));
 
-const MusicPlayerDemo = ({ isPlaying, setIsPlaying, progress }) => (
-    <motion.div variants={demoVariants} initial="initial" animate="animate" exit="exit" transition={transition} className="w-full h-full p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 text-white">
+const MusicPlayerDemo = memo(({ isPlaying, setIsPlaying, progress }) => (
+    <motion.div variants={DEMO_VARIANTS} initial="initial" animate="animate" exit="exit" transition={DEMO_TRANSITION} className="w-full h-full p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 text-white">
         <div className="text-center">
             <motion.div animate={{ scale: isPlaying ? 1.05 : 1, transition: { duration: 1.5, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' } }} className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 mx-auto bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl lg:rounded-2xl mb-3 sm:mb-4 flex items-center justify-center shadow-2xl">
                 <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-20 lg:h-20 bg-white/20 rounded-lg lg:rounded-xl backdrop-blur-sm"></div>
@@ -133,11 +138,10 @@ const MusicPlayerDemo = ({ isPlaying, setIsPlaying, progress }) => (
             </div>
         </div>
     </motion.div>
-);
+));
 
-
-const SocialFeedDemo = ({ isLiked, likes }) => (
-    <motion.div variants={demoVariants} initial="initial" animate="animate" exit="exit" transition={transition} className="w-full h-full p-6 space-y-4 text-white">
+const SocialFeedDemo = memo(({ isLiked, likes }) => (
+    <motion.div variants={DEMO_VARIANTS} initial="initial" animate="animate" exit="exit" transition={DEMO_TRANSITION} className="w-full h-full p-6 space-y-4 text-white">
         <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500"></div>
             <div><p className="font-semibold">Alex Designer</p><p className="text-sm text-neutral-400">2 minutes ago</p></div>
@@ -154,19 +158,17 @@ const SocialFeedDemo = ({ isLiked, likes }) => (
             </div>
         </div>
     </motion.div>
-);
+));
 
-const DashboardDemo = ({ isDarkMode }) => (
-    <motion.div variants={demoVariants} initial="initial" animate="animate" exit="exit" transition={transition} className="w-full h-full p-6 space-y-4 text-white">
+const DashboardDemo = memo(({ isDarkMode }) => (
+    <motion.div variants={DEMO_VARIANTS} initial="initial" animate="animate" exit="exit" transition={DEMO_TRANSITION} className="w-full h-full p-6 space-y-4 text-white">
         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-500 ${isDarkMode ? 'text-white' : 'text-neutral-900'}`}>Analytics Dashboard</h3>
         <div className="grid grid-cols-2 gap-3">
-            {/* --- REVENUE CARD --- */}
             <div className={`p-3 rounded-xl transition-colors duration-500 ${isDarkMode ? 'bg-gradient-to-br from-green-500/20 to-emerald-500/20' : 'bg-green-100'}`}>
                 <p className={`text-sm ${isDarkMode ? 'text-neutral-300' : 'text-green-800/80'}`}>Revenue</p>
                 <p className={`text-2xl font-bold ${isDarkMode ? 'text-green-400' : 'text-green-700'}`}>$12.4k</p>
                 <p className={`text-xs font-medium ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>+12%</p>
             </div>
-             {/* --- USERS CARD --- */}
             <div className={`p-3 rounded-xl transition-colors duration-500 ${isDarkMode ? 'bg-gradient-to-br from-blue-500/20 to-cyan-500/20' : 'bg-blue-100'}`}>
                 <p className={`text-sm ${isDarkMode ? 'text-neutral-300' : 'text-blue-800/80'}`}>Users</p>
                 <p className={`text-2xl font-bold ${isDarkMode ? 'text-blue-400' : 'text-blue-700'}`}>2.1k</p>
@@ -186,10 +188,10 @@ const DashboardDemo = ({ isDarkMode }) => (
             </motion.div>
         </div>
     </motion.div>
-);
+));
 
-const NotificationsDemo = ({ notifications }) => (
-    <motion.div variants={demoVariants} initial="initial" animate="animate" exit="exit" transition={transition} className="w-full h-full p-6 space-y-3 text-white">
+const NotificationsDemo = memo(({ notifications }) => (
+    <motion.div variants={DEMO_VARIANTS} initial="initial" animate="animate" exit="exit" transition={DEMO_TRANSITION} className="w-full h-full p-6 space-y-3 text-white">
         <div className="flex items-center gap-2 mb-4"><Bell size={20} className="text-yellow-500" /><h3 className="text-lg font-semibold">Notifications</h3></div>
         <motion.div variants={{ animate: { transition: { staggerChildren: 0.2 } } }} className="space-y-2 max-h-64 overflow-hidden">
             {notifications.map((notif) => (
@@ -199,9 +201,10 @@ const NotificationsDemo = ({ notifications }) => (
             ))}
         </motion.div>
     </motion.div>
-);
+));
 
-const ShowcaseNode = ({ isVisible }) => {
+// === LAZY LOADED SHOWCASE NODE === //
+const ShowcaseNode = memo(({ isVisible }) => {
     const [isDarkMode, setIsDarkMode] = useState(true);
     const [currentDemoIndex, setCurrentDemoIndex] = useState(0);
     const [notifications, setNotifications] = useState([]);
@@ -212,20 +215,33 @@ const ShowcaseNode = ({ isVisible }) => {
     const [batteryLevel, setBatteryLevel] = useState(85);
     const [signalStrength, setSignalStrength] = useState(4);
     
-    const demos = ['theme-toggle', 'music-player', 'social-feed', 'dashboard', 'notifications'];
-    const currentDemo = demos[currentDemoIndex];
+    const currentDemo = DEMO_NAMES[currentDemoIndex];
 
-    // ... (keep all your existing useEffect hooks - they don't need changes)
-    // Auto-cycle through demos with improved timing
+    // Memoized theme object
+    const theme = useMemo(() => 
+        isDarkMode ? THEMES.dark : THEMES.light, 
+        [isDarkMode]
+    );
+
+    // Memoized demo components object
+    const demoComponents = useMemo(() => ({
+        'theme-toggle': <ThemeDemo theme={theme} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />,
+        'music-player': <MusicPlayerDemo isPlaying={isPlaying} setIsPlaying={setIsPlaying} progress={progress} />,
+        'social-feed': <SocialFeedDemo isLiked={isLiked} likes={likes} />,
+        'dashboard': <DashboardDemo isDarkMode={isDarkMode} />,
+        'notifications': <NotificationsDemo notifications={notifications} />,
+    }), [theme, isDarkMode, isPlaying, progress, isLiked, likes, notifications]);
+
+    // Auto-cycle through demos
     useEffect(() => {
         if (!isVisible) return;
         const interval = setInterval(() => {
-            setCurrentDemoIndex(prev => (prev + 1) % demos.length);
-        }, 5500); // Increased duration for better viewing
+            setCurrentDemoIndex(prev => (prev + 1) % DEMO_NAMES.length);
+        }, 5500);
         return () => clearInterval(interval);
-    }, [isVisible, demos.length]);
+    }, [isVisible]);
     
-    // Manage state resets and timed actions for each demo
+    // Demo state management
     useEffect(() => {
         const resetAll = () => {
             setIsPlaying(false);
@@ -248,8 +264,7 @@ const ShowcaseNode = ({ isVisible }) => {
                 setTimeout(() => { setIsLiked(true); setLikes(666); }, 2500);
                 break;
             case 'notifications':
-                const notificationMessages = ['New message from Sarah', 'Payment received $250', 'System update available'];
-                notificationMessages.forEach((message, index) => {
+                NOTIFICATION_MESSAGES.forEach((message, index) => {
                     setTimeout(() => {
                         setNotifications(prev => [...prev, { id: Date.now() + index, message }]);
                     }, (index + 1) * 900);
@@ -257,7 +272,6 @@ const ShowcaseNode = ({ isVisible }) => {
                 break;
             default: break;
         }
-
     }, [currentDemo]);
     
     // Music player progress animation
@@ -267,7 +281,7 @@ const ShowcaseNode = ({ isVisible }) => {
         return () => clearInterval(interval);
     }, [isPlaying, currentDemo]);
 
-    // Simulate battery drain and signal changes
+    // Battery and signal simulation
     useEffect(() => {
         const interval = setInterval(() => {
             setBatteryLevel(prev => (prev <= 20 ? 95 : prev - 1));
@@ -275,17 +289,6 @@ const ShowcaseNode = ({ isVisible }) => {
         }, 5000);
         return () => clearInterval(interval);
     }, []);
-
-    const theme = isDarkMode ? { bg: 'bg-neutral-900', cardBg: 'bg-neutral-800', text: 'text-white', subText: 'text-neutral-300' }
-                              : { bg: 'bg-green-300', cardBg: 'bg-neutral-100', text: 'text-neutral-900', subText: 'text-neutral-600' };
-
-    const demoComponents = {
-        'theme-toggle': <ThemeDemo theme={theme} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />,
-        'music-player': <MusicPlayerDemo isPlaying={isPlaying} setIsPlaying={setIsPlaying} progress={progress} />,
-        'social-feed': <SocialFeedDemo isLiked={isLiked} likes={likes} />,
-        'dashboard': <DashboardDemo isDarkMode={isDarkMode} />,
-        'notifications': <NotificationsDemo notifications={notifications} />,
-    };
 
     return (
         <div
@@ -296,7 +299,7 @@ const ShowcaseNode = ({ isVisible }) => {
                 opacity: isVisible ? 1 : 0.8,
             }}
         >
-            {/* Phone Header - Made responsive */}
+            {/* Phone Header */}
             <div className="h-8 sm:h-9 bg-neutral-900/90 flex items-center justify-between px-3 sm:px-4 border-b border-neutral-700">
                 <div className="flex gap-1.5 sm:gap-2">
                     <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500/70 hover:bg-red-500"></div>
@@ -321,64 +324,109 @@ const ShowcaseNode = ({ isVisible }) => {
                 </AnimatePresence>
             </div>
             
-            {/* Demo indicator dots - Made responsive */}
+            {/* Demo indicator dots */}
             <div className="absolute bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 sm:gap-2">
-                {demos.map((_, index) => (
+                {DEMO_NAMES.map((_, index) => (
                     <div key={index} className={`h-1.5 sm:h-2 rounded-full transition-all duration-500 ${currentDemoIndex === index ? 'bg-yellow-500 w-4 sm:w-6' : 'bg-neutral-600 w-1.5 sm:w-2'}`} />
                 ))}
             </div>
         </div>
     );
-};
+});
 
+// === STYLING & PAGE HELPERS === //
+const GlobalStyles = memo(() => ( 
+    <style>{`:root { --color-frontend: #fbbf24; --color-backend: #22c55e; --color-grid-frontend: rgba(251, 191, 36, 0.08); --color-grid-backend: rgba(34, 197, 94, 0.08); --color-text-main: #EAEAEA; --color-text-subtle: #A0A0A0; } html, body { margin: 0; padding: 0; overflow: hidden; background-color: #000; color: var(--color-text-main); font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; } .scroll-container { height: 100vh; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth; } .scroll-container::-webkit-scrollbar { display: none; } @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } } .animate-fade-in { animation: fadeIn 1s ease-out forwards; }`}
+    </style> 
+));
 
-// --- STYLING & PAGE HELPERS --- //
-const GlobalStyles = () => ( <style>{`:root { --color-frontend: #fbbf24; --color-backend: #22c55e; --color-grid-frontend: rgba(251, 191, 36, 0.08); --color-grid-backend: rgba(34, 197, 94, 0.08); --color-text-main: #EAEAEA; --color-text-subtle: #A0A0A0; } html, body { margin: 0; padding: 0; overflow: hidden; background-color: #000; color: var(--color-text-main); font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; } .scroll-container { height: 100vh; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth; } .scroll-container::-webkit-scrollbar { display: none; } @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } } .animate-fade-in { animation: fadeIn 1s ease-out forwards; }`}</style> );
-const AnimatedContent = ({ scrollX, trigger, children, className = '' }) => { const isVisible = scrollX >= trigger; return ( <div className={`transition-all duration-700 ease-out ${className}`} style={{ opacity: isVisible ? 1 : 0, transform: `translateY(${isVisible ? 0 : '20px'})` }} > {children} </div> ); };
-const InfoNode = ({ scrollX, trigger, Icon, title, text, color }) => { const screenW = window.innerWidth; const isVisible = scrollX >= trigger; const nodeCenter = trigger + screenW / 2; const distanceFromCenter = nodeCenter - scrollX; const parallax = -distanceFromCenter * 0.1; const scale = 1 - Math.min(Math.abs(distanceFromCenter) / screenW, 0.2); return ( <div className="w-screen h-screen flex items-center justify-center font-sans px-8"> <div className="text-center transition-all duration-700 ease-out flex flex-col items-center gap-4" style={{ opacity: isVisible ? 1 : 0, transform: `translateY(${parallax}px) scale(${scale})` }} > <div className="rounded-full p-4 border-2" style={{ borderColor: color, boxShadow: `0 0 30px ${color}` }}> <Icon size={40} color={color} /> </div> <h2 className="text-5xl font-bold tracking-tight mt-4" style={{ color: color }}>{title}</h2> <p className="text-xl text-neutral-400 max-w-lg mt-2">{text}</p> </div> </div> ); };
+const AnimatedContent = memo(({ scrollX, trigger, children, className = '' }) => { 
+    const isVisible = scrollX >= trigger; 
+    return ( 
+        <div className={`transition-all duration-700 ease-out ${className}`} style={{ opacity: isVisible ? 1 : 0, transform: `translateY(${isVisible ? 0 : '20px'})` }} > 
+            {children} 
+        </div> 
+    ); 
+});
 
-// === PROGRESSBAR FIX STARTS HERE === //
-const ProgressBar = ({ isHorizontalMode, progress }) => {
-    // The target color changes based on the scrolling mode (horizontal vs. vertical)
+const InfoNode = memo(({ scrollX, trigger, Icon, title, text, color }) => { 
+    const screenW = window.innerWidth; 
+    const isVisible = scrollX >= trigger; 
+    const nodeCenter = trigger + screenW / 2; 
+    const distanceFromCenter = nodeCenter - scrollX; 
+    const parallax = -distanceFromCenter * 0.1; 
+    const scale = 1 - Math.min(Math.abs(distanceFromCenter) / screenW, 0.2); 
+    
+    return ( 
+        <div className="w-screen h-screen flex items-center justify-center font-sans px-8"> 
+            <div className="text-center transition-all duration-700 ease-out flex flex-col items-center gap-4" style={{ opacity: isVisible ? 1 : 0, transform: `translateY(${parallax}px) scale(${scale})` }} > 
+                <div className="rounded-full p-4 border-2" style={{ borderColor: color, boxShadow: `0 0 30px ${color}` }}> 
+                    <Icon size={40} color={color} /> 
+                </div> 
+                <h2 className="text-5xl font-bold tracking-tight mt-4" style={{ color: color }}>{title}</h2> 
+                <p className="text-xl text-neutral-400 max-w-lg mt-2">{text}</p> 
+            </div> 
+        </div> 
+    ); 
+});
+
+// === PROGRESS BAR === //
+const ProgressBar = memo(({ isHorizontalMode, progress }) => {
     const targetColor = isHorizontalMode ? 'var(--color-frontend)' : 'var(--color-backend)';
-    // Ensure the progress value is clamped between 0 and 1 to prevent visual bugs
     const safeProgress = Math.max(0, Math.min(progress, 1));
 
-    // Using Framer Motion's motion.div allows us to animate properties performantly
-    // and with physics-based transitions for a much smoother, more responsive feel.
     return (
         <div className="fixed bottom-0 left-0 w-full h-1 bg-neutral-900 z-50">
             <motion.div
-                className="h-full origin-left w-full" // `origin-left` makes the bar grow from the left side.
-                initial={false} // We don't need an animation when the component first loads.
+                className="h-full origin-left w-full"
+                initial={false}
                 animate={{
-                    // We animate `scaleX` instead of `width`. It's much better for performance.
                     scaleX: safeProgress,
-                    // Animate the background color for a smooth transition between modes.
                     backgroundColor: targetColor,
-                    // Animating the boxShadow as a string provides a smooth glow color change.
                     boxShadow: `0 0 10px ${targetColor}, 0 0 20px ${targetColor}`,
                 }}
                 transition={{
-                    // Use different transition types for different properties for the best effect.
                     scaleX: {
-                        type: 'spring',     // A spring physics animation for the bar's length.
-                        stiffness: 100,     // How "strong" the spring is.
-                        damping: 25,        // How much friction is applied (less bounce).
-                        restDelta: 0.001,   // When the animation is considered complete.
+                        type: 'spring',
+                        stiffness: 100,
+                        damping: 25,
+                        restDelta: 0.001,
                     },
-                    // For color changes, a simple "tween" (ease-in-out) feels better than a spring.
                     backgroundColor: { type: 'tween', duration: 0.5, ease: 'easeIn' },
                     boxShadow: { type: 'tween', duration: 0.5, ease: 'easeIn' },
                 }}
             />
         </div>
     );
-};
-// === PROGRESSBAR FIX ENDS HERE === //
+});
 
+// === LAZY LOADED SHOWCASE WRAPPER === //
+const LazyShowcaseNode = memo(({ isVisible }) => {
+    // Only render when visible
+    if (!isVisible) {
+        return (
+            <div className="flex items-center justify-center min-h-[220px] sm:min-h-[280px] lg:min-h-0">
+                <div className="w-full h-full max-w-sm sm:max-w-md lg:max-w-2xl max-h-[300px] sm:max-h-[350px] lg:max-h-[450px] bg-black/20 backdrop-blur-md rounded-xl border border-neutral-800 shadow-xl overflow-hidden mx-auto flex items-center justify-center">
+                    <div className="text-neutral-500">Loading...</div>
+                </div>
+            </div>
+        );
+    }
+    
+    return (
+        <div className="flex items-center justify-center min-h-[220px] sm:min-h-[280px] lg:min-h-0">
+            <Suspense fallback={
+                <div className="w-full h-full max-w-sm sm:max-w-md lg:max-w-2xl max-h-[300px] sm:max-h-[350px] lg:max-h-[450px] bg-black/20 backdrop-blur-md rounded-xl border border-neutral-800 shadow-xl overflow-hidden mx-auto flex items-center justify-center">
+                    <div className="text-neutral-500">Loading showcase...</div>
+                </div>
+            }>
+                <ShowcaseNode isVisible={isVisible} />
+            </Suspense>
+        </div>
+    );
+});
 
-// --- MAIN PAGE COMPONENT (UNCHANGED) --- //
+// --- MAIN PAGE COMPONENT --- //
 const DiellPage = () => {
     const [scrollPosition, setScrollPosition] = useState(0);
     const [verticalScrollProgress, setVerticalScrollProgress] = useState(0);
@@ -390,11 +438,18 @@ const DiellPage = () => {
     const animationFrameId = useRef(null);
     const currentScrollX = useRef(0);
     const targetScrollX = useRef(0);
-    const screenW = window.innerWidth;
-    const numHorizontalSections = 3;
-    const totalHorizontalWidth = screenW * (numHorizontalSections - 1);
-
     
+    // Memoized calculations
+    const screenW = useMemo(() => window.innerWidth, []);
+    const numHorizontalSections = useMemo(() => 3, []);
+    const totalHorizontalWidth = useMemo(() => screenW * (numHorizontalSections - 1), [screenW, numHorizontalSections]);
+    
+    const horizontalProgress = useMemo(() => scrollPosition / totalHorizontalWidth, [scrollPosition, totalHorizontalWidth]);
+    const currentProgress = isHorizontalMode ? horizontalProgress : verticalScrollProgress;
+    const isShowcaseVisible = useMemo(() => 
+        scrollPosition > screenW * 0.4 && scrollPosition < screenW * 1.6, 
+        [scrollPosition, screenW]
+    );
 
     // Smooth scroll animation loop
     useEffect(() => {
@@ -414,9 +469,8 @@ const DiellPage = () => {
         return () => cancelAnimationFrame(animationFrameId.current);
     }, []);
 
-
-useEffect(() => {
-    const handleWheel = (e) => {
+    // Memoized wheel handler
+    const handleWheel = useCallback((e) => {
         if (isHorizontalMode) e.preventDefault();
         if (isTransitioning) return;
         const delta = e.deltaY;
@@ -428,125 +482,8 @@ useEffect(() => {
                 targetScrollX.current = totalHorizontalWidth;
                 setIsTransitioning(true);
                 
-                // Start the transition to vertical mode
                 setTimeout(() => setIsHorizontalMode(false), 200);
                 
-                // === NEW FAST FALL ANIMATION === //
-                setTimeout(() => {
-                    const container = verticalContentRef.current;
-                    if (!container) return;
-                    
-                    // Reset to top before starting the fall animation
-                    container.scrollTo({ top: 0, behavior: 'auto' });
-                    
-                    // Fast fall animation parameters
-                    const fallDuration = 1200; // 1.2 seconds
-                    const fallDistance = window.innerHeight * 5.5;
-                    const startTime = Date.now();
-                    
-                    const animateFall = () => {
-                        const elapsed = Date.now() - startTime;
-                        const progress = Math.min(elapsed / fallDuration, 1);
-                        
-                        // Use easeOutCubic for a more natural fall feeling
-                        const easeOutCubic = 1 - Math.pow(1 - progress, 3);
-                        const currentScrollTop = easeOutCubic * fallDistance;
-                        
-                        container.scrollTop = currentScrollTop;
-                        
-                        if (progress < 1) {
-                            requestAnimationFrame(animateFall);
-                        } else {
-                            // Animation complete - user now has control
-                            setIsTransitioning(false);
-                        }
-                    };
-                    
-                    // Start the fall animation
-                    requestAnimationFrame(animateFall);
-                }, 400); // Start fall after vertical section is visible
-            }
-        } else {
-            const container = verticalContentRef.current;
-            if (!container) return;
-            
-            if (delta < 0 && container.scrollTop <= 0) {
-                e.preventDefault();
-                container.scrollTo({ top: 0, behavior: 'auto' });
-                setIsTransitioning(true);
-                setIsHorizontalMode(true);
-                setTimeout(() => setIsTransitioning(false), 1200);
-            }
-        }
-    };
-    
-    const node = pageContainerRef.current;
-    if (!node) return;
-    node.addEventListener('wheel', handleWheel, { passive: false });
-    return () => node.removeEventListener('wheel', handleWheel);
-}, [isHorizontalMode, isTransitioning, totalHorizontalWidth]);
-
-
-useEffect(() => {
-    let touchStartY = 0;
-    let lastTouchY = 0;
-    let isTrackingTouch = false;
-    
-    const handleTouchStart = (e) => {
-        if (isTransitioning) return;
-        
-        const touch = e.touches[0];
-        touchStartY = touch.clientY;
-        lastTouchY = touch.clientY;
-        isTrackingTouch = true;
-    };
-    
-    const handleTouchMove = (e) => {
-        if (!isTrackingTouch || isTransitioning) return;
-        
-        const touch = e.touches[0];
-        const currentY = touch.clientY;
-        const deltaY = currentY - lastTouchY;
-        
-        if (isHorizontalMode) {
-            // Prevent default scrolling behavior in horizontal mode
-            e.preventDefault();
-            
-            // Use vertical swipes to control horizontal scrolling (like mouse wheel)
-            const scrollSensitivity = 2.0;
-            targetScrollX.current = Math.max(0, 
-                Math.min(targetScrollX.current - deltaY * scrollSensitivity, totalHorizontalWidth)
-            );
-        } else {
-            // In vertical mode, let native scrolling handle most of the work
-            // We only need to detect swipe up at the top to return to horizontal
-            const container = verticalContentRef.current;
-            if (container && container.scrollTop <= 0 && deltaY > 0) {
-                // User is swiping down at the top - prevent native scroll
-                e.preventDefault();
-            }
-        }
-        
-        lastTouchY = currentY;
-    };
-    
-    const handleTouchEnd = (e) => {
-        if (!isTrackingTouch || isTransitioning) return;
-        
-        const touch = e.changedTouches[0];
-        const endY = touch.clientY;
-        const totalDeltaY = endY - touchStartY;
-        
-        if (isHorizontalMode) {
-            // Check if we're at the end and user swiped up (like wheel scroll down)
-            if (targetScrollX.current >= totalHorizontalWidth && totalDeltaY < -10) {
-                targetScrollX.current = totalHorizontalWidth;
-                setIsTransitioning(true);
-                
-                // Start the transition to vertical mode
-                setTimeout(() => setIsHorizontalMode(false), 200);
-                
-                // === FAST FALL ANIMATION === //
                 setTimeout(() => {
                     const container = verticalContentRef.current;
                     if (!container) return;
@@ -577,11 +514,102 @@ useEffect(() => {
                 }, 400);
             }
         } else {
-            // Handle transition from vertical to horizontal mode
             const container = verticalContentRef.current;
             if (!container) return;
             
-            // Check if we're at the top and user swiped down (like wheel scroll up)
+            if (delta < 0 && container.scrollTop <= 0) {
+                e.preventDefault();
+                container.scrollTo({ top: 0, behavior: 'auto' });
+                setIsTransitioning(true);
+                setIsHorizontalMode(true);
+                setTimeout(() => setIsTransitioning(false), 1200);
+            }
+        }
+    }, [isHorizontalMode, isTransitioning, totalHorizontalWidth]);
+
+    // Memoized touch handlers
+    const handleTouchStart = useCallback((e) => {
+        if (isTransitioning) return;
+        
+        const touch = e.touches[0];
+        const touchStartY = touch.clientY;
+        
+        e.target.touchStartY = touchStartY;
+        e.target.lastTouchY = touchStartY;
+        e.target.isTrackingTouch = true;
+    }, [isTransitioning]);
+    
+    const handleTouchMove = useCallback((e) => {
+        if (!e.target.isTrackingTouch || isTransitioning) return;
+        
+        const touch = e.touches[0];
+        const currentY = touch.clientY;
+        const deltaY = currentY - e.target.lastTouchY;
+        
+        if (isHorizontalMode) {
+            e.preventDefault();
+            
+            const scrollSensitivity = 2.0;
+            targetScrollX.current = Math.max(0, 
+                Math.min(targetScrollX.current - deltaY * scrollSensitivity, totalHorizontalWidth)
+            );
+        } else {
+            const container = verticalContentRef.current;
+            if (container && container.scrollTop <= 0 && deltaY > 0) {
+                e.preventDefault();
+            }
+        }
+        
+        e.target.lastTouchY = currentY;
+    }, [isHorizontalMode, isTransitioning, totalHorizontalWidth]);
+    
+    const handleTouchEnd = useCallback((e) => {
+        if (!e.target.isTrackingTouch || isTransitioning) return;
+        
+        const touch = e.changedTouches[0];
+        const endY = touch.clientY;
+        const totalDeltaY = endY - e.target.touchStartY;
+        
+        if (isHorizontalMode) {
+            if (targetScrollX.current >= totalHorizontalWidth && totalDeltaY < -10) {
+                targetScrollX.current = totalHorizontalWidth;
+                setIsTransitioning(true);
+                
+                setTimeout(() => setIsHorizontalMode(false), 200);
+                
+                setTimeout(() => {
+                    const container = verticalContentRef.current;
+                    if (!container) return;
+                    
+                    container.scrollTo({ top: 0, behavior: 'auto' });
+                    
+                    const fallDuration = 1200;
+                    const fallDistance = window.innerHeight * 5.5;
+                    const startTime = Date.now();
+                    
+                    const animateFall = () => {
+                        const elapsed = Date.now() - startTime;
+                        const progress = Math.min(elapsed / fallDuration, 1);
+                        
+                        const easeOutCubic = 1 - Math.pow(1 - progress, 3);
+                        const currentScrollTop = easeOutCubic * fallDistance;
+                        
+                        container.scrollTop = currentScrollTop;
+                        
+                        if (progress < 1) {
+                            requestAnimationFrame(animateFall);
+                        } else {
+                            setIsTransitioning(false);
+                        }
+                    };
+                    
+                    requestAnimationFrame(animateFall);
+                }, 400);
+            }
+        } else {
+            const container = verticalContentRef.current;
+            if (!container) return;
+            
             if (container.scrollTop <= 0 && totalDeltaY > 10) {
                 container.scrollTo({ top: 0, behavior: 'auto' });
                 setIsTransitioning(true);
@@ -590,43 +618,56 @@ useEffect(() => {
             }
         }
         
-        isTrackingTouch = false;
-    };
-    
-    const node = pageContainerRef.current;
-    if (!node) return;
-    
-    // Add touch event listeners
-    node.addEventListener('touchstart', handleTouchStart, { passive: true });
-    node.addEventListener('touchmove', handleTouchMove, { passive: false });
-    node.addEventListener('touchend', handleTouchEnd, { passive: true });
-    
-    return () => {
-        node.removeEventListener('touchstart', handleTouchStart);
-        node.removeEventListener('touchmove', handleTouchMove);
-        node.removeEventListener('touchend', handleTouchEnd);
-    };
-}, [isHorizontalMode, isTransitioning, totalHorizontalWidth]);
+        e.target.isTrackingTouch = false;
+    }, [isHorizontalMode, isTransitioning, totalHorizontalWidth]);
+
+    // Memoized vertical scroll handler
+    const handleVerticalScroll = useCallback(() => {
+        const container = verticalContentRef.current;
+        if (!container) return;
+        
+        const firstChild = container.firstChild; 
+        if(!firstChild) return;
+        
+        const totalContentHeight = firstChild.scrollHeight;
+        const totalScrollableHeight = totalContentHeight - container.offsetHeight;
+        const effectiveScrollTop = Math.max(0, container.scrollTop - window.innerHeight);
+        const effectiveScrollableHeight = totalScrollableHeight - window.innerHeight;
+        
+        setVerticalScrollProgress(effectiveScrollableHeight > 0 ? Math.min(effectiveScrollTop / effectiveScrollableHeight, 1) : 1);
+    }, []);
+
+    // Event listeners with memoized handlers
+    useEffect(() => {
+        const node = pageContainerRef.current;
+        if (!node) return;
+        node.addEventListener('wheel', handleWheel, { passive: false });
+        return () => node.removeEventListener('wheel', handleWheel);
+    }, [handleWheel]);
+
+    useEffect(() => {
+        const node = pageContainerRef.current;
+        if (!node) return;
+        
+        node.addEventListener('touchstart', handleTouchStart, { passive: true });
+        node.addEventListener('touchmove', handleTouchMove, { passive: false });
+        node.addEventListener('touchend', handleTouchEnd, { passive: true });
+        
+        return () => {
+            node.removeEventListener('touchstart', handleTouchStart);
+            node.removeEventListener('touchmove', handleTouchMove);
+            node.removeEventListener('touchend', handleTouchEnd);
+        };
+    }, [handleTouchStart, handleTouchMove, handleTouchEnd]);
 
     // Vertical scroll progress tracker
     useEffect(() => {
         const container = verticalContentRef.current;
         if (isHorizontalMode || !container) return;
-        const handleVerticalScroll = () => {
-            const firstChild = container.firstChild; if(!firstChild) return;
-            const totalContentHeight = firstChild.scrollHeight;
-            const totalScrollableHeight = totalContentHeight - container.offsetHeight;
-            const effectiveScrollTop = Math.max(0, container.scrollTop - window.innerHeight);
-            const effectiveScrollableHeight = totalScrollableHeight - window.innerHeight;
-            setVerticalScrollProgress(effectiveScrollableHeight > 0 ? Math.min(effectiveScrollTop / effectiveScrollableHeight, 1) : 1);
-        }
+        
         container.addEventListener('scroll', handleVerticalScroll);
         return () => container.removeEventListener('scroll', handleVerticalScroll);
-    }, [isHorizontalMode]);
-
-    const horizontalProgress = scrollPosition / totalHorizontalWidth;
-    const currentProgress = isHorizontalMode ? horizontalProgress : verticalScrollProgress;
-    const isShowcaseVisible = scrollPosition > screenW * 0.4 && scrollPosition < screenW * 1.6;
+    }, [isHorizontalMode, handleVerticalScroll]);
 
     return (
         <>
@@ -635,39 +676,69 @@ useEffect(() => {
                 <div className='absolute top-0 left-0 w-full h-full grid-background-frontend transition-transform duration-1000' style={{ transform: isHorizontalMode ? 'translateY(0%)' : 'translateY(-100%)', transitionTimingFunction: 'cubic-bezier(0.7, 0, 0.3, 1)' }}>
                     <div ref={horizontalContentRef} className="flex absolute top-0 left-0" style={{ width: `${numHorizontalSections * 100}vw`, height: '100vh' }}>
                         
+                        {/* Section 1: Hero */}
                         <section className="w-screen h-screen flex flex-col items-center justify-center text-center font-sans p-8">
-                            <div style={{ filter: 'drop-shadow(0 0 35px var(--color-frontend))' }}> <DiellLogo size={250} text='' PrimaryColor="var(--color-frontend)" /> </div>
+                            <div style={{ filter: 'drop-shadow(0 0 35px var(--color-frontend))' }}> 
+                                <DiellLogo size={250} text='' PrimaryColor="var(--color-frontend)" /> 
+                            </div>
                             <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                                <h1 className="text-7xl font-bold tracking-tighter mt-8 text-[var(--color-frontend)]" style={{ textShadow: '0 0 20px rgba(251, 191, 36, 0.3)'}} > Diell </h1>
-                                <p className="text-2xl mt-3 text-neutral-400"> <span className='text-[#fbbf24]'>//</span> Building The Exceptional.</p>
+                                <h1 className="text-7xl font-bold tracking-tighter mt-8 text-[var(--color-frontend)]" style={{ textShadow: '0 0 20px rgba(251, 191, 36, 0.3)'}} > 
+                                    Diell 
+                                </h1>
+                                <p className="text-2xl mt-3 text-neutral-400"> 
+                                    <span className='text-[#fbbf24]'>//</span> Building The Exceptional.
+                                </p>
                             </div>
                         </section>
             
-<section className="w-screen h-screen flex items-center justify-center p-4 sm:p-8 lg:p-16" style={{ minHeight: '100dvh' }}>
-    <div className="grid lg:grid-cols-2 gap-6 lg:gap-16 items-center w-full max-w-7xl mx-auto py-8 sm:py-0">
-        <AnimatedContent scrollX={scrollPosition} trigger={screenW * 0.7} className="font-sans order-2 lg:order-1">
-            <h2 className="text-2xl sm:text-3xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
-                We Craft. We Engineer.
-            </h2>
-            <p className="text-base sm:text-lg lg:text-xl text-neutral-400 mt-3 sm:mt-4 max-w-lg leading-relaxed"> 
-                We specialize in creating bespoke, high-performance web applications. From interactive UIs to complex data-driven platforms, we transform ambitious ideas into flawless digital realities. 
-            </p>
-            <div className="mt-4 sm:mt-6">
-                <TechStackCarousel />
-            </div>
-        </AnimatedContent>
-        <div className="flex items-center justify-center order-1 lg:order-2 min-h-[220px] sm:min-h-[280px] lg:min-h-0">
-            <ShowcaseNode isVisible={isShowcaseVisible} />
-        </div>
-    </div>
-</section>
+                        {/* Section 2: Showcase */}
+                        <section className="w-screen h-screen flex items-center justify-center p-4 sm:p-8 lg:p-16" style={{ minHeight: '100dvh' }}>
+                            <div className="grid lg:grid-cols-2 gap-6 lg:gap-16 items-center w-full max-w-7xl mx-auto py-8 sm:py-0">
+                                <AnimatedContent scrollX={scrollPosition} trigger={screenW * 0.7} className="font-sans order-2 lg:order-1">
+                                    <h2 className="text-2xl sm:text-3xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
+                                        We Craft. We Engineer.
+                                    </h2>
+                                    <p className="text-base sm:text-lg lg:text-xl text-neutral-400 mt-3 sm:mt-4 max-w-lg leading-relaxed"> 
+                                        We specialize in creating bespoke, high-performance web applications. From interactive UIs to complex data-driven platforms, we transform ambitious ideas into flawless digital realities. 
+                                    </p>
+                                    <div className="mt-4 sm:mt-6">
+                                        <TechStackCarousel />
+                                    </div>
+                                </AnimatedContent>
+                                <LazyShowcaseNode isVisible={isShowcaseVisible} />
+                            </div>
+                        </section>
 
-                        <InfoNode scrollX={scrollPosition} trigger={screenW * 1.5} Icon={WandSparkles} title="Design-Driven Engineering." text="Our process lives at the intersection of creative design and technical precision. We build interfaces that are not only beautiful and intuitive but also robust, scalable, and a pleasure to use." color="var(--color-frontend)" />
+                        {/* Section 3: Design Info */}
+                        <InfoNode 
+                            scrollX={scrollPosition} 
+                            trigger={screenW * 1.5} 
+                            Icon={WandSparkles} 
+                            title="Design-Driven Engineering." 
+                            text="Our process lives at the intersection of creative design and technical precision. We build interfaces that are not only beautiful and intuitive but also robust, scalable, and a pleasure to use." 
+                            color="var(--color-frontend)" 
+                        />
                     </div>
                 </div>
 
-                <div ref={verticalContentRef} className="absolute top-0 left-0 w-full h-full scroll-container" style={{ transform: isHorizontalMode ? 'translateY(100%)' : 'translateY(0%)', transition: 'transform 1.0s cubic-bezier(0.7, 0, 0.3, 1)'}} >
-                    <VerticalContent />
+                {/* Vertical Content - Lazy Loaded */}
+                <div 
+                    ref={verticalContentRef} 
+                    className="absolute top-0 left-0 w-full h-full scroll-container" 
+                    style={{ 
+                        transform: isHorizontalMode ? 'translateY(100%)' : 'translateY(0%)', 
+                        transition: 'transform 1.0s cubic-bezier(0.7, 0, 0.3, 1)'
+                    }}
+                >
+                    {!isHorizontalMode && (
+                        <Suspense fallback={
+                            <div className="w-full h-screen flex items-center justify-center">
+                                <div className="text-neutral-400">Loading vertical content...</div>
+                            </div>
+                        }>
+                            <VerticalContent />
+                        </Suspense>
+                    )}
                 </div>
             </div>
             <ProgressBar isHorizontalMode={isHorizontalMode} progress={currentProgress} />
