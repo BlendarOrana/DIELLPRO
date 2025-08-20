@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { DiellLogo } from 'diell-logo';
-import { Rocket, Layers, ShieldCheck, Database, User, Router } from 'lucide-react';
+import { Rocket, Layers, ShieldCheck, Database, User, Router, Loader2, Send } from 'lucide-react';
+
+// Assuming your store is located in a path relative to this component
+// Adjust the path if necessary, e.g., '../store/store' or 'diell/src/store/store'
+import { useAppStore } from '../store';
 
 // --- A REUSABLE HOOK FOR SCROLL ANIMATIONS --- //
 const useIntersectionObserver = (options) => {
@@ -20,7 +24,7 @@ const useIntersectionObserver = (options) => {
     return [ref, isIntersecting];
 };
 
-// --- NEW STYLES SPECIFIC TO THIS COMPONENT --- //
+// --- STYLES SPECIFIC TO THIS COMPONENT --- //
 const BackendStyles = () => ( <style>{`
     .reveal-card { opacity: 0; transform: translateY(40px); transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
     .reveal-card.is-visible { opacity: 1; transform: translateY(0); }
@@ -33,7 +37,7 @@ const BackendStyles = () => ( <style>{`
        background-size: 80px 80px, 80px 80px, 20px 20px, 20px 20px;
     }
 
-    /* === NEW STYLES FOR THE BACKEND SHOWCASE === */
+    /* === STYLES FOR THE BACKEND SHOWCASE === */
     .showcase-node {
         transition: all 0.4s ease;
         border: 1px solid #27272a;
@@ -59,7 +63,7 @@ const BackendStyles = () => ( <style>{`
         opacity: 0;
         animation-duration: 1.5s;
         animation-timing-function: ease-in-out;
-        animation-iteration-count: 1; /* Was infinite */
+        animation-iteration-count: 1;
     }
     .flow-packet.active {
        animation-name: flow;
@@ -101,7 +105,6 @@ const BackendStyles = () => ( <style>{`
 
 const TransitionTunnel = () => (
     <section className="w-full flex flex-col items-center justify-center relative overflow-hidden " style={{ height: '600vh' }}>
-        {/* Multiple gradient lines for tunnel effect */}
         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-1 h-full" 
              style={{ 
                  background: 'linear-gradient(to bottom, var(--color-frontend) 0%, var(--color-backend) 100%)', 
@@ -125,7 +128,7 @@ const IconInfoCard = ({ Icon, iconColor, title, children, delay = 0 }) => {
     );
 };
 
-// --- THE NEW DYNAMIC BACKEND SHOWCASE --- //
+// --- DYNAMIC BACKEND SHOWCASE --- //
 const BackendShowcase = () => {
     const [step, setStep] = useState(0);
     const numSteps = 6;
@@ -133,7 +136,7 @@ const BackendShowcase = () => {
     useEffect(() => {
         const interval = setInterval(() => {
             setStep((prevStep) => (prevStep + 1) % numSteps);
-        }, 1500); // Duration of one step of the animation
+        }, 1500);
         return () => clearInterval(interval);
     }, []);
 
@@ -149,26 +152,21 @@ const BackendShowcase = () => {
 
     return (
         <div className="relative w-full max-w-2xl mx-auto p-4 md:p-8 aspect-[4/3] bg-neutral-900/30 border border-neutral-800 rounded-2xl">
-            {/* SVG Layer for lines - sits underneath the nodes */}
             <svg width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="none" className="absolute top-0 left-0">
                 <defs><marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#404040" /></marker></defs>
                 <path className="flow-path" d="M 70 150 Q 150 150, 150 80" markerEnd="url(#arrow)" />
                 <path className="flow-path" d="M 180 60 L 250 60" markerEnd="url(#arrow)" />
                 <path className="flow-path" d="M 280 80 Q 280 150, 200 150" markerEnd="url(#arrow)" />
                 <path className="flow-path" d="M 170 180 L 170 230" markerEnd="url(#arrow)" />
-                <path className="flow-path" d="M 170 270 L 170 190" /> {/* Response Path */}
+                <path className="flow-path" d="M 170 270 L 170 190" />
                 <path className="flow-path" d="M 200 150 Q 280 150, 280 220" />
-                
-                {/* Animated Packets */}
                 <path className={`flow-packet ${getPacketClass(0)}`} d="M 70 150 Q 150 150, 150 80" />
                 <path className={`flow-packet ${getPacketClass(1)}`} d="M 180 60 L 250 60" />
                 <path className={`flow-packet ${getPacketClass(2)}`} d="M 280 80 Q 280 150, 200 150" />
                 <path className={`flow-packet ${getPacketClass(3)}`} d="M 170 180 L 170 230" />
-                {/* Response Flow */}
                 <path className={`flow-packet ${getPacketClass(4)}`} style={{ animationDirection: 'reverse' }} d="M 170 180 L 170 230" /> 
                 <path className={`flow-packet ${getPacketClass(5)}`} style={{ animationDirection: 'reverse' }} d="M 70 150 Q 150 150, 150 80" />
             </svg>
-             {/* Node Grid - sits on top of the SVG */}
             <div className="relative z-10 grid grid-cols-4 grid-rows-3 h-full gap-4">
                  <Node icon={User} title="Client" gridClass="col-start-1 row-start-2" nodeStep={0} />
                  <Node icon={Router} title="API Gateway" gridClass="col-start-2 row-start-1" nodeStep={1} />
@@ -180,6 +178,82 @@ const BackendShowcase = () => {
     );
 };
 
+// --- CONTACT FORM COMPONENT --- //
+const ContactForm = () => {
+    const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+    
+    // --- FIX APPLIED HERE --- //
+    // Select each piece of state individually to prevent unnecessary re-renders.
+    const sendEmail = useAppStore(state => state.sendEmail);
+    const isLoading = useAppStore(state => state.isLoading);
+    const error = useAppStore(state => state.error);
+    const successMessage = useAppStore(state => state.successMessage);
+    
+    useEffect(() => {
+        if (successMessage) {
+            setFormData({ name: '', email: '', message: '' });
+        }
+    }, [successMessage]);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        sendEmail(formData);
+    };
+
+    return (
+        <div className="bg-black/40 backdrop-blur-md border border-green-900/50 rounded-2xl p-6 md:p-10 shadow-2xl shadow-green-900/20 max-w-2xl mx-auto">
+            <h3 className="text-4xl font-bold text-white mb-2 text-center">Ready to Build?</h3>
+            <p className="text-neutral-400 text-lg mb-8 text-center">Let's start the conversation.</p>
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label htmlFor="name" className="block text-neutral-300 text-sm font-bold mb-2">Name</label>
+                        <input 
+                            type="text" name="name" id="name" value={formData.name}
+                            onChange={handleChange} required placeholder="Your Name"
+                            className="w-full bg-neutral-900/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[var(--color-backend)] focus:border-transparent transition-colors"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="email" className="block text-neutral-300 text-sm font-bold mb-2">Email</label>
+                        <input 
+                            type="email" name="email" id="email" value={formData.email}
+                            onChange={handleChange} required placeholder="your.email@example.com"
+                            className="w-full bg-neutral-900/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[var(--color-backend)] focus:border-transparent transition-colors"
+                        />
+                    </div>
+                </div>
+                <div>
+                    <label htmlFor="message" className="block text-neutral-300 text-sm font-bold mb-2">Message</label>
+                    <textarea
+                        name="message" id="message" rows="5" value={formData.message}
+                        onChange={handleChange} required placeholder="Tell us about your project..."
+                        className="w-full bg-neutral-900/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[var(--color-backend)] focus:border-transparent transition-colors"
+                    ></textarea>
+                </div>
+                <div>
+                    <button 
+                        type="submit" disabled={isLoading}
+                        className="w-full flex items-center justify-center bg-[var(--color-backend)] text-black px-10 py-4 rounded-full font-bold text-xl transition-all duration-300 ease-in-out transform hover:scale-105 hover:bg-green-400 shadow-2xl shadow-green-500/30 hover:shadow-green-400/50 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+                    >
+                        {isLoading ? ( <Loader2 className="mr-2 h-6 w-6 animate-spin" /> ) : ( <Send className="mr-2 h-5 w-5" /> )}
+                        {isLoading ? 'Sending...' : 'Send Message'}
+                    </button>
+                </div>
+                <div className="h-6 mt-4 text-center text-base">
+                    {successMessage && <p className="text-green-400">{successMessage}</p>}
+                    {error && <p className="text-red-500">{error}</p>}
+                </div>
+            </form>
+        </div>
+    );
+};
+
 // --- MAIN VERTICAL CONTENT COMPONENT --- //
 const VerticalContent = () => { 
     return (
@@ -187,7 +261,7 @@ const VerticalContent = () => {
             <BackendStyles />
             <TransitionTunnel />
 
-            <main className="relative px-6 md:px-8 min-h-screen ">
+            <main className="relative px-6 md:px-8 py-20">
                  <div className="max-w-4xl mx-auto">
                     <div className="text-center mb-20 md:mb-28">
                          <div style={{ filter: 'drop-shadow(0 0 30px var(--color-backend))' }} className="inline-block animate-fade-in"><DiellLogo size={250} text='' primaryColor="var(--color-backend)" /></div>
@@ -200,13 +274,12 @@ const VerticalContent = () => {
                         <IconInfoCard Icon={ShieldCheck} iconColor="var(--color-backend)" title="Secure & Scalable." delay={200}>We build digital fortresses by design. Our backends are architected for exponential growth and hardened against emerging threats, protecting your data and users.</IconInfoCard>
                     </div>
 
-                    <div className="text-center mt-28">
+                    <div className="my-28 text-center">
                         <BackendShowcase />
                     </div>
 
-                    <div className="text-center mt-32">
-                        <h3 className="text-4xl font-bold text-white mb-8">Ready to Build Something Powerful?</h3>
-                        <button className="bg-[var(--color-backend)] text-black px-10 py-4 rounded-full font-bold text-xl transition-all duration-300 ease-in-out transform hover:scale-105 hover:bg-green-400 shadow-2xl shadow-green-500/30 hover:shadow-green-400/50">Let's Talk</button>
+                    <div className="mt-32">
+                        <ContactForm />
                     </div>
                 </div>
             </main>
