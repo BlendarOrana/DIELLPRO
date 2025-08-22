@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { DiellLogo } from 'diell-logo';
-import { Rocket, Layers, ShieldCheck, Database, User, Router, Loader2, Send } from 'lucide-react';
+import { Rocket, Layers, ShieldCheck, Database, User, Router, Loader2, Send, Calendar } from 'lucide-react';
+import { InlineWidget } from 'react-calendly';
 
 // Assuming your store is located in a path relative to this component
 // Adjust the path if necessary, e.g., '../store/store' or 'diell/src/store/store'
@@ -101,6 +102,16 @@ const BackendStyles = () => ( <style>{`
             opacity: 1;
         }
     }
+
+    /* Custom Calendly styling to remove white backgrounds */
+    .calendly-inline-widget iframe {
+        background: transparent !important;
+    }
+    
+    .calendly-inline-widget {
+        background: transparent !important;
+        border-radius: 8px !important;
+    }
 `}</style>);
 
 const TransitionTunnel = () => (
@@ -178,16 +189,19 @@ const BackendShowcase = () => {
     );
 };
 
-// --- CONTACT FORM COMPONENT --- //
-const ContactForm = () => {
-    const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+// --- CONTACT SECTION WITH TABS --- //
+const ContactSection = () => {
+    const [activeTab, setActiveTab] = useState('message');
     
-    // --- FIX APPLIED HERE --- //
-    // Select each piece of state individually to prevent unnecessary re-renders.
+    // For the contact form
+    const [formData, setFormData] = useState({ name: '', email: '', message: '' });
     const sendEmail = useAppStore(state => state.sendEmail);
     const isLoading = useAppStore(state => state.isLoading);
     const error = useAppStore(state => state.error);
     const successMessage = useAppStore(state => state.successMessage);
+    
+    // Get Calendly URL - your actual Calendly URL
+    const calendlyUrl = 'https://calendly.com/blendarorana/20min';
     
     useEffect(() => {
         if (successMessage) {
@@ -206,50 +220,113 @@ const ContactForm = () => {
     };
 
     return (
-        <div className="bg-black/40 backdrop-blur-md border border-green-900/50 rounded-2xl p-6 md:p-10 shadow-2xl shadow-green-900/20 max-w-2xl mx-auto">
-            <h3 className="text-4xl font-bold text-white mb-2 text-center">Ready to Build?</h3>
-            <p className="text-neutral-400 text-lg mb-8 text-center">Let's start the conversation.</p>
-            <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label htmlFor="name" className="block text-neutral-300 text-sm font-bold mb-2">Name</label>
-                        <input 
-                            type="text" name="name" id="name" value={formData.name}
-                            onChange={handleChange} required placeholder="Your Name"
-                            className="w-full bg-neutral-900/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[var(--color-backend)] focus:border-transparent transition-colors"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="email" className="block text-neutral-300 text-sm font-bold mb-2">Email</label>
-                        <input 
-                            type="email" name="email" id="email" value={formData.email}
-                            onChange={handleChange} required placeholder="your.email@example.com"
-                            className="w-full bg-neutral-900/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[var(--color-backend)] focus:border-transparent transition-colors"
-                        />
-                    </div>
-                </div>
-                <div>
-                    <label htmlFor="message" className="block text-neutral-300 text-sm font-bold mb-2">Message</label>
-                    <textarea
-                        name="message" id="message" rows="5" value={formData.message}
-                        onChange={handleChange} required placeholder="Tell us about your project..."
-                        className="w-full bg-neutral-900/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[var(--color-backend)] focus:border-transparent transition-colors"
-                    ></textarea>
-                </div>
-                <div>
-                    <button 
-                        type="submit" disabled={isLoading}
-                        className="w-full flex items-center justify-center bg-[var(--color-backend)] text-black px-10 py-4 rounded-full font-bold text-xl transition-all duration-300 ease-in-out transform hover:scale-105 hover:bg-green-400 shadow-2xl shadow-green-500/30 hover:shadow-green-400/50 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+        <div className="bg-black/40 backdrop-blur-md border border-green-900/50 rounded-2xl shadow-2xl shadow-green-900/20 max-w-4xl mx-auto overflow-hidden">
+            <div className="p-6 md:p-10 text-center border-b border-green-900/30">
+                <h3 className="text-4xl font-bold text-white mb-2">Ready to Build?</h3>
+                <p className="text-neutral-400 text-lg mb-6">Choose how you'd like to connect with us.</p>
+                
+                {/* Tab Navigation */}
+                <div className="flex w-full max-w-md mx-auto mb-8 bg-neutral-800 rounded-lg p-1">
+                    <button
+                        onClick={() => setActiveTab('message')}
+                        className={`flex items-center justify-center gap-2 px-4 py-3 rounded-md font-semibold transition-all duration-300 flex-1 ${
+                            activeTab === 'message' 
+                                ? 'bg-[var(--color-backend)] text-black shadow-lg shadow-green-500/30' 
+                                : 'text-neutral-300 hover:text-white hover:bg-neutral-700'
+                        }`}
                     >
-                        {isLoading ? ( <Loader2 className="mr-2 h-6 w-6 animate-spin" /> ) : ( <Send className="mr-2 h-5 w-5" /> )}
-                        {isLoading ? 'Sending...' : 'Send Message'}
+                        <Send size={16} />
+                        <span className="text-sm sm:text-base">Message</span>
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('schedule')}
+                        className={`flex items-center justify-center gap-2 px-4 py-3 rounded-md font-semibold transition-all duration-300 flex-1 ${
+                            activeTab === 'schedule' 
+                                ? 'bg-[var(--color-backend)] text-black shadow-lg shadow-green-500/30' 
+                                : 'text-neutral-300 hover:text-white hover:bg-neutral-700'
+                        }`}
+                    >
+                        <Calendar size={16} />
+                        <span className="text-sm sm:text-base">Schedule</span>
                     </button>
                 </div>
-                <div className="h-6 mt-4 text-center text-base">
-                    {successMessage && <p className="text-green-400">{successMessage}</p>}
-                    {error && <p className="text-red-500">{error}</p>}
-                </div>
-            </form>
+            </div>
+
+            <div className="p-6 md:p-10">
+                {/* Contact Form Tab */}
+                {activeTab === 'message' && (
+                    <div className="animate-fade-in">
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label htmlFor="name" className="block text-neutral-300 text-sm font-bold mb-2">Name</label>
+                                    <input 
+                                        type="text" name="name" id="name" value={formData.name}
+                                        onChange={handleChange} required placeholder="Your Name"
+                                        className="w-full bg-neutral-900/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[var(--color-backend)] focus:border-transparent transition-colors"
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="email" className="block text-neutral-300 text-sm font-bold mb-2">Email</label>
+                                    <input 
+                                        type="email" name="email" id="email" value={formData.email}
+                                        onChange={handleChange} required placeholder="your.email@example.com"
+                                        className="w-full bg-neutral-900/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[var(--color-backend)] focus:border-transparent transition-colors"
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label htmlFor="message" className="block text-neutral-300 text-sm font-bold mb-2">Message</label>
+                                <textarea
+                                    name="message" id="message" rows="5" value={formData.message}
+                                    onChange={handleChange} required placeholder="Tell us about your project..."
+                                    className="w-full bg-neutral-900/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[var(--color-backend)] focus:border-transparent transition-colors"
+                                ></textarea>
+                            </div>
+                            <div>
+                                <button 
+                                    type="submit" disabled={isLoading}
+                                    className="w-full flex items-center justify-center bg-[var(--color-backend)] text-black px-10 py-4 rounded-full font-bold text-xl transition-all duration-300 ease-in-out transform hover:scale-105 hover:bg-green-400 shadow-2xl shadow-green-500/30 hover:shadow-green-400/50 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+                                >
+                                    {isLoading ? ( <Loader2 className="mr-2 h-6 w-6 animate-spin" /> ) : ( <Send className="mr-2 h-5 w-5" /> )}
+                                    {isLoading ? 'Sending...' : 'Send Message'}
+                                </button>
+                            </div>
+                            <div className="h-6 mt-4 text-center text-base">
+                                {successMessage && <p className="text-green-400">{successMessage}</p>}
+                                {error && <p className="text-red-500">{error}</p>}
+                            </div>
+                        </form>
+                    </div>
+                )}
+
+                {/* Calendly Tab */}
+                {activeTab === 'schedule' && (
+                    <div className="animate-fade-in">
+                        <p className="text-neutral-400 text-center mb-6">
+                            Book a time that works for you. We'll discuss your project and how we can help.
+                        </p>
+                        <div className="rounded-lg overflow-hidden border border-neutral-700 bg-neutral-900/50">
+                            <InlineWidget 
+                                url={calendlyUrl}
+                                styles={{
+                                    height: '600px',
+                                    borderRadius: '8px',
+                                    backgroundColor: 'transparent'
+                                }}
+                                pageSettings={{
+                                    backgroundColor: '171717',
+                                    hideEventTypeDetails: true,
+                                    hideLandingPageDetails: false,
+                                    hideGdprBanner: true,
+                                    primaryColor: '22c55e',
+                                    textColor: 'ffffff'
+                                }}
+                            />
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
@@ -279,7 +356,7 @@ const VerticalContent = () => {
                     </div>
 
                     <div className="mt-32">
-                        <ContactForm />
+                        <ContactSection />
                     </div>
                 </div>
             </main>
