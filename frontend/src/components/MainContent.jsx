@@ -20,15 +20,31 @@ import {
     Volume2,
     Wifi,
     Battery,
-    Signal
+    Signal,
+    ExternalLink
 } from 'lucide-react';
 
+// --- NAVIGATION BUTTON COMPONENT --- //
+const FreeToolsButton = () => {
+    const handleNavigation = () => {
+        window.location.href = '/freetools';
+    };
 
-
-
-
-
-
+    return (
+        <motion.button
+            onClick={handleNavigation}
+            className="fixed top-4 right-4 z-50 bg-yellow-500/20 hover:bg-yellow-500/30 backdrop-blur-md border border-yellow-500/30 rounded-full px-4 py-2 flex items-center gap-2 text-yellow-500 font-medium text-sm transition-all duration-300 hover:scale-105"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+        >
+            <span>Free Tools</span>
+            <ExternalLink size={16} />
+        </motion.button>
+    );
+};
 
 // --- HELPER & DECORATIVE COMPONENTS --- //
 const TechStackCarousel = () => {
@@ -631,6 +647,7 @@ useEffect(() => {
     return (
         <>
             <GlobalStyles />
+            <FreeToolsButton />
             <div ref={pageContainerRef} className="fixed top-0 left-0 w-full h-full overflow-hidden">
                 <div className='absolute top-0 left-0 w-full h-full grid-background-frontend transition-transform duration-1000' style={{ transform: isHorizontalMode ? 'translateY(0%)' : 'translateY(-100%)', transitionTimingFunction: 'cubic-bezier(0.7, 0, 0.3, 1)' }}>
                     <div ref={horizontalContentRef} className="flex absolute top-0 left-0" style={{ width: `${numHorizontalSections * 100}vw`, height: '100vh' }}>
