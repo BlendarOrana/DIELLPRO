@@ -1,16 +1,46 @@
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'; // 1. Import routing components
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ExternalLink } from 'lucide-react';
 import { useAppStore } from './store';
+import { useEffect } from 'react';
 import UnlockScreen from './components/UnlockScreen';
 import MainContent from './components/MainContent';
-import FreeTools from './components/FreeTools.jsx'; // 2. Import your new component
+import FreeTools from './components/FreeTools.jsx';
 
-
-
-// 4. It's cleaner to group your original app logic into a "Home" component.
 const HomePage = () => {
   const isUnlocked = useAppStore((state) => state.isUnlocked);
+  const unlock = useAppStore((state) => state.unlock); // <-- get the setter
+
+  useEffect(() => {
+    // Detect bots and performance testing tools
+    const ua = navigator.userAgent.toLowerCase();
+    const isBot = ua.includes("googlebot") || 
+                  ua.includes("bingbot") || 
+                  ua.includes("slurp") ||
+                  ua.includes("duckduckbot") ||
+                  ua.includes("baiduspider") ||
+                  ua.includes("yandexbot") ||
+                  ua.includes("facebookexternalhit") ||
+                  ua.includes("twitterbot") ||
+                  ua.includes("linkedinbot") ||
+                  ua.includes("whatsapp") ||
+                  ua.includes("lighthouse") ||
+                  ua.includes("pagespeed") ||
+                  ua.includes("gtmetrix") ||
+                  ua.includes("pingdom") ||
+                  ua.includes("webpagetest");
+    
+    // Also check for headless browsers (commonly used by performance tools)
+    const isHeadless = window.navigator.webdriver ||
+                       window.phantom ||
+                       window.callPhantom ||
+                       window._phantom ||
+                       window.__nightmare;
+    
+    // Skip unlock screen for bots and performance tools
+    if (isBot || isHeadless) {
+      unlock(); // <-- use the store action
+    }
+  }, [unlock]);
 
   return (
     <main className="h-screen w-screen">
@@ -33,9 +63,8 @@ const HomePage = () => {
       </AnimatePresence>
     </main>
   );
-}
+};
 
-// 5. Your main App component is now responsible for routing.
 function App() {
   return (
     <BrowserRouter>
