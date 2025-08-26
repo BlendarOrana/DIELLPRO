@@ -1,20 +1,19 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '../store'; // Import the real store
 import { DiellLogo } from 'diell-logo';
 
 // Constants for styling and behavior
 const PATH_WIDTH = 40;
-const HANDLE_SIZE = PATH_WIDTH * 1.5;
-const DRAG_SENSITIVITY = 80;
 const PATH_POINTS_COUNT = 400;
 const SPIRAL_TURNS = 2.5;
+const AUTO_COMPLETE_DURATION = 3000; // 3 seconds to complete
 
 function UnlockScreen() {
   const unlock = useAppStore((state) => state.unlock);
   const containerRef = useRef(null);
   const pathRef = useRef(null);
-  const rafRef = useRef(null);
+  const animationRef = useRef(null);
 
   // State
   const [isReady, setIsReady] = useState(false);
@@ -26,7 +25,6 @@ function UnlockScreen() {
   });
   const [pathLength, setPathLength] = useState(0);
   const [progressValue, setProgressValue] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
   const [isUnlocking, setIsUnlocking] = useState(false);
 
   // Mobile detection
@@ -54,11 +52,38 @@ function UnlockScreen() {
   useEffect(() => {
     if (isComplete && !isUnlocking) {
       setIsUnlocking(true);
-      setIsDragging(false); // Stop dragging immediately
-      // Keep the full duration for all effects to complete
       setTimeout(() => unlock(), 2500);
     }
   }, [isComplete, isUnlocking, unlock]);
+
+  // Auto-progress animation
+  useEffect(() => {
+    if (!isReady || isComplete) return;
+
+    const startTime = Date.now();
+    
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / AUTO_COMPLETE_DURATION, 1);
+      
+      // Smooth easing function for natural progression
+      const easedProgress = 1 - Math.pow(1 - progress, 3); // Ease-out cubic
+      
+      setProgressValue(easedProgress * 100);
+      
+      if (progress < 1) {
+        animationRef.current = requestAnimationFrame(animate);
+      }
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [isReady, isComplete]);
 
   // Effect to calculate the spiral path
   useEffect(() => {
@@ -117,10 +142,9 @@ function UnlockScreen() {
     }
   }, [pathData.svg]);
 
-  const getCurrentPointIndex = useCallback(() => {
+  const getCurrentPointIndex = () => {
     if (!pathData.cumulativeDistances.length || !pathData.totalLength) return 0;
     const targetDistance = (progressValue / 100) * pathData.totalLength;
-    // Simple linear search is fast enough here. For very large arrays, a binary search could be an optimization.
     for (let i = 0; i < pathData.cumulativeDistances.length - 1; i++) {
       if (pathData.cumulativeDistances[i] <= targetDistance &&
           pathData.cumulativeDistances[i + 1] > targetDistance) {
@@ -128,79 +152,7 @@ function UnlockScreen() {
       }
     }
     return pathData.cumulativeDistances.length - 1;
-  }, [progressValue, pathData.cumulativeDistances, pathData.totalLength]);
-
-  // Pointer move handler optimized with requestAnimationFrame
-  const handlePointerMove = useCallback((event) => {
-    if (!isDragging || !containerRef.current || isComplete || isUnlocking || !pathData.points.length) return;
-
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
-
-    rafRef.current = requestAnimationFrame(() => {
-      const rect = containerRef.current.getBoundingClientRect();
-      const pointer = {
-        x: (event.clientX || event.touches[0].clientX) - rect.left,
-        y: (event.clientY || event.touches[0].clientY) - rect.top
-      };
-
-      const startIndex = getCurrentPointIndex();
-      let closestPointIndex = startIndex;
-      let minDistance = Infinity;
-
-      // More optimized search range
-      const lookAheadRange = 50;
-      const lookBackRange = 10;
-      const searchStart = Math.max(0, startIndex - lookBackRange);
-      const searchEnd = Math.min(pathData.points.length - 1, startIndex + lookAheadRange);
-
-      for (let i = searchStart; i <= searchEnd; i++) {
-        const point = pathData.points[i];
-        const distance = Math.hypot(pointer.x - point.x, pointer.y - point.y);
-        if (distance < minDistance) {
-          minDistance = distance;
-          closestPointIndex = i;
-        }
-      }
-
-      if (minDistance < DRAG_SENSITIVITY) {
-        const currentDistance = pathData.cumulativeDistances[closestPointIndex];
-        const totalDistance = pathData.totalLength;
-        const newProgressValue = Math.min((currentDistance / totalDistance) * 100, 100);
-
-        // Prevent large jumps backward, allow small jumps forward
-        const maxAllowedJump = 5;
-        if (newProgressValue >= progressValue || (progressValue - newProgressValue) < maxAllowedJump) {
-           setProgressValue(newProgressValue);
-        }
-      }
-    });
-  }, [isDragging, isComplete, isUnlocking, progressValue, pathData, getCurrentPointIndex]);
-
-  const handlePointerUp = useCallback(() => {
-    if (!isUnlocking) {
-      setIsDragging(false);
-    }
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
-  }, [isUnlocking]);
-
-  useEffect(() => {
-    const options = { passive: true };
-    if (isDragging && !isUnlocking) {
-      window.addEventListener('pointermove', handlePointerMove, options);
-      window.addEventListener('pointerup', handlePointerUp, options);
-      // touchmove and touchend are now covered by pointer events for better compatibility
-    }
-    return () => {
-      window.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('pointerup', handlePointerUp);
-    };
-  }, [isDragging, isUnlocking, handlePointerMove, handlePointerUp]);
-
-  const handlePointerDown = useCallback((e) => {
-    if (isComplete || isUnlocking) return;
-    e.preventDefault();
-    setIsDragging(true);
-  }, [isComplete, isUnlocking]);
+  };
 
   const currentPointIndex = getCurrentPointIndex();
   const currentPos = pathData.points[currentPointIndex] || { x: 0, y: 0 };
@@ -218,14 +170,13 @@ function UnlockScreen() {
       const blue = Math.floor(100 + (21 - 100) * intensity);
       return `rgb(${red}, ${green}, ${blue})`;
     }
-    return '#646464'; // Gray when inactive (solid color instead of rgba)
+    return '#646464'; // Gray when inactive
   };
 
   return (
     <motion.div
       ref={containerRef}
-      className="relative h-screen w-screen overflow-hidden bg-black select-none touch-action-none"
-      style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+      className="relative h-screen w-screen overflow-hidden bg-black select-none"
     >
       <AnimatePresence>
         {isReady && (
@@ -246,7 +197,6 @@ function UnlockScreen() {
                     <stop offset="0%" stopColor="#f97316" />
                     <stop offset="100%" stopColor="#facc15" />
                   </linearGradient>
-
                 </defs>
 
                 {/* Background Path */}
@@ -278,22 +228,20 @@ function UnlockScreen() {
                     cx={pathData.points[pathData.points.length - 1].x}
                     cy={pathData.points[pathData.points.length - 1].y}
                     r="100"
-           
                   />
                 )}
               </svg>
             </motion.div>
 
-            {/* Draggable Handle with DiellLogo: Only render if the path points exist to prevent initial flicker */}
+            {/* Auto-moving Logo Handle: Only render if the path points exist */}
             {pathData.points.length > 0 && (
               <motion.div
-                className="absolute flex items-center justify-center"
+                className="absolute flex items-center justify-center pointer-events-none"
                 style={{
                   width: 80,
                   height: 80,
                   x: currentPos.x - 40,
                   y: currentPos.y - 40,
-                  touchAction: 'none'
                 }}
                 animate={isComplete ? {
                   scale: 1.8,
@@ -302,19 +250,16 @@ function UnlockScreen() {
                   scale: 1,
                   filter: 'brightness(1)'
                 }}
-               transition={{
-  x: { type: 'spring', stiffness: 3000, damping: 50 },
-  y: { type: 'spring', stiffness: 3000, damping: 50 },
-  scale: { duration: isComplete ? 0.2 : 0.3, ease: "easeOut" },
-  filter: { 
-    duration: isComplete ? 2.0 : 0.5, 
-    ease: "easeOut",
-    times: isComplete ? [0, 0.1, 1] : undefined
-  }
-}}
-                onPointerDown={handlePointerDown}
-                whileHover={!isComplete ? { scale: 1.1 } : {}}
-                whileTap={!isComplete ? { scale: 1.2 } : {}}
+                transition={{
+                  x: { type: 'tween', duration: 0.1, ease: "easeOut" },
+                  y: { type: 'tween', duration: 0.1, ease: "easeOut" },
+                  scale: { duration: isComplete ? 0.2 : 0.3, ease: "easeOut" },
+                  filter: { 
+                    duration: isComplete ? 2.0 : 0.5, 
+                    ease: "easeOut",
+                    times: isComplete ? [0, 0.1, 1] : undefined
+                  }
+                }}
               >
                 {/* DiellLogo as the handle */}
                 <div className="relative w-full h-full flex items-center justify-center">
@@ -375,12 +320,12 @@ function UnlockScreen() {
                               className="absolute inset-0 rounded-full pointer-events-none"
                               style={{
                                 background: 'radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(250,204,21,0.9) 30%, rgba(249,115,22,0.6) 60%, transparent 100%)',
-                                filter: 'blur(0.5px) ', // Subtle blur instead of heavy box-shadow
+                                filter: 'blur(0.5px)', // Subtle blur instead of heavy box-shadow
                               }}
                               initial={{ scale: 0, opacity: 0 }}
                               animate={{ 
                                 scale: [0, 3, 5, 8, 12], 
-                                opacity: [0, 1, 0.8, 0.3, 0] ,
+                                opacity: [0, 1, 0.8, 0.3, 0],
                               }}
                               transition={{ 
                                 duration: 0.6, 
