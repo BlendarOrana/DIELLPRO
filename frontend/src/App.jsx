@@ -1,48 +1,41 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'; // 1. Import routing components
 import { AnimatePresence, motion } from 'framer-motion';
+import { ExternalLink } from 'lucide-react';
 import { useAppStore } from './store';
 import UnlockScreen from './components/UnlockScreen';
 import MainContent from './components/MainContent';
-import FreeTools from './components/FreeTools.jsx';
+import FreeTools from './components/FreeTools.jsx'; // 2. Import your new component
 
-// Home page with unlock + main content
+
+
+// 4. It's cleaner to group your original app logic into a "Home" component.
 const HomePage = () => {
   const isUnlocked = useAppStore((state) => state.isUnlocked);
 
   return (
     <main className="h-screen w-screen">
-      {/* Unlock screen always rendered when locked */}
       <AnimatePresence mode="wait">
-        {!isUnlocked && <UnlockScreen key="unlock-screen" />}
+        {!isUnlocked ? (
+          <UnlockScreen key="unlock-screen" />
+        ) : (
+          <motion.div
+            key="main-content"
+            initial={{ opacity: 0, backgroundColor: '#000000' }}
+            animate={{ opacity: 1, backgroundColor: 'transparent' }}
+            transition={{ 
+              opacity: { duration: 1.5, ease: 'easeOut' },
+              backgroundColor: { duration: 2.0, ease: 'easeInOut' }
+            }}
+          >
+            <MainContent />
+          </motion.div>
+        )}
       </AnimatePresence>
-
-      {/* Main content is in DOM from start, just hidden until unlocked */}
-      <motion.div
-        key="main-content"
-        initial={{ opacity: 0, backgroundColor: '#000000' }}
-        animate={{
-          opacity: isUnlocked ? 1 : 0, 
-          backgroundColor: isUnlocked ? 'transparent' : '#000000'
-        }}
-        transition={{
-          opacity: { duration: 1.5, ease: 'easeOut' },
-          backgroundColor: { duration: 2.0, ease: 'easeInOut' }
-        }}
-        style={{
-          pointerEvents: isUnlocked ? 'auto' : 'none',
-          height: '100%',
-          width: '100%',
-          position: 'absolute',
-          top: 0,
-          left: 0
-        }}
-      >
-        <MainContent />
-      </motion.div>
     </main>
   );
-};
+}
 
+// 5. Your main App component is now responsible for routing.
 function App() {
   return (
     <BrowserRouter>
