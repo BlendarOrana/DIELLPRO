@@ -1,14 +1,31 @@
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'; // 1. Import routing components
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ExternalLink } from 'lucide-react';
+import { Suspense, lazy, useEffect } from 'react'; // Import useEffect too
 import { useAppStore } from './store';
 import UnlockScreen from './components/UnlockScreen';
 import MainContent from './components/MainContent';
-import FreeTools from './components/FreeTools.jsx'; // 2. Import your new component
 
+// Lazy load the FreeTools component
+const FreeTools = lazy(() => import('./components/FreeTools.jsx'));
 
+// Preload the component immediately
+const preloadFreeTools = () => {
+  import('./components/FreeTools.jsx');
+};
 
-// 4. It's cleaner to group your original app logic into a "Home" component.
+// Loading component for fallback
+const LoadingSpinner = () => (
+  <div className="h-screen w-screen flex items-center justify-center bg-black">
+    <motion.div
+      className="w-8 h-8 border-2 border-white border-t-transparent rounded-full"
+      animate={{ rotate: 360 }}
+      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+    />
+  </div>
+);
+
+// It's cleaner to group your original app logic into a "Home" component.
 const HomePage = () => {
   const isUnlocked = useAppStore((state) => state.isUnlocked);
 
@@ -35,13 +52,25 @@ const HomePage = () => {
   );
 }
 
-// 5. Your main App component is now responsible for routing.
+// Your main App component is now responsible for routing.
 function App() {
+  // Preload FreeTools component when the app starts
+  useEffect(() => {
+    preloadFreeTools();
+  }, []);
+
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/freetools" element={<FreeTools />} />
+        <Route 
+          path="/freetools" 
+          element={
+            <Suspense fallback={<LoadingSpinner />}>
+              <FreeTools />
+            </Suspense>
+          } 
+        />
       </Routes>
     </BrowserRouter>
   );

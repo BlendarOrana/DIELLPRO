@@ -1,39 +1,35 @@
+import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Wrench, Palette, Code, Zap } from 'lucide-react';
+import { ArrowLeft, CheckCircle } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
 
-const FreeTools = ({ onBack }) => {
 
-  const tools = [
-    {
-      id: 1,
-      title: 'Color Palette Generator',
-      description: 'Generate beautiful color palettes for your projects',
-      icon: Palette,
-      color: '#f59e0b',
-      comingSoon: true
+// This is your actual tool.
+import QRCodeGenerator from './QRCodeGenerator';
+
+
+// Animation variants for the feature list
+const listVariants = {
+  visible: {
+    transition: {
+      staggerChildren: 0.1,
     },
-    {
-      id: 2,
-      title: 'CSS Grid Generator',
-      description: 'Create responsive CSS Grid layouts visually',
-      icon: Code,
-      color: '#10b981',
-      comingSoon: true
-    },
-    {
-      id: 3,
-      title: 'Animation Helper',
-      description: 'Generate CSS animations and transitions',
-      icon: Zap,
-      color: '#8b5cf6',
-      comingSoon: true
-    }
-  ];
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: { opacity: 1, x: 0 },
+};
+
+
+const FreeTools = () => {
+      const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-auto">
+    <div className="min-h-screen bg-black text-white overflow-y-auto">
       {/* Background Grid */}
-      <div className="fixed inset-0 opacity-10">
+      <div className="fixed inset-0 opacity-10 pointer-events-none">
         <div className="w-full h-full" style={{
           backgroundImage: `
             linear-gradient(rgba(251, 191, 36, 0.1) 1px, transparent 1px),
@@ -45,8 +41,8 @@ const FreeTools = ({ onBack }) => {
 
       {/* Back Button */}
       <motion.button
-        onClick={onBack}
-        className="fixed top-6 left-6 z-50 flex items-center gap-2 px-4 py-2 bg-neutral-800/50 backdrop-blur-sm border border-neutral-700 rounded-lg text-neutral-300 hover:text-white hover:border-neutral-600 transition-all duration-300"
+      onClick={() => navigate("/")}
+        className="fixed top-6 left-6 z-50 flex items-center gap-2 px-4 py-2 bg-neutral-900/50 backdrop-blur-sm border border-neutral-700 rounded-lg text-neutral-300 hover:text-white hover:border-yellow-400/50 transition-all duration-300"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         initial={{ opacity: 0, x: -20 }}
@@ -57,86 +53,103 @@ const FreeTools = ({ onBack }) => {
       </motion.button>
 
       {/* Main Content */}
-      <div className="relative z-10 container mx-auto px-6 py-20">
+      <div className="relative z-10 container mx-auto px-6 py-24 md:py-32">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-16"
+          className="text-center mb-20 md:mb-28"
         >
-          <div className="inline-flex items-center justify-center w-20 h-20 mb-6 rounded-full bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30">
-            <Wrench size={32} className="text-yellow-400" />
-          </div>
-          
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-4 bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
-            Free Tools
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-4 bg-[#fbbf24] bg-clip-text text-transparent" style={{ textShadow: '0 0 20px rgba(251, 191, 36, 0.3)'}} >
+            Just a Free QR Code Generator
           </h1>
-          
-          <p className="text-xl text-neutral-400 max-w-2xl mx-auto leading-relaxed">
-            Powerful, free web development tools to accelerate your workflow and enhance your projects.
+          <p className="text-lg md:text-xl text-neutral-400 max-w-3xl mx-auto">
+            Honestly, we wanted custom QR codes for our business cards and got annoyed that every good tool was behind a paywall. So we built our own. Here it is—no strings attached. Hope you find it useful!
           </p>
         </motion.div>
 
-        {/* Tools Grid */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.8 }}
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto"
-        >
-          {tools.map((tool, index) => (
-            <motion.div
-              key={tool.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 * index, duration: 0.6 }}
-              className="group relative p-6 bg-neutral-900/50 backdrop-blur-sm border border-neutral-800 rounded-xl hover:border-neutral-700 transition-all duration-300 cursor-pointer"
-              whileHover={{ scale: 1.02, boxShadow: `0 10px 40px ${tool.color}20` }}
-            >
-              {tool.comingSoon && (
-                <div className="absolute top-4 right-4 px-2 py-1 text-xs font-medium bg-yellow-500/20 text-yellow-400 rounded-full border border-yellow-500/30">
-                  Coming Soon
-                </div>
-              )}
-              
-              <div 
-                className="w-12 h-12 rounded-lg mb-4 flex items-center justify-center"
-                style={{ backgroundColor: `${tool.color}20`, border: `1px solid ${tool.color}30` }}
-              >
-                <tool.icon size={24} color={tool.color} />
-              </div>
-              
-              <h3 className="text-xl font-semibold mb-2 group-hover:text-white transition-colors">
-                {tool.title}
-              </h3>
-              
-              <p className="text-neutral-400 group-hover:text-neutral-300 transition-colors">
-                {tool.description}
-              </p>
+        {/* --- Showcase Section --- */}
+        <div className="grid lg:grid-cols-2 gap-16 lg:gap-8 items-center">
 
-              {/* Hover effect */}
-              <motion.div
-                className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                style={{ 
-                  background: `linear-gradient(135deg, ${tool.color}05, transparent)`,
-                  border: `1px solid ${tool.color}20`
-                }}
+          {/* Left Side: Text and Features */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="flex flex-col gap-6"
+          >
+            <h2 className="text-3xl md:text-4xl font-semibold text-neutral-100">Simple, Custom, and Completely Free.</h2>
+            
+            {/* NEW: Replaced the paragraph with a clear, scannable list */}
+            <motion.ul 
+              className="space-y-4 text-lg text-neutral-300"
+              variants={listVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              <motion.li className="flex items-center gap-3" variants={itemVariants}>
+                <CheckCircle className="text-yellow-400" size={20} />
+                <span>Custom Colors & Styles</span>
+              </motion.li>
+              <motion.li className="flex items-center gap-3" variants={itemVariants}>
+                <CheckCircle className="text-yellow-400" size={20} />
+                <span>Add Your Own Logo</span>
+              </motion.li>
+              <motion.li className="flex items-center gap-3" variants={itemVariants}>
+                <CheckCircle className="text-yellow-400" size={20} />
+                <span>High-Resolution Download (SVG)</span>
+              </motion.li>
+              <motion.li className="flex items-center gap-3" variants={itemVariants}>
+                <CheckCircle className="text-yellow-400" size={20} />
+                <span>No Sign-Up Required, Ever.</span>
+              </motion.li>
+            </motion.ul>
+
+          </motion.div>
+
+          {/* Right Side: 3D SVG Showcase */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, y: 50 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4, type: 'spring' }}
+            style={{ perspective: '1000px' }}
+            className="flex items-center justify-center min-h-[350px]"
+          >
+            <motion.div
+              whileHover={{
+                scale: 1.05,
+                rotateY: -10,
+                rotateX: 5,
+                boxShadow: '0px 20px 40px rgba(251, 191, 36, 0.3)'
+              }}
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+              style={{ transformStyle: 'preserve-3d' }}
+              className="w-full max-w-sm  bg-neutral-800/40 backdrop-blur-md rounded-2xl  "
+            >
+              <img
+                src="/diell-qr-code.svg"
+                alt="Custom QR Code Showcase"
+                className="w-full h-auto rounded-lg "
+                style={{ transform: 'translateZ(20px)' }}
               />
             </motion.div>
-          ))}
-        </motion.div>
+          </motion.div>
+        </div>
 
-        {/* Coming Soon Notice */}
+        {/* --- QR Code Generator Tool Section --- */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8, duration: 0.8 }}
-          className="text-center mt-16"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="mt-28 md:mt-36"
         >
-          <p className="text-neutral-500">
-            More tools coming soon! Follow our progress and suggest new tools.
-          </p>
+  
+
+
+          <div className="max-w-4xl mx-auto   bg-neutral-900/60 backdrop-blur-lg  ">
+            <QRCodeGenerator />
+          </div>
         </motion.div>
       </div>
     </div>
