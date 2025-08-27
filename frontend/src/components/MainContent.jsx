@@ -452,7 +452,7 @@ useEffect(() => {
                     
                     // Fast fall animation parameters
                     const fallDuration = 1200; // 1.2 seconds
-                    const fallDistance = window.innerHeight * 5.5;
+                    const fallDistance = window.innerHeight * 5.7;
                     const startTime = Date.now();
                     
                     const animateFall = () => {
