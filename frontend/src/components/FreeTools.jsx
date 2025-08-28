@@ -147,7 +147,7 @@ const FreeTools = () => {
   
 
 
-          <div className="max-w-4xl mx-auto   bg-neutral-900/60 backdrop-blur-lg  ">
+          <div className="max-w-4xl mx-auto    backdrop-blur-lg  ">
             <QRCodeGenerator />
           </div>
         </motion.div>

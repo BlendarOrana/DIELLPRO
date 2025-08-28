@@ -64,7 +64,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route 
-          path="/freetools" 
+          path="/freeqr" 
           element={
             <Suspense fallback={<LoadingSpinner />}>
               <FreeTools />

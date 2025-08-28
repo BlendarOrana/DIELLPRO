@@ -27,7 +27,7 @@ import {
 // --- NAVIGATION BUTTON COMPONENT --- //
 const FreeToolsButton = () => {
     const handleNavigation = () => {
-        window.location.href = '/freetools';
+        window.location.href = '/freeqr';
     };
 
     return (
