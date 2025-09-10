@@ -6,10 +6,46 @@ import axiosInstance from './lib/axios.js'; // Make sure the path is correct
 
 export const useAppStore = create(
   persist(
-    (set) => ({
+    (set, get) => ({
       // Persistent state - will be saved to localStorage
       isUnlocked: false,
-      unlock: () => set({ isUnlocked: true }),
+      unlockTimestamp: null, // Store when the unlock happened
+      
+      unlock: () => set({ 
+        isUnlocked: true,
+        unlockTimestamp: Date.now() // Store current timestamp
+      }),
+
+      // Function to check if unlock has expired (30 minutes = 30 * 60 * 1000 ms)
+      checkUnlockExpiry: () => {
+        const state = get();
+        if (!state.isUnlocked || !state.unlockTimestamp) {
+          return false; // Already locked or no timestamp
+        }
+        
+        const thirtyMinutes = 30 * 60 * 1000;
+        const isExpired = Date.now() - state.unlockTimestamp > thirtyMinutes;
+        
+        if (isExpired) {
+          set({ isUnlocked: false, unlockTimestamp: null });
+          return true; // Was expired and now locked
+        }
+        
+        return false; // Still valid
+      },
+
+      // Helper function to get unlock status (automatically checks expiry)
+      getIsUnlocked: () => {
+        const state = get();
+        state.checkUnlockExpiry(); // This will auto-lock if expired
+        return get().isUnlocked; // Get fresh state after potential lock
+      },
+
+      // Manual lock function
+      lock: () => set({ 
+        isUnlocked: false, 
+        unlockTimestamp: null 
+      }),
 
       // Non-persistent state for form handling - these shouldn't persist across sessions
       isLoading: false,
@@ -50,9 +86,10 @@ export const useAppStore = create(
     }),
     {
       name: 'diell-app-storage', // unique name for localStorage key
-      // Only persist the isUnlocked state, not the form states
+      // Persist both isUnlocked and unlockTimestamp
       partialize: (state) => ({ 
-        isUnlocked: state.isUnlocked 
+        isUnlocked: state.isUnlocked,
+        unlockTimestamp: state.unlockTimestamp
       }),
     }
   )
