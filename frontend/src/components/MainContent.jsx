@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion'; // Added for animations
-import { DiellLogo } from 'diell-logo'; // Assuming this is your logo component
-import VerticalContent from './VerticalContent'; // This remains untouched
+import { motion, AnimatePresence } from 'framer-motion';
+import { DiellLogo } from 'diell-logo';
+import VerticalContent from './VerticalContent';
 import {
     Laptop,
     WandSparkles,
@@ -38,6 +38,37 @@ const FreeToolsButton = () => {
             <span>Qr code generator</span>
             <ExternalLink size={16} />
         </motion.button>
+    );
+};
+
+// --- WAVE TEXT ANIMATION COMPONENT --- //
+const WaveText = ({ text, delay = 0 }) => {
+    const words = text.split(' ');
+    
+    return (
+        <div className="inline-block">
+            {words.map((word, wordIndex) => (
+                <span key={wordIndex} className="inline-block mr-3">
+                    {word.split('').map((letter, letterIndex) => (
+                        <motion.span
+                            key={letterIndex}
+                            className="inline-block"
+                            initial={{ y: 50, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{
+                                delay: delay + (wordIndex * word.length + letterIndex) * 0.05,
+                                duration: 0.4,
+                                type: "spring",
+                                stiffness: 200,
+                                damping: 10
+                            }}
+                        >
+                            {letter}
+                        </motion.span>
+                    ))}
+                </span>
+            ))}
+        </div>
     );
 };
 
@@ -81,7 +112,6 @@ const TechStackCarousel = () => {
         </div>
     );
 };
-
 
 // --- REFACTORED AUTOMATED MULTI-DEMO SHOWCASE --- //
 
@@ -146,7 +176,6 @@ const MusicPlayerDemo = ({ isPlaying, setIsPlaying, progress }) => (
     </motion.div>
 );
 
-
 const SocialFeedDemo = ({ isLiked, likes }) => (
     <motion.div variants={demoVariants} initial="initial" animate="animate" exit="exit" transition={transition} className="w-full h-full p-6 space-y-4 text-white">
         <div className="flex items-center gap-3 mb-4">
@@ -171,13 +200,11 @@ const DashboardDemo = ({ isDarkMode }) => (
     <motion.div variants={demoVariants} initial="initial" animate="animate" exit="exit" transition={transition} className="w-full h-full p-6 space-y-4 text-white">
         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-500 ${isDarkMode ? 'text-white' : 'text-neutral-900'}`}>Analytics Dashboard</h3>
         <div className="grid grid-cols-2 gap-3">
-            {/* --- REVENUE CARD --- */}
             <div className={`p-3 rounded-xl transition-colors duration-500 ${isDarkMode ? 'bg-gradient-to-br from-green-500/20 to-emerald-500/20' : 'bg-green-100'}`}>
                 <p className={`text-sm ${isDarkMode ? 'text-neutral-300' : 'text-green-800/80'}`}>Revenue</p>
                 <p className={`text-2xl font-bold ${isDarkMode ? 'text-green-400' : 'text-green-700'}`}>$12.4k</p>
                 <p className={`text-xs font-medium ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>+12%</p>
             </div>
-             {/* --- USERS CARD --- */}
             <div className={`p-3 rounded-xl transition-colors duration-500 ${isDarkMode ? 'bg-gradient-to-br from-blue-500/20 to-cyan-500/20' : 'bg-blue-100'}`}>
                 <p className={`text-sm ${isDarkMode ? 'text-neutral-300' : 'text-blue-800/80'}`}>Users</p>
                 <p className={`text-2xl font-bold ${isDarkMode ? 'text-blue-400' : 'text-blue-700'}`}>2.1k</p>
@@ -226,13 +253,12 @@ const ShowcaseNode = ({ isVisible }) => {
     const demos = ['theme-toggle', 'music-player', 'social-feed', 'dashboard', 'notifications'];
     const currentDemo = demos[currentDemoIndex];
 
-    // ... (keep all your existing useEffect hooks - they don't need changes)
     // Auto-cycle through demos with improved timing
     useEffect(() => {
         if (!isVisible) return;
         const interval = setInterval(() => {
             setCurrentDemoIndex(prev => (prev + 1) % demos.length);
-        }, 5500); // Increased duration for better viewing
+        }, 5500);
         return () => clearInterval(interval);
     }, [isVisible, demos.length]);
     
@@ -268,7 +294,6 @@ const ShowcaseNode = ({ isVisible }) => {
                 break;
             default: break;
         }
-
     }, [currentDemo]);
     
     // Music player progress animation
@@ -342,54 +367,84 @@ const ShowcaseNode = ({ isVisible }) => {
     );
 };
 
-
 // --- STYLING & PAGE HELPERS --- //
-const GlobalStyles = () => ( <style>{`:root { --color-frontend: #fbbf24; --color-backend: #22c55e; --color-grid-frontend: rgba(251, 191, 36, 0.08); --color-grid-backend: rgba(34, 197, 94, 0.08); --color-text-main: #EAEAEA; --color-text-subtle: #A0A0A0; } html, body { margin: 0; padding: 0; overflow: hidden; background-color: #000; color: var(--color-text-main); font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; } .scroll-container { height: 100vh; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth; } .scroll-container::-webkit-scrollbar { display: none; } @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } } .animate-fade-in { animation: fadeIn 1s ease-out forwards; }`}</style> );
-const AnimatedContent = ({ scrollX, trigger, children, className = '' }) => { const isVisible = scrollX >= trigger; return ( <div className={`transition-all duration-700 ease-out ${className}`} style={{ opacity: isVisible ? 1 : 0, transform: `translateY(${isVisible ? 0 : '20px'})` }} > {children} </div> ); };
-const InfoNode = ({ scrollX, trigger, Icon, title, text, color }) => { const screenW = window.innerWidth; const isVisible = scrollX >= trigger; const nodeCenter = trigger + screenW / 2; const distanceFromCenter = nodeCenter - scrollX; const parallax = -distanceFromCenter * 0.1; const scale = 1 - Math.min(Math.abs(distanceFromCenter) / screenW, 0.2); return ( <div className="w-screen h-screen flex items-center justify-center font-sans px-8"> <div className="text-center transition-all duration-700 ease-out flex flex-col items-center gap-4" style={{ opacity: isVisible ? 1 : 0, transform: `translateY(${parallax}px) scale(${scale})` }} > <div className="rounded-full p-4 border-2" style={{ borderColor: color, boxShadow: `0 0 30px ${color}` }}> <Icon size={40} color={color} /> </div> <h2 className="text-5xl font-bold tracking-tight mt-4" style={{ color: color }}>{title}</h2> <p className="text-xl text-neutral-400 max-w-lg mt-2">{text}</p> </div> </div> ); };
+const GlobalStyles = () => ( 
+    <style>{`
+        :root { 
+            --color-frontend: #fbbf24; 
+            --color-backend: #22c55e; 
+            --color-grid-frontend: rgba(251, 191, 36, 0.08); 
+            --color-grid-backend: rgba(34, 197, 94, 0.08); 
+            --color-text-main: #EAEAEA; 
+            --color-text-subtle: #A0A0A0; 
+        } 
+        html, body { 
+            margin: 0; 
+            padding: 0; 
+            overflow: hidden; 
+            background-color: #000; 
+            color: var(--color-text-main); 
+            font-family: 'Inter', sans-serif; 
+            -webkit-font-smoothing: antialiased; 
+            -moz-osx-font-smoothing: grayscale; 
+        } 
+        .scroll-container { 
+            height: 100vh; 
+            overflow-y: auto; 
+            overflow-x: hidden; 
+            scrollbar-width: none; 
+            -ms-overflow-style: none; 
+            scroll-behavior: smooth; 
+        } 
+        .scroll-container::-webkit-scrollbar { 
+            display: none; 
+        } 
+        @keyframes fadeIn { 
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            } 
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            } 
+        } 
+        .animate-fade-in { 
+            animation: fadeIn 1s ease-out forwards; 
+        }
+    `}</style> 
+);
 
-// === PROGRESSBAR FIX STARTS HERE === //
-const ProgressBar = ({ isHorizontalMode, progress }) => {
-    // The target color changes based on the scrolling mode (horizontal vs. vertical)
-    const targetColor = isHorizontalMode ? 'var(--color-frontend)' : 'var(--color-backend)';
-    // Ensure the progress value is clamped between 0 and 1 to prevent visual bugs
-    const safeProgress = Math.max(0, Math.min(progress, 1));
-
-    // Using Framer Motion's motion.div allows us to animate properties performantly
-    // and with physics-based transitions for a much smoother, more responsive feel.
-    return (
-        <div className="fixed bottom-0 left-0 w-full h-1 bg-neutral-900 z-50">
-            <motion.div
-                className="h-full origin-left w-full" // `origin-left` makes the bar grow from the left side.
-                initial={false} // We don't need an animation when the component first loads.
-                animate={{
-                    // We animate `scaleX` instead of `width`. It's much better for performance.
-                    scaleX: safeProgress,
-                    // Animate the background color for a smooth transition between modes.
-                    backgroundColor: targetColor,
-                    // Animating the boxShadow as a string provides a smooth glow color change.
-                    boxShadow: `0 0 10px ${targetColor}, 0 0 20px ${targetColor}`,
-                }}
-                transition={{
-                    // Use different transition types for different properties for the best effect.
-                    scaleX: {
-                        type: 'spring',     // A spring physics animation for the bar's length.
-                        stiffness: 100,     // How "strong" the spring is.
-                        damping: 25,        // How much friction is applied (less bounce).
-                        restDelta: 0.001,   // When the animation is considered complete.
-                    },
-                    // For color changes, a simple "tween" (ease-in-out) feels better than a spring.
-                    backgroundColor: { type: 'tween', duration: 0.5, ease: 'easeIn' },
-                    boxShadow: { type: 'tween', duration: 0.5, ease: 'easeIn' },
-                }}
-            />
-        </div>
-    );
+const AnimatedContent = ({ scrollX, trigger, children, className = '' }) => { 
+    const isVisible = scrollX >= trigger; 
+    return ( 
+        <div className={`transition-all duration-700 ease-out ${className}`} style={{ opacity: isVisible ? 1 : 0, transform: `translateY(${isVisible ? 0 : '20px'})` }} > 
+            {children} 
+        </div> 
+    ); 
 };
-// === PROGRESSBAR FIX ENDS HERE === //
 
+const InfoNode = ({ scrollX, trigger, Icon, title, text, color }) => { 
+    const screenW = window.innerWidth; 
+    const isVisible = scrollX >= trigger; 
+    const nodeCenter = trigger + screenW / 2; 
+    const distanceFromCenter = nodeCenter - scrollX; 
+    const parallax = -distanceFromCenter * 0.1; 
+    const scale = 1 - Math.min(Math.abs(distanceFromCenter) / screenW, 0.2); 
+    return ( 
+        <div className="w-screen h-screen flex items-center justify-center font-sans px-8"> 
+            <div className="text-center transition-all duration-700 ease-out flex flex-col items-center gap-4" style={{ opacity: isVisible ? 1 : 0, transform: `translateY(${parallax}px) scale(${scale})` }} > 
+                <div className="rounded-full p-4 border-2" style={{ borderColor: color, boxShadow: `0 0 30px ${color}` }}> 
+                    <Icon size={40} color={color} /> 
+                </div> 
+                <h2 className="text-5xl font-bold tracking-tight mt-4" style={{ color: color }}>{title}</h2> 
+                <p className="text-xl text-neutral-400 max-w-lg mt-2">{text}</p> 
+            </div> 
+        </div> 
+    ); 
+};
 
-// --- MAIN PAGE COMPONENT (UNCHANGED) --- //
+// --- MAIN PAGE COMPONENT --- //
 const DiellPage = () => {
     const [scrollPosition, setScrollPosition] = useState(0);
     const [verticalScrollProgress, setVerticalScrollProgress] = useState(0);
@@ -404,8 +459,6 @@ const DiellPage = () => {
     const screenW = window.innerWidth;
     const numHorizontalSections = 3;
     const totalHorizontalWidth = screenW * (numHorizontalSections - 1);
-
-    
 
     // Smooth scroll animation loop
     useEffect(() => {
@@ -425,199 +478,232 @@ const DiellPage = () => {
         return () => cancelAnimationFrame(animationFrameId.current);
     }, []);
 
-
-useEffect(() => {
-    const handleWheel = (e) => {
-        if (isHorizontalMode) e.preventDefault();
-        if (isTransitioning) return;
-        const delta = e.deltaY;
-        
-        if (isHorizontalMode) {
-            targetScrollX.current = Math.max(0, Math.min(targetScrollX.current + delta, totalHorizontalWidth));
+    // Enhanced wheel/scroll event handling
+    useEffect(() => {
+        const handleWheel = (e) => {
+            if (isHorizontalMode) e.preventDefault();
+            if (isTransitioning) return;
+            const delta = e.deltaY;
             
-            if (targetScrollX.current >= totalHorizontalWidth && delta > 0) {
-                targetScrollX.current = totalHorizontalWidth;
-                setIsTransitioning(true);
+            if (isHorizontalMode) {
+                targetScrollX.current = Math.max(0, Math.min(targetScrollX.current + delta, totalHorizontalWidth));
                 
-                // Start the transition to vertical mode
-                setTimeout(() => setIsHorizontalMode(false), 200);
-                
-                // === NEW FAST FALL ANIMATION === //
-                setTimeout(() => {
-                    const container = verticalContentRef.current;
-                    if (!container) return;
+                if (targetScrollX.current >= totalHorizontalWidth && delta > 0) {
+                    targetScrollX.current = totalHorizontalWidth;
+                    setIsTransitioning(true);
                     
-                    // Reset to top before starting the fall animation
+                    setTimeout(() => setIsHorizontalMode(false), 200);
+                    
+                    setTimeout(() => {
+                        const container = verticalContentRef.current;
+                        if (!container) return;
+                        
+                        container.scrollTo({ top: 0, behavior: 'auto' });
+                        
+                        const fallDuration = 1200;
+                        const fallDistance = window.innerHeight * 5.7;
+                        const startTime = Date.now();
+                        
+                        const animateFall = () => {
+                            const elapsed = Date.now() - startTime;
+                            const progress = Math.min(elapsed / fallDuration, 1);
+                            
+                            // Use easeOutCubic for a more natural fall feeling
+                            const easeOutCubic = 1 - Math.pow(1 - progress, 3);
+                            const currentScrollTop = easeOutCubic * fallDistance;
+                            
+                            container.scrollTop = currentScrollTop;
+                            
+                            if (progress < 1) {
+                                requestAnimationFrame(animateFall);
+                            } else {
+                                // Animation complete - user now has control
+                                setIsTransitioning(false);
+                            }
+                        };
+                        
+                        // Start the fall animation
+                        requestAnimationFrame(animateFall);
+                    }, 400); // Start fall after vertical section is visible
+                }
+            } else {
+                const container = verticalContentRef.current;
+                if (!container) return;
+                
+                if (delta < 0 && container.scrollTop <= 0) {
+                    e.preventDefault();
                     container.scrollTo({ top: 0, behavior: 'auto' });
-                    
-                    // Fast fall animation parameters
-                    const fallDuration = 1200; // 1.2 seconds
-                    const fallDistance = window.innerHeight * 5.7;
-                    const startTime = Date.now();
-                    
-                    const animateFall = () => {
-                        const elapsed = Date.now() - startTime;
-                        const progress = Math.min(elapsed / fallDuration, 1);
-                        
-                        // Use easeOutCubic for a more natural fall feeling
-                        const easeOutCubic = 1 - Math.pow(1 - progress, 3);
-                        const currentScrollTop = easeOutCubic * fallDistance;
-                        
-                        container.scrollTop = currentScrollTop;
-                        
-                        if (progress < 1) {
-                            requestAnimationFrame(animateFall);
-                        } else {
-                            // Animation complete - user now has control
-                            setIsTransitioning(false);
-                        }
-                    };
-                    
-                    // Start the fall animation
-                    requestAnimationFrame(animateFall);
-                }, 400); // Start fall after vertical section is visible
+                    setIsTransitioning(true);
+                    setIsHorizontalMode(true);
+                    setTimeout(() => setIsTransitioning(false), 1200);
+                }
             }
-        } else {
-            const container = verticalContentRef.current;
-            if (!container) return;
-            
-            if (delta < 0 && container.scrollTop <= 0) {
-                e.preventDefault();
-                container.scrollTo({ top: 0, behavior: 'auto' });
-                setIsTransitioning(true);
-                setIsHorizontalMode(true);
-                setTimeout(() => setIsTransitioning(false), 1200);
-            }
-        }
-    };
-    
-    const node = pageContainerRef.current;
-    if (!node) return;
-    node.addEventListener('wheel', handleWheel, { passive: false });
-    return () => node.removeEventListener('wheel', handleWheel);
-}, [isHorizontalMode, isTransitioning, totalHorizontalWidth]);
+        };
+        
+        const node = pageContainerRef.current;
+        if (!node) return;
+        node.addEventListener('wheel', handleWheel, { passive: false });
+        return () => node.removeEventListener('wheel', handleWheel);
+    }, [isHorizontalMode, isTransitioning, totalHorizontalWidth]);
 
-
-useEffect(() => {
-    let touchStartY = 0;
-    let lastTouchY = 0;
-    let isTrackingTouch = false;
-    
-    const handleTouchStart = (e) => {
-        if (isTransitioning) return;
+    // Enhanced touch handling for both vertical AND horizontal swipes
+    useEffect(() => {
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let lastTouchX = 0;
+        let lastTouchY = 0;
+        let isTrackingTouch = false;
+        let swipeDirection = null; // 'horizontal' or 'vertical'
         
-        const touch = e.touches[0];
-        touchStartY = touch.clientY;
-        lastTouchY = touch.clientY;
-        isTrackingTouch = true;
-    };
-    
-    const handleTouchMove = (e) => {
-        if (!isTrackingTouch || isTransitioning) return;
-        
-        const touch = e.touches[0];
-        const currentY = touch.clientY;
-        const deltaY = currentY - lastTouchY;
-        
-        if (isHorizontalMode) {
-            // Prevent default scrolling behavior in horizontal mode
-            e.preventDefault();
+        const handleTouchStart = (e) => {
+            if (isTransitioning) return;
             
-            // Use vertical swipes to control horizontal scrolling (like mouse wheel)
-            const scrollSensitivity = 2.0;
-            targetScrollX.current = Math.max(0, 
-                Math.min(targetScrollX.current - deltaY * scrollSensitivity, totalHorizontalWidth)
-            );
-        } else {
-            // In vertical mode, let native scrolling handle most of the work
-            // We only need to detect swipe up at the top to return to horizontal
-            const container = verticalContentRef.current;
-            if (container && container.scrollTop <= 0 && deltaY > 0) {
-                // User is swiping down at the top - prevent native scroll
-                e.preventDefault();
+            const touch = e.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+            lastTouchX = touch.clientX;
+            lastTouchY = touch.clientY;
+            isTrackingTouch = true;
+            swipeDirection = null;
+        };
+        
+        const handleTouchMove = (e) => {
+            if (!isTrackingTouch || isTransitioning) return;
+            
+            const touch = e.touches[0];
+            const currentX = touch.clientX;
+            const currentY = touch.clientY;
+            const deltaX = currentX - lastTouchX;
+            const deltaY = currentY - lastTouchY;
+            
+            // Determine swipe direction on first significant movement
+            if (!swipeDirection) {
+                const totalDeltaX = Math.abs(currentX - touchStartX);
+                const totalDeltaY = Math.abs(currentY - touchStartY);
+                
+                if (totalDeltaX > 10 || totalDeltaY > 10) {
+                    swipeDirection = totalDeltaX > totalDeltaY ? 'horizontal' : 'vertical';
+                }
             }
-        }
+            
+            if (isHorizontalMode) {
+                if (swipeDirection === 'horizontal') {
+                    // Horizontal swipe controls horizontal scrolling
+                    e.preventDefault();
+                    const scrollSensitivity = 3.0;
+                    targetScrollX.current = Math.max(0, 
+                        Math.min(targetScrollX.current - deltaX * scrollSensitivity, totalHorizontalWidth)
+                    );
+                } else if (swipeDirection === 'vertical') {
+                    // Vertical swipe also controls horizontal scrolling (like mouse wheel)
+                    e.preventDefault();
+                    const scrollSensitivity = 2.0;
+                    targetScrollX.current = Math.max(0, 
+                        Math.min(targetScrollX.current - deltaY * scrollSensitivity, totalHorizontalWidth)
+                    );
+                }
+            } else {
+                // In vertical mode, let native scrolling handle most of the work
+                // We only need to detect swipe up at the top to return to horizontal
+                const container = verticalContentRef.current;
+                if (container && container.scrollTop <= 0 && deltaY > 0) {
+                    // User is swiping down at the top - prevent native scroll
+                    e.preventDefault();
+                }
+            }
+            
+            lastTouchX = currentX;
+            lastTouchY = currentY;
+        };
         
-        lastTouchY = currentY;
-    };
-    
-    const handleTouchEnd = (e) => {
-        if (!isTrackingTouch || isTransitioning) return;
-        
-        const touch = e.changedTouches[0];
-        const endY = touch.clientY;
-        const totalDeltaY = endY - touchStartY;
-        
-        if (isHorizontalMode) {
-            // Check if we're at the end and user swiped up (like wheel scroll down)
-            if (targetScrollX.current >= totalHorizontalWidth && totalDeltaY < -10) {
-                targetScrollX.current = totalHorizontalWidth;
-                setIsTransitioning(true);
+        const handleTouchEnd = (e) => {
+            if (!isTrackingTouch || isTransitioning) return;
+            
+            const touch = e.changedTouches[0];
+            const endX = touch.clientX;
+            const endY = touch.clientY;
+            const totalDeltaX = endX - touchStartX;
+            const totalDeltaY = endY - touchStartY;
+            
+            if (isHorizontalMode) {
+                // Check if we're at the end and user swiped up (or left at end)
+                const isAtEnd = targetScrollX.current >= totalHorizontalWidth;
+                const isSwipeUp = totalDeltaY < -30;
+                const isSwipeLeft = totalDeltaX < -30;
                 
-                // Start the transition to vertical mode
-                setTimeout(() => setIsHorizontalMode(false), 200);
-                
-                // === FAST FALL ANIMATION === //
-                setTimeout(() => {
-                    const container = verticalContentRef.current;
-                    if (!container) return;
+                if (isAtEnd && (isSwipeUp || isSwipeLeft)) {
+                    targetScrollX.current = totalHorizontalWidth;
+                    setIsTransitioning(true);
                     
+                    // Start the transition to vertical mode
+                    setTimeout(() => setIsHorizontalMode(false), 200);
+                    
+                    // === FAST FALL ANIMATION === //
+                    setTimeout(() => {
+                        const container = verticalContentRef.current;
+                        if (!container) return;
+                        
+                        container.scrollTo({ top: 0, behavior: 'auto' });
+                        
+                        const fallDuration = 1200;
+                        const fallDistance = window.innerHeight * 5.5;
+                        const startTime = Date.now();
+                        
+                        const animateFall = () => {
+                            const elapsed = Date.now() - startTime;
+                            const progress = Math.min(elapsed / fallDuration, 1);
+                            
+                            const easeOutCubic = 1 - Math.pow(1 - progress, 3);
+                            const currentScrollTop = easeOutCubic * fallDistance;
+                            
+                            container.scrollTop = currentScrollTop;
+                            
+                            if (progress < 1) {
+                                requestAnimationFrame(animateFall);
+                            } else {
+                                setIsTransitioning(false);
+                            }
+                        };
+                        
+                        requestAnimationFrame(animateFall);
+                    }, 400);
+                }
+            } else {
+                // Handle transition from vertical to horizontal mode
+                const container = verticalContentRef.current;
+                if (!container) return;
+                
+                // Check if we're at the top and user swiped down (or right at top)
+                const isAtTop = container.scrollTop <= 0;
+                const isSwipeDown = totalDeltaY > 30;
+                const isSwipeRight = totalDeltaX > 30;
+                
+                if (isAtTop && (isSwipeDown || isSwipeRight)) {
                     container.scrollTo({ top: 0, behavior: 'auto' });
-                    
-                    const fallDuration = 1200;
-                    const fallDistance = window.innerHeight * 5.5;
-                    const startTime = Date.now();
-                    
-                    const animateFall = () => {
-                        const elapsed = Date.now() - startTime;
-                        const progress = Math.min(elapsed / fallDuration, 1);
-                        
-                        const easeOutCubic = 1 - Math.pow(1 - progress, 3);
-                        const currentScrollTop = easeOutCubic * fallDistance;
-                        
-                        container.scrollTop = currentScrollTop;
-                        
-                        if (progress < 1) {
-                            requestAnimationFrame(animateFall);
-                        } else {
-                            setIsTransitioning(false);
-                        }
-                    };
-                    
-                    requestAnimationFrame(animateFall);
-                }, 400);
+                    setIsTransitioning(true);
+                    setIsHorizontalMode(true);
+                    setTimeout(() => setIsTransitioning(false), 1200);
+                }
             }
-        } else {
-            // Handle transition from vertical to horizontal mode
-            const container = verticalContentRef.current;
-            if (!container) return;
             
-            // Check if we're at the top and user swiped down (like wheel scroll up)
-            if (container.scrollTop <= 0 && totalDeltaY > 10) {
-                container.scrollTo({ top: 0, behavior: 'auto' });
-                setIsTransitioning(true);
-                setIsHorizontalMode(true);
-                setTimeout(() => setIsTransitioning(false), 1200);
-            }
-        }
+            isTrackingTouch = false;
+            swipeDirection = null;
+        };
         
-        isTrackingTouch = false;
-    };
-    
-    const node = pageContainerRef.current;
-    if (!node) return;
-    
-    // Add touch event listeners
-    node.addEventListener('touchstart', handleTouchStart, { passive: true });
-    node.addEventListener('touchmove', handleTouchMove, { passive: false });
-    node.addEventListener('touchend', handleTouchEnd, { passive: true });
-    
-    return () => {
-        node.removeEventListener('touchstart', handleTouchStart);
-        node.removeEventListener('touchmove', handleTouchMove);
-        node.removeEventListener('touchend', handleTouchEnd);
-    };
-}, [isHorizontalMode, isTransitioning, totalHorizontalWidth]);
+        const node = pageContainerRef.current;
+        if (!node) return;
+        
+        // Add touch event listeners
+        node.addEventListener('touchstart', handleTouchStart, { passive: true });
+        node.addEventListener('touchmove', handleTouchMove, { passive: false });
+        node.addEventListener('touchend', handleTouchEnd, { passive: true });
+        
+        return () => {
+            node.removeEventListener('touchstart', handleTouchStart);
+            node.removeEventListener('touchmove', handleTouchMove);
+            node.removeEventListener('touchend', handleTouchEnd);
+        };
+    }, [isHorizontalMode, isTransitioning, totalHorizontalWidth]);
 
     // Vertical scroll progress tracker
     useEffect(() => {
@@ -648,31 +734,38 @@ useEffect(() => {
                     <div ref={horizontalContentRef} className="flex absolute top-0 left-0" style={{ width: `${numHorizontalSections * 100}vw`, height: '100vh' }}>
                         
                         <section className="w-screen h-screen flex flex-col items-center justify-center text-center font-sans p-8">
-                            <div style={{ filter: 'drop-shadow(0 0 35px var(--color-frontend))' }}> <DiellLogo size={250} text='' PrimaryColor="var(--color-frontend)" /> </div>
+                            <div style={{ filter: 'drop-shadow(0 0 35px var(--color-frontend))' }}> 
+                                <DiellLogo size={250} text='' PrimaryColor="var(--color-frontend)" /> 
+                            </div>
                             <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                                <h1 className="text-7xl font-bold tracking-tighter mt-8 text-[var(--color-frontend)]" style={{ textShadow: '0 0 20px rgba(251, 191, 36, 0.3)'}} > Diell </h1>
-                                <p className="text-2xl mt-3 text-neutral-400"> <span className='text-[#fbbf24]'>//</span> Building The Exceptional.</p>
+                                <h1 className="text-7xl font-bold tracking-tighter mt-8 text-[var(--color-frontend)]" style={{ textShadow: '0 0 20px rgba(251, 191, 36, 0.3)'}} > 
+                                    Diell 
+                                </h1>
+                                <div className="text-2xl mt-3 text-neutral-400">
+                                    <span className='text-[#fbbf24]'>//</span> 
+                                    <WaveText text="Building The Exceptional." delay={1.5} />
+                                </div>
                             </div>
                         </section>
             
-<section className="w-screen h-screen flex items-center justify-center p-4 sm:p-8 lg:p-16" style={{ minHeight: '100dvh' }}>
-    <div className="grid lg:grid-cols-2 gap-6 lg:gap-16 items-center w-full max-w-7xl mx-auto py-8 sm:py-0">
-        <AnimatedContent scrollX={scrollPosition} trigger={screenW * 0.7} className="font-sans order-2 lg:order-1">
-            <h2 className="text-2xl sm:text-3xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
-                We Craft. We Engineer.
-            </h2>
-            <p className="text-base sm:text-lg lg:text-xl text-neutral-400 mt-3 sm:mt-4 max-w-lg leading-relaxed"> 
-                We specialize in creating bespoke, high-performance web applications. From interactive UIs to complex data-driven platforms, we transform ambitious ideas into flawless digital realities. 
-            </p>
-            <div className="mt-4 sm:mt-6">
-                <TechStackCarousel />
-            </div>
-        </AnimatedContent>
-        <div className="flex items-center justify-center order-1 lg:order-2 min-h-[220px] sm:min-h-[280px] lg:min-h-0">
-            <ShowcaseNode isVisible={isShowcaseVisible} />
-        </div>
-    </div>
-</section>
+                        <section className="w-screen h-screen flex items-center justify-center p-4 sm:p-8 lg:p-16" style={{ minHeight: '100dvh' }}>
+                            <div className="grid lg:grid-cols-2 gap-6 lg:gap-16 items-center w-full max-w-7xl mx-auto py-8 sm:py-0">
+                                <AnimatedContent scrollX={scrollPosition} trigger={screenW * 0.7} className="font-sans order-2 lg:order-1">
+                                    <h2 className="text-2xl sm:text-3xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
+                                        We Craft. We Engineer.
+                                    </h2>
+                                    <p className="text-base sm:text-lg lg:text-xl text-neutral-400 mt-3 sm:mt-4 max-w-lg leading-relaxed"> 
+                                        We specialize in creating bespoke, high-performance web applications. From interactive UIs to complex data-driven platforms, we transform ambitious ideas into flawless digital realities. 
+                                    </p>
+                                    <div className="mt-4 sm:mt-6">
+                                        <TechStackCarousel />
+                                    </div>
+                                </AnimatedContent>
+                                <div className="flex items-center justify-center order-1 lg:order-2 min-h-[220px] sm:min-h-[280px] lg:min-h-0">
+                                    <ShowcaseNode isVisible={isShowcaseVisible} />
+                                </div>
+                            </div>
+                        </section>
 
                         <InfoNode scrollX={scrollPosition} trigger={screenW * 1.5} Icon={WandSparkles} title="Design-Driven Engineering." text="Our process lives at the intersection of creative design and technical precision. We build interfaces that are not only beautiful and intuitive but also robust, scalable, and a pleasure to use." color="var(--color-frontend)" />
                     </div>
@@ -682,7 +775,6 @@ useEffect(() => {
                     <VerticalContent />
                 </div>
             </div>
-            <ProgressBar isHorizontalMode={isHorizontalMode} progress={currentProgress} />
         </>
     );
 };
