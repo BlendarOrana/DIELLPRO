@@ -7,6 +7,9 @@ import {
     Loader2, Send, Calendar, ChevronDown
 } from 'lucide-react';
 
+import { useAppStore } from '../store'; // Adjust path as needed
+
+
 // Import your actual DiellLogo
 import { DiellLogo } from 'diell-logo';
 
@@ -531,25 +534,37 @@ const ClientLogos = () => {
 // Contact Section
 const ContactSection = () => {
     const [formData, setFormData] = useState({ name: '', email: '', message: '' });
-    const [isLoading, setIsLoading] = useState(false);
-    const [message, setMessage] = useState('');
+    const { sendEmail, isLoading, error, successMessage, resetFormStatus } = useAppStore();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsLoading(true);
+        
+        // Validate form data
+        if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
+            return;
+        }
 
-        // Simulate API call
-        setTimeout(() => {
-            setIsLoading(false);
-            setMessage('Message sent successfully! We\'ll get back to you soon.');
-            setFormData({ name: '', email: '', message: '' });
-        }, 2000);
+        // Send email using the store function
+        await sendEmail(formData);
+        
+        // Clear form after sending
+        setFormData({ name: '', email: '', message: '' });
     };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
+
+    // Clear messages after 5 seconds
+    useEffect(() => {
+        if (successMessage || error) {
+            const timer = setTimeout(() => {
+                resetFormStatus();
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [successMessage, error, resetFormStatus]);
 
     return (
         <motion.div
@@ -578,7 +593,8 @@ const ContactSection = () => {
                                 onChange={handleChange}
                                 required
                                 placeholder="Your Name"
-                                className="w-full bg-neutral-900/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                                disabled={isLoading}
+                                className="w-full bg-neutral-900/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors disabled:opacity-50"
                             />
                         </div>
                         <div>
@@ -593,7 +609,8 @@ const ContactSection = () => {
                                 onChange={handleChange}
                                 required
                                 placeholder="your.email@example.com"
-                                className="w-full bg-neutral-900/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                                disabled={isLoading}
+                                className="w-full bg-neutral-900/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors disabled:opacity-50"
                             />
                         </div>
                     </div>
@@ -609,7 +626,8 @@ const ContactSection = () => {
                             onChange={handleChange}
                             required
                             placeholder="Tell us about your project..."
-                            className="w-full bg-neutral-900/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                            disabled={isLoading}
+                            className="w-full bg-neutral-900/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors disabled:opacity-50"
                         ></textarea>
                     </div>
                     <div>
@@ -628,20 +646,40 @@ const ContactSection = () => {
                             {isLoading ? 'Sending...' : 'Send Message'}
                         </motion.button>
                     </div>
-                    {message && (
-                        <motion.p
+                    
+                    {/* Success Message */}
+                    {successMessage && (
+                        <motion.div
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="text-green-400 text-center"
+                            exit={{ opacity: 0, y: -10 }}
+                            className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg"
                         >
-                            {message}
-                        </motion.p>
+                            <p className="text-green-400 text-center font-medium">
+                                {successMessage}
+                            </p>
+                        </motion.div>
+                    )}
+                    
+                    {/* Error Message */}
+                    {error && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg"
+                        >
+                            <p className="text-red-400 text-center font-medium">
+                                {error}
+                            </p>
+                        </motion.div>
                     )}
                 </form>
             </div>
         </motion.div>
     );
 };
+
 
 // Main Portfolio Component
 const DiellPortfolio = () => {
