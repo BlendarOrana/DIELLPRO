@@ -8,7 +8,7 @@
   "dev": "cross-env NODE_ENV=development nodemon backend/server.js",
   "start": "node backend/server.js",
   "build": "npm install && npm install --prefix frontend --include=dev && npm run build --prefix frontend"
-},,
+},
 
   "dependencies": {
     "cors": "^2.8.5",
