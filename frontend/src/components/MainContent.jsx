@@ -446,7 +446,7 @@ const ProductsShowcase = () => {
                                 <DiellLogo size={140} primaryColor="#000" halfColor="var(--color-secondary)" />
                             </div>
 
-                            <p className="text-gray-800 text-lg font-bold mt-1 tracking-tight">Diell React native App</p>
+                            <p className="text-gray-800 text-lg font-bold mt-1 tracking-tight">Diell  Mobile App</p>
                         </div>
                         
                         {/* Device App Environment Indicator Line - Very Real Mobile Element*/}
