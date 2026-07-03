@@ -643,43 +643,43 @@ const DiellPortfolio = () => {
                      <DiellLogo size={280} primaryColor="var(--color-primary)" halfColor="var(--color-secondary)" text='' />
                  </div>
                  
-                 <div className="text-center z-10 max-w-4xl mx-auto space-y-8 mt-2">
-                     
-                     <div 
-                         className="flex flex-col items-center"
-                         style={{ 
-                             opacity: pageLoaded ? 1 : 0, transform: `translateY(${pageLoaded ? 0 : '30px'})`,
-                             transition: 'all 0.8s ease 0.2s' 
-                         }}
-                     >
-                        <h1 className="text-7xl font-bold tracking-tighter text-yellow-400 mb-4">
-                             {/* Perfectly replicated native wave drop bouncing! */}
-                             {pageLoaded && <WaveText text="Diell" delay={0.4} />}
-                         </h1>
-                         <p className="text-xl md:text-4xl text-white font-bold tracking-tight mt-2 md:mt-0">
-                             <span className="text-yellow-500 mr-3 md:mr-4 opacity-80">//</span> 
-                             Building The Exceptional.
-                         </p>
-                     </div>
-                     
-                     {/* Skills highlight under header */}
-                     <p 
-                         style={{ 
-                            opacity: pageLoaded ? 1 : 0, transform: `translateY(${pageLoaded ? 0 : '10px'})`,
-                            transition: 'all 0.8s ease 1s' 
-                        }}
-                         className="text-base md:text-xl text-neutral-400 max-w-3xl mx-auto font-light tracking-tight leading-relaxed px-4 md:px-0 pt-4"
-                     >
-                          Mobile & Web Applications. Expert-level <span className="text-white font-medium text-green-400 border-b border-green-400/30 pb-0.5 hover:text-green-300 transition-colors">Data Engineering</span>. Highly scalable <span className="text-white font-medium text-yellow-400 border-b border-yellow-400/30 pb-0.5 hover:text-yellow-300 transition-colors">Cloud Architecture</span> & AI Integrations.
-                     </p>
-                     
-                     <div 
-                         style={{ opacity: pageLoaded ? 1 : 0, transition: 'all 0.5s ease 1.2s' }}
-                         className="pt-6"
-                     >
-                         <InfiniteTechMarquee />
-                     </div>
-                 </div>
+              <div className="text-center z-10 max-w-4xl mx-auto space-y-8 mt-2 px-4">
+              
+              <div 
+                  className="flex flex-col items-center"
+                  style={{ 
+                      opacity: pageLoaded ? 1 : 0, transform: `translateY(${pageLoaded ? 0 : '30px'})`,
+                      transition: 'all 0.8s ease 0.2s' 
+                  }}
+              >
+                 <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tighter text-yellow-400 mb-4 leading-tight">
+                      {/* Perfectly replicated native wave drop bouncing! */}
+                      {pageLoaded && <WaveText text="Diell" delay={0.4} />}
+                 </h1>
+                 <p className="text-lg sm:text-xl md:text-4xl text-white font-bold tracking-tight mt-2 md:mt-0 px-2">
+                      <span className="text-yellow-500 mr-2 sm:mr-3 md:mr-4 opacity-80">//</span> 
+                      Building The Exceptional.
+                 </p>
+              </div>
+              
+              {/* Skills highlight under header */}
+              <p 
+                  style={{ 
+                     opacity: pageLoaded ? 1 : 0, transform: `translateY(${pageLoaded ? 0 : '10px'})`,
+                     transition: 'all 0.8s ease 1s' 
+                 }}
+                  className="text-sm sm:text-base md:text-xl text-neutral-400 max-w-3xl mx-auto font-light tracking-tight leading-relaxed px-2 sm:px-4 md:px-0 pt-4"
+              >
+                   Mobile & Web Applications. Expert-level <span className="text-white font-medium text-green-400 border-b border-green-400/30 pb-0.5 hover:text-green-300 transition-colors">Data Engineering</span>. Highly scalable <span className="text-white font-medium text-yellow-400 border-b border-yellow-400/30 pb-0.5 hover:text-yellow-300 transition-colors">Cloud Architecture</span> & AI Integrations.
+              </p>
+              
+              <div 
+                  style={{ opacity: pageLoaded ? 1 : 0, transition: 'all 0.5s ease 1.2s' }}
+                  className="pt-6 w-full overflow-hidden"
+              >
+                  <InfiniteTechMarquee />
+              </div>
+          </div>
 
                  {/* Bouncing scroll arrow */}
                  <div className="absolute bottom-8 md:bottom-12 left-1/2 transform -translate-x-1/2 z-10">
