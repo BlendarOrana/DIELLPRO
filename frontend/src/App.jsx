@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ExternalLink } from 'lucide-react';
 import { Suspense, lazy, useEffect } from 'react'; // Import useEffect too
-import { useAppStore } from './store';
 import UnlockScreen from './components/UnlockScreen';
 import MainContent from './components/MainContent';
 
@@ -27,9 +26,8 @@ const LoadingSpinner = () => (
 
 // It's cleaner to group your original app logic into a "Home" component.
 const HomePage = () => {
-  
+
   const isUnlocked = true;
-  
 
   return (
     <main className="h-screen w-screen">
