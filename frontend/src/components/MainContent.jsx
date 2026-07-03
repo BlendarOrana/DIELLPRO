@@ -1,42 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import {
-    Laptop, WandSparkles, Sun, Moon, Bell, Settings, User, Heart,
-    MessageCircle, Share, Play, Pause, SkipForward, Volume2,
-    ExternalLink, Rocket, Layers, ShieldCheck, Database, Router,
-    Loader2, Send, Calendar, ChevronDown
+    Laptop, Settings, Send, Calendar, ChevronDown,
+    ExternalLink, Layers, ShieldCheck, Database, Router, Loader2,
+    Cloud, Code2, Cpu, Smartphone, Activity, Terminal, 
+    Bell, CreditCard, ShoppingCart, User
 } from 'lucide-react';
 
 import { useAppStore } from '../store'; // Adjust path as needed
+import { DiellLogo } from 'diell-logo'; // Your exact imported logo
 
-
-// Import your actual DiellLogo
-import { DiellLogo } from 'diell-logo';
-
-// Import client logos
-// Create a folder named 'logos' in your 'public' directory
-// and add your client logos there.
-// Example: public/logos/company-a.svg
-const clientLogos = [
-      {src:'/logos/zemra.png', alt:'lbgroup'},
-    { src: '/logos/Kosovamed.webp', alt: 'Kosovamed' },
-    { src: '/logos/Logowhite.webp', alt: 'Microsoft' },
-    { src: '/logos/hunters.webp', alt: 'hunters' },
-
-
-];
-
-
-// Global Styles
+// ==============================
+// 1. HIGH-PERFORMANCE GLOBAL CSS
+// ==============================
 const GlobalStyles = () => (
     <style>{`
     :root { 
-      --color-frontend: #fbbf24; 
-      --color-backend: #22c55e; 
-      --color-grid-frontend: rgba(251, 191, 36, 0.08); 
-      --color-grid-backend: rgba(34, 197, 94, 0.08); 
-      --color-text-main: #EAEAEA; 
-      --color-text-subtle: #A0A0A0; 
+      --color-primary: #fbbf24; /* Yellow */
+      --color-secondary: #22c55e; /* Green */
+      --color-text-main: #FAFAFA; 
+      --color-text-subtle: #888888; 
     } 
     
     html, body { 
@@ -44,510 +26,525 @@ const GlobalStyles = () => (
       padding: 0; 
       background-color: #000; 
       color: var(--color-text-main); 
-      font-family: 'Inter', sans-serif; 
+      font-family: 'Inter', -apple-system, sans-serif; 
       -webkit-font-smoothing: antialiased; 
-      -moz-osx-font-smoothing: grayscale; 
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden; 
     } 
-    
-    .grid-background-frontend {
-      background-image: 
-        linear-gradient(to right, var(--color-grid-frontend) 1px, transparent 1px), 
-        linear-gradient(to bottom, var(--color-grid-frontend) 1px, transparent 1px);
-      background-size: 80px 80px;
-    }
-    
-    .grid-background-backend {
-      background-image: 
-        linear-gradient(to right, var(--color-grid-backend) 1px, transparent 1px), 
-        linear-gradient(to bottom, var(--color-grid-backend) 1px, transparent 1px);
-      background-size: 80px 80px;
-    }
-    
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(40px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    .animate-fade-in-up {
-      animation: fadeInUp 0.8s ease-out forwards;
-    }
-    
-    .reveal-on-scroll {
-      opacity: 0;
-      transform: translateY(40px);
-      transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
-    
-    .reveal-on-scroll.is-visible {
-      opacity: 1;
-      transform: translateY(0);
+
+    /* Subtle background glow effect using pure CSS */
+    .bg-grid-mesh {
+        background-size: 50px 50px;
+        background-image: 
+          linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+        -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
     }
 
-    /* Custom scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
+    /* ---------------------------------
+       PURE CSS HARDWARE ANIMATIONS 
+       (Replacing Framer Motion)
+    --------------------------------- */
+
+    .scroller {
+        width: 100%;
+        overflow: hidden;
+        -webkit-mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent);
+        mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent);
     }
     
-    ::-webkit-scrollbar-track {
-      background: #1a1a1a;
+    .scroller__inner {
+        display: flex;
+        flex-wrap: nowrap;
+        animation: scroll 20s forwards linear infinite;
+    }
+
+    .scroller:hover .scroller__inner {
+        animation-play-state: paused;
+    }
+
+    @keyframes scroll {
+        to { transform: translate(calc(-50% - 0.5rem)); }
+    }
+
+    /* Reusable Base CSS Scroll Reveal (IntersectionObserver triggered) */
+    .reveal-base {
+        opacity: 0;
+        transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
     
-    ::-webkit-scrollbar-thumb {
-      background: var(--color-frontend);
-      border-radius: 4px;
+    .reveal-base.in-view { opacity: 1; transform: translate(0, 0) scale(1); }
+
+    /* Origin States for Revealing */
+    .start-y-50 { transform: translateY(50px); }
+    .start-y-30 { transform: translateY(30px); }
+    .start-y-10 { transform: translateY(10px); }
+    .start-scale-90 { transform: scale(0.9); }
+
+    /* Hover interactions replacing motion elements */
+    .btn-scale-interactive {
+        transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.2s, color 0.2s;
+    }
+    .btn-scale-interactive:hover { transform: scale(1.05); }
+    .btn-scale-interactive:active { transform: scale(0.95); }
+
+    /* Realistic Spring Keyframes for Text Bouncing */
+    @keyframes springBounce {
+        0% { opacity: 0; transform: translateY(50px); }
+        60% { transform: translateY(-5px); opacity: 1; }
+        80% { transform: translateY(2px); opacity: 1; }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .spring-letter {
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(50px);
+        animation: springBounce 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     }
     
-    ::-webkit-scrollbar-thumb:hover {
-      background: #e5a900;
+    @keyframes simpleFadeInScale {
+        to { opacity: 1; transform: scale(1); }
     }
+
+    /* ---------------------------------
+       SMOOTH PURE CSS MOCKUPS
+    --------------------------------- */
+
+    .iphone-frame {
+        box-shadow: inset 0 0 0 4px #e5e5e5, inset 0 0 10px rgba(0,0,0,0.1), 0 20px 50px rgba(0,0,0,0.5);
+    }
+
+    .dynamic-island {
+        position: absolute;
+        top: 14px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 32px;
+        background-color: #000;
+        border-radius: 20px;
+        z-index: 50;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        padding-right: 12px;
+    }
+    .island-cam {
+        width: 12px; height: 12px;
+        background: #111; border-radius: 50%;
+        box-shadow: inset 0 0 3px rgba(255,255,255,0.1);
+    }
+
+    /* CSS iPhone Interactive Notification Pill Animation */
+    @keyframes slideDropNotif {
+        0% { transform: translate(-50%, -150%) scale(0.9); opacity: 0; }
+        8% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+        15% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+        85% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+        92% { transform: translate(-50%, -150%) scale(0.9); opacity: 0; }
+        100% { transform: translate(-50%, -150%) scale(0.9); opacity: 0; }
+    }
+
+    .cool-notification {
+        position: absolute;
+        top: 55px; /* Sits exactly below island */
+        left: 50%;
+        width: 250px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        padding: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15), 0 0 1px rgba(0,0,0,0.1);
+        z-index: 45;
+        animation: slideDropNotif 7s cubic-bezier(0.3, 0.8, 0.1, 1.2) infinite;
+        will-change: transform, opacity;
+    }
+
+    /* Seamless Web Pan Engine (No Javascript mapping needed) */
+    @keyframes autoScrollWeb {
+        0%, 15% { transform: translateY(0); }
+        45%, 65% { transform: translateY(calc(-100% + 300px)); /* Pan to bottom of specific container */ }
+        90%, 100% { transform: translateY(0); }
+    }
+    .web-auto-scroll-viewport {
+        animation: autoScrollWeb 15s ease-in-out infinite alternate;
+        will-change: transform;
+    }
+
+    /* Glass Panels */
+    .glass-card {
+        background: linear-gradient(145deg, rgba(25, 25, 25, 0.6) 0%, rgba(10, 10, 10, 0.8) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(12px);
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #000; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 6px; }
+    ::-webkit-scrollbar-thumb:hover { background: #555; }
   `}</style>
 );
 
-// Free Tools Navigation Button
-const FreeToolsButton = () => (
-    <motion.button
-onClick={() => window.location.href = '/freeqr'}
-        className="fixed top-6 right-6 z-50 bg-yellow-500/20 hover:bg-yellow-500/30 backdrop-blur-md border border-yellow-500/30 rounded-full px-4 py-2 flex items-center gap-2 text-yellow-500 font-medium text-sm transition-all duration-300 hover:scale-105"
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-    >
-        <span>QR Generator</span>
-        <ExternalLink size={16} />
-    </motion.button>
-);
+// ==============================
+// 2. HELPER COMPONENTS & LOGIC
+// ==============================
 
-// Intersection Observer Hook
-const useIntersectionObserver = (options = {}) => {
-    const [isIntersecting, setIsIntersecting] = useState(false);
+// NATIVE Intersection Observer wrapper to replace Framer Motion `whileInView`
+const RevealOnScroll = ({ children, className = "", startClass = "start-y-30" }) => {
+    const [isVisible, setIsVisible] = useState(false);
     const ref = useRef(null);
 
     useEffect(() => {
-        const observer = new IntersectionObserver(([entry]) => {
-            setIsIntersecting(entry.isIntersecting);
-        }, { threshold: 0.1, ...options });
-
-        if (ref.current) observer.observe(ref.current);
-        return () => observer.disconnect();
+        const currentRef = ref.current;
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                    observer.disconnect(); // Triggers only once equivalent
+                }
+            },
+            { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+        );
+        if (currentRef) observer.observe(currentRef);
+        return () => { if (currentRef) observer.disconnect(); };
     }, []);
 
-    return [ref, isIntersecting];
+    return (
+        <div ref={ref} className={`reveal-base ${startClass} ${isVisible ? 'in-view' : ''} ${className}`}>
+            {children}
+        </div>
+    );
 };
 
-// Wave Text Animation
+
+// Native WaveText matching strictly exact UI 
 const WaveText = ({ text, delay = 0 }) => {
     const words = text.split(' ');
 
     return (
         <div className="inline-block">
             {words.map((word, wordIndex) => (
-                <span key={wordIndex} className="inline-block mr-3">
-                    {word.split('').map((letter, letterIndex) => (
-                        <motion.span
-                            key={letterIndex}
-                            className="inline-block"
-                            initial={{ y: 50, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            transition={{
-                                delay: delay + (wordIndex * word.length + letterIndex) * 0.05,
-                                duration: 0.4,
-                                type: "spring",
-                                stiffness: 200,
-                                damping: 10
-                            }}
-                        >
-                            {letter}
-                        </motion.span>
-                    ))}
+                <span key={wordIndex} className="inline-block mr-3 drop-shadow-[0_0_20px_rgba(251,191,36,0.3)]">
+                    {word.split('').map((letter, letterIndex) => {
+                        const animationDelay = `${delay + (wordIndex * word.length + letterIndex) * 0.05}s`;
+                        return (
+                            <span key={letterIndex} className="spring-letter" style={{ animationDelay }}>
+                                {letter}
+                            </span>
+                        );
+                    })}
                 </span>
             ))}
         </div>
     );
 };
 
-// Tech Stack Carousel
-const TechStackCarousel = () => {
-    const skills = [
-        { text: 'React', color: '#61DAFB' },
-        { text: 'Framer Motion', color: '#BB44B3' },
-        { text: 'TypeScript', color: '#3178C6' },
-        { text: 'Tailwind CSS', color: '#38BDF8' },
-        { text: 'DaisyUI', color: '#fbbf24' },
-    ];
-    const [currentIndex, setCurrentIndex] = useState(0);
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setCurrentIndex(prev => (prev + 1) % skills.length);
-        }, 2500);
-        return () => clearInterval(interval);
-    }, [skills.length]);
+const InfiniteTechMarquee = () => {
+    const techStack = [
+        "React", "React Native", "TypeScript",  "Python",
+        "AWS Cloud", "Node.js", "Docker", "Kubernetes", "Java"
+    ];
+    const doubledStack = [...techStack, ...techStack];
 
     return (
-        <div className="mt-8 flex flex-wrap gap-3">
-            {skills.map((skill, index) => {
-                const isActive = index === currentIndex;
-                return (
-                    <motion.div
-                        key={skill.text}
-                        className="font-mono text-sm font-bold h-10 flex items-center justify-center px-4 rounded-full border transition-all duration-500"
-                        style={{
-                            color: isActive ? '#0a0a0a' : skill.color,
-                            backgroundColor: isActive ? skill.color : 'rgba(255, 255, 255, 0.05)',
-                            borderColor: skill.color,
-                            boxShadow: isActive ? `0 0 20px ${skill.color}` : 'none',
-                        }}
-                        whileHover={{ scale: 1.05 }}
-                    >
-                        <span>{skill.text}</span>
-                    </motion.div>
-                );
-            })}
+        <div className="scroller mt-10">
+            <ul className="scroller__inner gap-4 m-0 p-0 list-none">
+                {doubledStack.map((tech, idx) => (
+                    <li key={idx} className="flex-shrink-0 text-neutral-400 bg-neutral-900/50 border border-neutral-800 rounded-full px-5 py-2 font-mono text-sm tracking-wide shadow-sm whitespace-nowrap hover:border-yellow-500 hover:text-white transition-colors duration-300">
+                        {tech}
+                    </li>
+                ))}
+            </ul>
         </div>
     );
 };
 
-// Demo Components
-const ShowcaseDemo = ({ isVisible }) => {
-    const [isDarkMode, setIsDarkMode] = useState(true);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [progress, setProgress] = useState(0);
-    const [likes, setLikes] = useState(665);
-    const [isLiked, setIsLiked] = useState(false);
-    const [currentDemo, setCurrentDemo] = useState(0);
+// Top Floating Tools Button Rebuilt With Pure CSS Classes 
+const FreeToolsButton = () => (
+    <button
+        onClick={() => window.location.href = '/freeqr'}
+        className="fixed top-6 right-6 z-50 glass-card btn-scale-interactive rounded-full px-5 py-2.5 flex items-center gap-2 text-yellow-500 font-medium text-xs uppercase tracking-widest hover:bg-yellow-500 hover:text-black shadow-[0_0_15px_rgba(251,191,36,0.15)]"
+    >
+        <span>QR Tool</span>
+        <ExternalLink size={14} />
+    </button>
+);
 
-    const demos = ['settings', 'music', 'social'];
 
-    useEffect(() => {
-        if (!isVisible) return;
-        const interval = setInterval(() => {
-            setCurrentDemo(prev => (prev + 1) % demos.length);
-        }, 4000);
-        return () => clearInterval(interval);
-    }, [isVisible, demos.length]);
+// ==============================
+// 3. MAIN CONTENT SECTIONS
+// ==============================
 
-    useEffect(() => {
-        if (currentDemo === 0) {
-            setTimeout(() => setIsDarkMode(prev => !prev), 1500);
-        } else if (currentDemo === 1) {
-            setIsPlaying(true);
-            setTimeout(() => setIsPlaying(false), 3000);
-        } else if (currentDemo === 2) {
-            setTimeout(() => {
-                setIsLiked(true);
-                setLikes(666);
-            }, 1500);
-        }
-    }, [currentDemo]);
-
-    useEffect(() => {
-        if (!isPlaying) return;
-        const interval = setInterval(() => {
-            setProgress(p => p >= 100 ? 0 : p + 2);
-        }, 100);
-        return () => clearInterval(interval);
-    }, [isPlaying]);
-
-    const theme = isDarkMode ?
-        { bg: 'bg-neutral-900', text: 'text-white', subText: 'text-neutral-300' } :
-        { bg: 'bg-neutral-100', text: 'text-neutral-900', subText: 'text-neutral-600' };
+// 1. STATS SECTION
+const StatsSection = () => {
+    const stats = [
+        { title: "15+", label: "Finished Projects" },
+        { title: "5+", label: "Years Experience" },
+        { title: "99.9%", label: "Uptime & Reliability" },
+        { title: "100%", label: "Client Satisfaction" }
+    ];
 
     return (
-        <motion.div
-            className={`w-full max-w-sm mx-auto h-80 ${theme.bg} backdrop-blur-md rounded-2xl border border-neutral-700 shadow-2xl overflow-hidden transition-all duration-700`}
-            style={{
-                boxShadow: isVisible ? `0 0 40px -10px var(--color-frontend)` : 'none',
-            }}
-            animate={{ scale: isVisible ? 1 : 0.95 }}
-        >
-            {/* Phone Header */}
-            <div className="h-8 bg-neutral-900/90 flex items-center justify-between px-4 border-b border-neutral-700">
-                <div className="flex gap-2">
-                    <div className="w-3 h-3 rounded-full bg-red-500/70"></div>
-                    <div className="w-3 h-3 rounded-full bg-yellow-500/70"></div>
-                    <div className="w-3 h-3 rounded-full bg-green-500/70"></div>
-                </div>
-            </div>
-
-            <div className="p-6 h-full">
-                <AnimatePresence mode="wait">
-                    {currentDemo === 0 && (
-                        <motion.div
-                            key="settings"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            className={`${theme.text} space-y-4`}
-                        >
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-lg font-semibold">Settings</h3>
-                                <motion.div
-                                    className={`relative w-14 h-8 rounded-full cursor-pointer flex items-center transition-colors duration-500 ${isDarkMode ? 'bg-yellow-500 justify-end' : 'bg-neutral-300 justify-start'
-                                        }`}
-                                    onClick={() => setIsDarkMode(!isDarkMode)}
-                                >
-                                    <motion.div
-                                        layout
-                                        transition={{ type: 'spring', stiffness: 700, damping: 30 }}
-                                        className={`w-6 h-6 m-1 rounded-full shadow-lg flex items-center justify-center ${isDarkMode ? 'bg-neutral-900' : 'bg-white'
-                                            }`}
-                                    >
-                                        <AnimatePresence mode="wait">
-                                            {isDarkMode ? (
-                                                <motion.div key="moon" initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }}>
-                                                    <Moon size={14} />
-                                                </motion.div>
-                                            ) : (
-                                                <motion.div key="sun" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -20, opacity: 0 }}>
-                                                    <Sun size={14} />
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
-                                    </motion.div>
-                                </motion.div>
-                            </div>
-                            <div className="bg-neutral-800/50 p-4 rounded-xl">
-                                <div className="flex items-center gap-3">
-                                    <User className={theme.subText} size={16} />
-                                    <div>
-                                        <p className="font-medium">Dark Mode</p>
-                                        <p className={`text-sm ${theme.subText}`}>Automatically switches themes</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </motion.div>
-                    )}
-
-                    {currentDemo === 1 && (
-                        <motion.div
-                            key="music"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            className="text-white space-y-4"
-                        >
-                            <div className="text-center">
-                                <motion.div
-                                    animate={{ scale: isPlaying ? 1.05 : 1 }}
-                                    transition={{ duration: 1.5, repeat: Infinity, repeatType: 'reverse' }}
-                                    className="w-24 h-24 mx-auto bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl mb-4 flex items-center justify-center shadow-2xl"
-                                >
-                                    <div className="w-16 h-16 bg-white/20 rounded-xl backdrop-blur-sm"></div>
-                                </motion.div>
-                                <h3 className="text-lg font-bold">Midnight Vibes</h3>
-                                <p className="text-neutral-400">Lo-Fi Beats</p>
-                            </div>
-                            <div className="space-y-3">
-                                <div className="w-full bg-neutral-700 rounded-full h-1.5">
-                                    <motion.div
-                                        className="bg-yellow-500 h-1.5 rounded-full"
-                                        style={{ width: `${progress}%` }}
-                                    />
-                                </div>
-                                <div className="flex items-center justify-center gap-6">
-                                    <SkipForward size={20} className="rotate-180 text-neutral-400" />
-                                    <motion.button
-                                        whileTap={{ scale: 0.9 }}
-                                        className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center"
-                                        onClick={() => setIsPlaying(!isPlaying)}
-                                    >
-                                        {isPlaying ? <Pause size={18} className="text-black" /> : <Play size={18} className="text-black ml-0.5" />}
-                                    </motion.button>
-                                    <SkipForward size={20} className="text-neutral-400" />
-                                </div>
-                            </div>
-                        </motion.div>
-                    )}
-
-                    {currentDemo === 2 && (
-                        <motion.div
-                            key="social"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            className="text-white space-y-4"
-                        >
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500"></div>
-                                <div>
-                                    <p className="font-semibold">Alex Designer</p>
-                                    <p className="text-sm text-neutral-400">2 minutes ago</p>
-                                </div>
-                            </div>
-                            <div className="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 p-4 rounded-xl">
-                                <p className="mb-3">Just shipped our new dashboard redesign! The animations turned out incredible.</p>
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-4">
-                                        <motion.button
-                                            className={`flex items-center gap-2 transition-colors duration-300 ${isLiked ? 'text-red-500' : 'text-neutral-400'
-                                                }`}
-                                            animate={{ scale: isLiked ? [1, 1.3, 1] : 1 }}
-                                            transition={{ duration: 0.4 }}
-                                            onClick={() => {
-                                                setIsLiked(!isLiked);
-                                                setLikes(isLiked ? 665 : 666);
-                                            }}
-                                        >
-                                            <Heart size={18} className={isLiked ? 'fill-current' : ''} />
-                                            <span className="text-sm">{likes}</span>
-                                        </motion.button>
-                                        <button className="flex items-center gap-2 text-neutral-400">
-                                            <MessageCircle size={18} />
-                                            <span className="text-sm">23</span>
-                                        </button>
-                                    </div>
-                                    <button className="text-neutral-400">
-                                        <Share size={18} />
-                                    </button>
-                                </div>
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
-
-            {/* Demo indicators */}
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
-                {demos.map((_, index) => (
-                    <div
-                        key={index}
-                        className={`h-2 rounded-full transition-all duration-500 ${currentDemo === index ? 'bg-yellow-500 w-6' : 'bg-neutral-600 w-2'
-                            }`}
-                    />
+        <div className="w-full border-t border-b border-neutral-800/60 bg-black py-16 px-6 relative z-10">
+            <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
+                {stats.map((stat, i) => (
+                    <div key={i} className="text-center group flex flex-col justify-center items-center">
+                        <div className="text-5xl lg:text-6xl font-black bg-gradient-to-r from-yellow-500 to-green-500 bg-clip-text text-transparent mb-2 tracking-tight">
+                            {stat.title}
+                        </div>
+                        <div className="text-sm font-semibold uppercase tracking-widest text-neutral-500 group-hover:text-neutral-300 transition-colors">
+                            {stat.label}
+                        </div>
+                    </div>
                 ))}
             </div>
-        </motion.div>
+        </div>
     );
 };
 
-// Backend Showcase
-const BackendShowcase = () => {
-    const [step, setStep] = useState(0);
-    const numSteps = 6;
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setStep(prev => (prev + 1) % numSteps);
-        }, 1500);
-        return () => clearInterval(interval);
-    }, []);
-
-    const Node = ({ icon: Icon, title, gridClass, nodeStep }) => (
-        <div
-            className={`${gridClass} bg-neutral-900/70 p-4 rounded-lg flex flex-col items-center justify-center gap-2 font-mono text-sm text-neutral-400 border transition-all duration-500 ${step === nodeStep ? 'border-green-500 bg-green-500/10 text-green-400 scale-105' : 'border-neutral-700'
-                }`}
-        >
-            <Icon size={24} />
-            <span className="text-center">{title}</span>
-        </div>
-    );
-
+// 2. MOCKUP SECTION (REVOLUTIONIZED DEVICE ACCURACY USING HTML/CSS)
+const ProductsShowcase = () => {
     return (
-        <div className="relative w-full max-w-2xl mx-auto p-8 aspect-[4/3] bg-neutral-900/30 border border-neutral-800 rounded-2xl">
-            <svg width="100%" height="100%" viewBox="0 0 400 300" className="absolute top-0 left-0">
-                <defs>
-                    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse">
-                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#404040" />
-                    </marker>
-                </defs>
-
-                {/* Static paths */}
-                <path className="stroke-neutral-600 stroke-2 fill-none" d="M 70 150 Q 150 150, 150 80" markerEnd="url(#arrow)" />
-                <path className="stroke-neutral-600 stroke-2 fill-none" d="M 180 60 L 250 60" markerEnd="url(#arrow)" />
-                <path className="stroke-neutral-600 stroke-2 fill-none" d="M 280 80 Q 280 150, 200 150" markerEnd="url(#arrow)" />
-                <path className="stroke-neutral-600 stroke-2 fill-none" d="M 170 180 L 170 230" markerEnd="url(#arrow)" />
-
-                {/* Animated data flow */}
-                {step === 0 && (
-                    <motion.path
-                        initial={{ pathLength: 0, opacity: 0 }}
-                        animate={{ pathLength: 1, opacity: 1 }}
-                        transition={{ duration: 1, ease: "easeInOut" }}
-                        className="stroke-green-500 stroke-4 fill-none"
-                        d="M 70 150 Q 150 150, 150 80"
-                    />
-                )}
-            </svg>
-
-            <div className="relative z-10 grid grid-cols-4 grid-rows-3 h-full gap-4">
-                <Node icon={User} title="Client" gridClass="col-start-1 row-start-2" nodeStep={0} />
-                <Node icon={Router} title="API Gateway" gridClass="col-start-2 row-start-1" nodeStep={1} />
-                <Node icon={ShieldCheck} title="Auth Service" gridClass="col-start-3 row-start-1" nodeStep={2} />
-                <Node icon={Layers} title="App Server" gridClass="col-start-2 row-start-2 col-span-2" nodeStep={3} />
-                <Node icon={Database} title="Database" gridClass="col-start-2 row-start-3 col-span-2" nodeStep={4} />
+        <section className="py-24 px-6 relative bg-neutral-950 overflow-hidden">
+            <div className="max-w-7xl mx-auto text-center mb-16 relative z-10">
+                <RevealOnScroll>
+                    <h2 className="text-3xl md:text-5xl font-bold mb-6 tracking-tight">Omnichannel Architecture.</h2>
+              
+                </RevealOnScroll>
             </div>
-        </div>
+
+            <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-12 items-center justify-center relative z-10">
+                
+                {/* 1. REALISTIC SAFARI WEB MOCKUP ENGINE */}
+                <RevealOnScroll startClass="start-y-50" className="w-full max-w-2xl bg-white rounded-2xl overflow-hidden shadow-2xl flex flex-col">
+                    {/* Fake Browser Navbar (Chrome/Safari structure) */}
+                    <div className="h-12 bg-gray-100 border-b border-gray-300 flex items-center px-4 flex-shrink-0 z-20">
+                        <div className="flex gap-1.5 w-16">
+                            <div className="w-3 h-3 rounded-full bg-red-400 border border-red-500"></div>
+                            <div className="w-3 h-3 rounded-full bg-yellow-400 border border-yellow-500"></div>
+                            <div className="w-3 h-3 rounded-full bg-green-400 border border-green-500"></div>
+                        </div>
+                        <div className="mx-auto w-1/2 max-w-[300px] bg-white border border-gray-300 rounded-lg h-7 shadow-inner text-center flex items-center justify-center">
+                            <span className="text-[10px] text-gray-500 font-medium">diell.pro / ecommerce / platform</span>
+                        </div>
+                        <div className="w-16"></div> {/* Offset spacing align */}
+                    </div>
+                    
+                    {/* Simulated Highly Real Web App Layout with CSS Pan Animation Engine */}
+                    <div className="h-[300px] relative overflow-hidden bg-gray-50 flex">
+                        
+                        {/* Static Web App Sidebar */}
+                        <div className="w-48 bg-white border-r border-gray-200 hidden md:flex flex-col p-4 shadow-[4px_0_10px_rgba(0,0,0,0.02)] z-10">
+                           <div className="font-black text-gray-900 tracking-tight text-xl mb-6">Store.</div>
+                           <div className="space-y-4">
+                                <div className="h-4 bg-gray-100 rounded-md w-full mb-8"></div>
+                                <div className="h-3 bg-gray-100 rounded w-5/6"></div>
+                                <div className="h-3 bg-yellow-400/20 text-yellow-600 rounded font-semibold text-[8px] pl-2 flex items-center w-full shadow-sm">Dashboard Analytics</div>
+                                <div className="h-3 bg-gray-100 rounded w-4/6"></div>
+                                <div className="h-3 bg-gray-100 rounded w-full"></div>
+                                <div className="h-3 bg-gray-100 rounded w-3/4"></div>
+                           </div>
+                           <div className="mt-auto flex items-center gap-2 pt-4 border-t border-gray-100">
+                               <div className="w-6 h-6 rounded-full bg-gray-200 flex-shrink-0"></div>
+                               <div className="w-16 h-2 bg-gray-200 rounded"></div>
+                           </div>
+                        </div>
+
+                        {/* Scrolling Container area inside Webpage Viewport */}
+                        <div className="flex-1 relative overflow-hidden">
+                             {/* Applying CSS Auto Scroll logic class */}
+                             <div className="p-6 md:p-8 space-y-6 web-auto-scroll-viewport absolute w-full top-0 left-0">
+                                 {/* E-Comm Hero Panel Replica */}
+                                 <div className="w-full flex justify-between items-center pb-6">
+                                     <div>
+                                         <h3 className="text-xl font-bold text-gray-800">Administrator</h3>
+                                         <p className="text-xs text-gray-500">System overview showing steady engagement.</p>
+                                     </div>
+                                     <button className="px-4 py-2 bg-black text-white text-[10px] font-bold rounded-lg shadow-md">Create Sale</button>
+                                 </div>
+                                 
+                                 {/* Realistic Metric Dashboard Replica Elements */}
+                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                      <div className="p-4 rounded-xl border border-gray-100 bg-white shadow-sm flex flex-col justify-center">
+                                           <div className="w-6 h-6 bg-yellow-50 text-yellow-600 rounded-md flex items-center justify-center mb-3">
+                                               <CreditCard size={12}/>
+                                           </div>
+                                           <span className="text-[10px] font-semibold text-gray-500 uppercase">Gross Total</span>
+                                           <span className="font-bold text-gray-900 text-lg">$210,042</span>
+                                      </div>
+                                      <div className="p-4 rounded-xl border border-gray-100 bg-white shadow-sm flex flex-col justify-center">
+                                           <div className="w-6 h-6 bg-green-50 text-green-600 rounded-md flex items-center justify-center mb-3">
+                                               <ShoppingCart size={12}/>
+                                           </div>
+                                           <span className="text-[10px] font-semibold text-gray-500 uppercase">Orders / Hr</span>
+                                           <span className="font-bold text-gray-900 text-lg">+4,212</span>
+                                      </div>
+                                      <div className="p-4 rounded-xl border border-gray-100 bg-white shadow-sm flex flex-col justify-center hidden md:flex">
+                                           <div className="w-6 h-6 bg-blue-50 text-blue-600 rounded-md flex items-center justify-center mb-3">
+                                               <User size={12}/>
+                                           </div>
+                                           <span className="text-[10px] font-semibold text-gray-500 uppercase">Active Logins</span>
+                                           <span className="font-bold text-gray-900 text-lg">94,302</span>
+                                      </div>
+                                 </div>
+
+                                 {/* Real content replica */}
+                                 <div className="w-full bg-white rounded-xl shadow-sm border border-gray-100 p-5 mt-4">
+                                     <span className="text-[10px] font-semibold text-gray-500 uppercase block mb-4">Traffic Mapping Source Nodes</span>
+                                     <div className="space-y-3">
+                                         {[1,2,3,4].map((i)=>(
+                                            <div key={i} className="flex justify-between items-center w-full">
+                                                <div className="flex gap-2 items-center w-1/3">
+                                                   <div className="w-5 h-5 bg-gray-100 rounded-full flex-shrink-0"></div>
+                                                   <div className="w-full h-2 bg-gray-200 rounded"></div>
+                                                </div>
+                                                <div className="w-1/2 h-1.5 bg-gray-100 rounded-full overflow-hidden flex">
+                                                   <div className="h-full bg-gray-900" style={{width: `${80 - (i*12)}%`}}></div>
+                                                </div>
+                                                <div className="text-[9px] font-bold text-gray-800">${(i*122).toFixed(2)}</div>
+                                            </div>
+                                         ))}
+                                     </div>
+                                 </div>
+                             </div>
+                        </div>
+                    </div>
+                </RevealOnScroll>
+
+
+                {/* 2. REALISTIC IPHONE 14 PRO MAX PURE CSS DEVICE BODY AND UI */}
+                <RevealOnScroll startClass="start-scale-90" className="relative">
+                    <div className="iphone-frame relative w-[280px] h-[580px] rounded-[45px] bg-[#f9fafb] border-[14px] border-[#252525] flex flex-col overflow-hidden ring-2 ring-gray-600 shadow-2xl flex-shrink-0 relative">
+                        
+                        {/* Iconic Hardware - Dynamic Island Block */}
+                        <div className="dynamic-island">
+                            <div className="island-cam"></div>
+                        </div>
+                        
+                        {/* Inner Software CSS Mock Notification */}
+                        <div className="cool-notification flex items-center gap-3">
+                            <div className="h-10 w-10 rounded-xl bg-yellow-400 flex items-center justify-center flex-shrink-0 text-white shadow-inner">
+                                <Bell size={18} fill="currentColor"/>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-[13px] font-bold text-gray-800 leading-tight">Infrastructure Alert</span>
+                                <span className="text-[11px] text-gray-500 font-medium">Auto-scaling Node activated successfully.</span>
+                            </div>
+                        </div>
+
+                        {/* Interactive Mobile Device Application State Background Center */}
+                        <div className="flex-1 w-full h-full flex items-center justify-center relative flex-col pb-10">
+                            
+                            {/* Precise Mobile Native Logo Injection with Dark Mode override color fix inside white mobile env */}
+                            <div className="mb-4 drop-shadow-[0_20px_20px_rgba(251,191,36,0.1)] hover:scale-105 transition-transform cursor-default">
+                                {/* Adjusted primary color for visibility against the very clean white device mock! */}
+                                <DiellLogo size={140} primaryColor="#000" halfColor="var(--color-secondary)" />
+                            </div>
+
+                            <p className="text-gray-800 text-lg font-bold mt-1 tracking-tight">Diell React native App</p>
+                        </div>
+                        
+                        {/* Device App Environment Indicator Line - Very Real Mobile Element*/}
+                        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-1/3 h-1 bg-black rounded-full"></div>
+                    </div>
+                </RevealOnScroll>
+            </div>
+            
+            {/* Soft decorative background blurs (Pure styling, no DOM lag) */}
+            <div className="absolute top-1/2 left-0 w-96 h-96 bg-green-500/5 blur-[120px] rounded-full pointer-events-none transform -translate-y-1/2 z-0"></div>
+            <div className="absolute top-1/2 right-0 w-96 h-96 bg-yellow-500/5 blur-[120px] rounded-full pointer-events-none transform -translate-y-1/2 z-0"></div>
+        </section>
     );
 };
 
-// Client Logos Section
-const ClientLogos = () => {
+// 3. CORE EXPERTISE SECTION
+const CoreExpertise = () => {
+    const expertiseList = [
+        {
+            title: "Web Engineering",
+            desc: "High-performance Single Page Applications and robust Server-Side websites via frameworks structured closely specifically to distinct system logic scale limits.",
+            icon: Laptop,
+            color: "text-blue-400",
+            bgHover: "hover:border-blue-400/50 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(96,165,250,0.1)]"
+        },
+        {
+            title: "Mobile App Development",
+            desc: "Pristine Native iOS and Android device platform experiences uniquely customized implementing deeply structured hardware layer operating designs flawlessly.",
+            icon: Smartphone,
+            color: "text-purple-400",
+            bgHover: "hover:border-purple-400/50 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(192,132,252,0.1)]"
+        },
+        {
+            title: "Data Engineering",
+            desc: "Rapid analytical pipelines, optimized cloud warehousing structures, robust ETL deployments securing analytics natively strictly leveraging complex computing sets raw bytes.",
+            icon: Database,
+            color: "text-yellow-400",
+            bgHover: "hover:border-yellow-400/50 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(251,191,36,0.1)]"
+        },
+        {
+            title: "Cloud Ops & Architecture",
+            desc: "Enterprise robust node clusters hitting 99.9% fault-resistant resilient metrics mapped fully leveraging scalable Docker instances mapped around specific logic loops.",
+            icon: Cloud,
+            color: "text-green-400",
+            bgHover: "hover:border-green-400/50 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(34,197,94,0.1)]"
+        },
+        {
+            title: "AI Integrations & Deployments",
+            desc: "Fine-tuned business workflow systems dynamically generating context-secure retrieval generation specifically isolating high-end neural logic layers precisely locally and cloud native deployments models.",
+            icon: Activity, 
+            color: "text-red-400",
+            bgHover: "hover:border-red-400/50 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(248,113,113,0.1)]"
+        },
+        {
+            title: "API Platform Buildouts",
+            desc: "Lightning logic maps utilizing scalable python, fully strongly mapped typed systems securing all data in robust transfer points strictly operating through fast isolated structures environments networks nodes containers platforms APIs.",
+            icon: Terminal,
+            color: "text-neutral-300",
+            bgHover: "hover:border-white/40 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(255,255,255,0.1)]"
+        }
+    ];
+
     return (
-        <section className="py-20 px-8 bg-black">
-            <div className="max-w-7xl mx-auto">
-                <motion.div
-                    initial={{ opacity: 0, y: 40 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8 }}
-                    className="text-center mb-12"
-                >
-                    <h2 className="text-4xl font-bold text-white mb-4">
-                        Trusted by Leading Companies
-                    </h2>
-                    <p className="text-lg text-neutral-400">
-                        We are proud to have collaborated with these innovative brands.
-                    </p>
-                </motion.div>
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    transition={{ duration: 0.8, delay: 0.2 }}
-                    className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 items-center"
-                >
-                    {clientLogos.map((logo, index) => (
-                        <motion.div
-                            key={index}
-                            className="flex justify-center"
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: index * 0.1 }}
-                        >
-                            <img
-                                src={logo.src}
-                                alt={logo.alt}
-                                className="h-12 w-auto object-contain transition-all duration-300 filter grayscale hover:grayscale-0"
-                            />
-                        </motion.div>
-                    ))}
-                </motion.div>
+        <section className="py-24 px-6 max-w-7xl mx-auto relative z-10">
+            <RevealOnScroll className="mb-16">
+                 <h2 className="text-3xl md:text-5xl font-bold tracking-tight">Full-Stack </h2>
+                 <p className="text-neutral-500 mt-4 text-xl max-w-3xl">Delivering extensive digital ecosystem builds with expertise strictly covering all foundational, analytical, and external technology tiers.</p>
+            </RevealOnScroll>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {expertiseList.map((skill, index) => {
+                    const Icon = skill.icon;
+                    return (
+                        <RevealOnScroll key={index} startClass="start-y-30">
+                            <div className={`glass-card p-8 rounded-2xl transition-all duration-300 transform block h-full ${skill.bgHover}`}>
+                                 <div className={`h-12 w-12 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center mb-6`}>
+                                      <Icon className={`w-6 h-6 ${skill.color}`} />
+                                 </div>
+                                 <h3 className="text-xl font-bold mb-3">{skill.title}</h3>
+                                 <p className="text-neutral-400 text-sm leading-relaxed">{skill.desc}</p>
+                            </div>
+                        </RevealOnScroll>
+                    );
+                })}
             </div>
         </section>
     );
 };
 
-
-// Contact Section
-const ContactSection = () => {
+// 4. CONTACT SECTION 
+const ContactFormBlock = () => {
     const [formData, setFormData] = useState({ name: '', email: '', message: '' });
     const { sendEmail, isLoading, error, successMessage, resetFormStatus } = useAppStore();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
-        // Validate form data
-        if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
-            return;
-        }
-
-        // Send email using the store function
+        if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) return;
         await sendEmail(formData);
-        
-        // Clear form after sending
         setFormData({ name: '', email: '', message: '' });
     };
 
@@ -556,323 +553,178 @@ const ContactSection = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    // Clear messages after 5 seconds
     useEffect(() => {
         if (successMessage || error) {
-            const timer = setTimeout(() => {
-                resetFormStatus();
-            }, 5000);
+            const timer = setTimeout(() => resetFormStatus(), 5000);
             return () => clearTimeout(timer);
         }
     }, [successMessage, error, resetFormStatus]);
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="bg-black/40 backdrop-blur-md border border-green-900/50 rounded-2xl shadow-2xl max-w-2xl mx-auto overflow-hidden"
-        >
-            <div className="p-10 text-center border-b border-green-900/30">
-                <h3 className="text-4xl font-bold text-white mb-2">Ready to Build?</h3>
-                <p className="text-neutral-400 text-lg">Let's discuss your project and bring your vision to life.</p>
-            </div>
+        <RevealOnScroll className="w-full max-w-3xl mx-auto z-10 relative">
+            <div className="bg-black/60 backdrop-blur-xl border border-neutral-800/80 rounded-[30px] shadow-2xl w-full overflow-hidden ring-1 ring-white/5 relative z-10">
+                <div className="p-12 text-center border-b border-neutral-800/50 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-500/5 to-yellow-500/5"></div>
+                    <h3 className="text-4xl font-bold text-white tracking-tight relative z-10 mb-3">Email us.</h3>
+                </div>
 
-            <div className="p-10">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label htmlFor="name" className="block text-neutral-300 text-sm font-bold mb-2">
-                                Name
-                            </label>
-                            <input
-                                type="text"
-                                name="name"
-                                id="name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                required
-                                placeholder="Your Name"
-                                disabled={isLoading}
-                                className="w-full bg-neutral-900/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors disabled:opacity-50"
-                            />
+                <div className="p-8 md:p-12">
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <label className="block text-neutral-400 text-xs font-mono uppercase tracking-widest mb-3">Name </label>
+                                <input
+                                    type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="Full Name" disabled={isLoading}
+                                    className="w-full bg-neutral-900/60 border border-neutral-700/80 rounded-xl px-5 py-4 text-white text-sm focus:outline-none focus:border-yellow-500 focus:bg-neutral-800 transition-all duration-300 placeholder-neutral-600 disabled:opacity-50"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-neutral-400 text-xs font-mono uppercase tracking-widest mb-3"> E-Mail </label>
+                                <input
+                                    type="email" name="email" value={formData.email} onChange={handleChange} required placeholder="director@organization.dev" disabled={isLoading}
+                                    className="w-full bg-neutral-900/60 border border-neutral-700/80 rounded-xl px-5 py-4 text-white text-sm focus:outline-none focus:border-green-500 focus:bg-neutral-800 transition-all duration-300 placeholder-neutral-600 disabled:opacity-50"
+                                />
+                            </div>
                         </div>
                         <div>
-                            <label htmlFor="email" className="block text-neutral-300 text-sm font-bold mb-2">
-                                Email
-                            </label>
-                            <input
-                                type="email"
-                                name="email"
-                                id="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                required
-                                placeholder="your.email@example.com"
-                                disabled={isLoading}
-                                className="w-full bg-neutral-900/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors disabled:opacity-50"
-                            />
+                            <label className="block text-neutral-400 text-xs font-mono uppercase tracking-widest mb-3">Project Directive </label>
+                            <textarea
+                                name="message" rows="5" value={formData.message} onChange={handleChange} required placeholder="" disabled={isLoading}
+                                className="w-full bg-neutral-900/60 border border-neutral-700/80 rounded-xl px-5 py-4 text-white text-sm focus:outline-none focus:ring-1 focus:ring-yellow-500/50 focus:border-yellow-500 focus:bg-neutral-800 transition-all duration-300 placeholder-neutral-600 resize-y disabled:opacity-50"
+                            ></textarea>
                         </div>
-                    </div>
-                    <div>
-                        <label htmlFor="message" className="block text-neutral-300 text-sm font-bold mb-2">
-                            Message
-                        </label>
-                        <textarea
-                            name="message"
-                            id="message"
-                            rows="5"
-                            value={formData.message}
-                            onChange={handleChange}
-                            required
-                            placeholder="Tell us about your project..."
-                            disabled={isLoading}
-                            className="w-full bg-neutral-900/50 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors disabled:opacity-50"
-                        ></textarea>
-                    </div>
-                    <div>
-                        <motion.button
-                            type="submit"
-                            disabled={isLoading}
-                            className="w-full flex items-center justify-center bg-green-500 text-black px-10 py-4 rounded-full font-bold text-xl transition-all duration-300 hover:bg-green-400 shadow-2xl shadow-green-500/30 disabled:opacity-60"
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
+                        
+                        <button type="submit" disabled={isLoading}
+                            className="group btn-scale-interactive w-full relative flex items-center justify-center bg-white text-black px-10 py-5 rounded-2xl font-black text-sm uppercase tracking-widest transition-all overflow-hidden disabled:opacity-60 disabled:pointer-events-none"
                         >
-                            {isLoading ? (
-                                <Loader2 className="mr-2 h-6 w-6 animate-spin" />
-                            ) : (
-                                <Send className="mr-2 h-5 w-5" />
-                            )}
-                            {isLoading ? 'Sending...' : 'Send Message'}
-                        </motion.button>
-                    </div>
-                    
-                    {/* Success Message */}
-                    {successMessage && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg"
-                        >
-                            <p className="text-green-400 text-center font-medium">
-                                {successMessage}
-                            </p>
-                        </motion.div>
-                    )}
-                    
-                    {/* Error Message */}
-                    {error && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg"
-                        >
-                            <p className="text-red-400 text-center font-medium">
-                                {error}
-                            </p>
-                        </motion.div>
-                    )}
-                </form>
+                            {isLoading ? <Loader2 className="mr-3 h-5 w-5 animate-spin" /> : <Send className="mr-3 h-4 w-4" />}
+                            <span>{isLoading ? 'is Sending...' : 'Send'}</span>
+                        </button>
+                        
+                        {/* Status Alerts */}
+                        {successMessage && <div className="text-xs tracking-widest text-green-400 font-mono text-center pt-2">{successMessage}</div>}
+                        {error && <div className="text-xs tracking-widest text-red-400 font-mono text-center pt-2">{error}</div>}
+                    </form>
+                </div>
             </div>
-        </motion.div>
+        </RevealOnScroll>
     );
 };
 
+// ==============================
+// 4. MAIN EXPORT LAYOUT
+// ==============================
 
-// Main Portfolio Component
 const DiellPortfolio = () => {
-    const containerRef = useRef(null);
-    const { scrollYProgress } = useScroll({ container: containerRef });
-    const [heroRef, heroInView] = useIntersectionObserver();
-    const [showcaseRef, showcaseInView] = useIntersectionObserver();
-    const [backendRef, backendInView] = useIntersectionObserver();
+    // Basic startup animation sequence triggered globally strictly matching original layout flows via CSS.
+    const [pageLoaded, setPageLoaded] = useState(false);
+    useEffect(() => { setPageLoaded(true) }, []);
 
     return (
-        <>
+        <div className="bg-[#050505] min-h-screen text-white font-sans selection:bg-yellow-500/30 selection:text-white pb-0 m-0 relative">
             <GlobalStyles />
             <FreeToolsButton />
 
-            <div ref={containerRef} className="h-screen overflow-y-auto">
-                {/* Hero Section */}
-                <section ref={heroRef} className="min-h-screen grid-background-frontend flex flex-col items-center justify-center text-center relative">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 1, ease: "easeOut" }}
-                        style={{ filter: 'drop-shadow(0 0 35px var(--color-frontend))' }}
-                    >
-                        <DiellLogo size={300} primaryColor="var(--color-frontend)" text='' />
-                    </motion.div>
+            {/* Background elements */}
+            <div className="fixed top-0 left-0 w-full h-screen bg-grid-mesh pointer-events-none opacity-40 -z-0"></div>
 
-                    <motion.div
-                        initial={{ opacity: 0, y: 40 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.3 }}
-                        className="mt-8"
-                    >
+            {/* HERO SECTION - Refined CSS Pure Transitions Layer Engine Mapped directly avoiding JS mapping constraints mapping scopes sets bounds lines goals */}
+            <section className="relative min-h-screen flex flex-col items-center justify-center pt-16 px-6 overflow-hidden">
+                 
+                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[60vh] bg-gradient-radial from-neutral-800/20 via-transparent to-transparent -z-10 blur-xl pointer-events-none"></div>
+                 
+                 <div 
+                     className="mb-8"
+                     style={{ 
+                         opacity: pageLoaded ? 1 : 0, transform: `scale(${pageLoaded ? 1 : 0.90})`,
+                         transition: 'all 1s cubic-bezier(0.165, 0.84, 0.44, 1)' 
+                     }}
+                 >
+                     <DiellLogo size={280} primaryColor="var(--color-primary)" halfColor="var(--color-secondary)" text='' />
+                 </div>
+                 
+                 <div className="text-center z-10 max-w-4xl mx-auto space-y-8 mt-2">
+                     
+                     <div 
+                         className="flex flex-col items-center"
+                         style={{ 
+                             opacity: pageLoaded ? 1 : 0, transform: `translateY(${pageLoaded ? 0 : '30px'})`,
+                             transition: 'all 0.8s ease 0.2s' 
+                         }}
+                     >
                         <h1 className="text-7xl font-bold tracking-tighter text-yellow-400 mb-4">
-                            <WaveText text="Diell" delay={0.5} />
-                        </h1>
-                        <p className="text-2xl text-neutral-400">
-                            <span className="text-yellow-400">//</span> Building The Exceptional.
-                        </p>
-                    </motion.div>
+                             {/* Perfectly replicated native wave drop bouncing! */}
+                             {pageLoaded && <WaveText text="Diell" delay={0.4} />}
+                         </h1>
+                         <p className="text-xl md:text-4xl text-white font-bold tracking-tight mt-2 md:mt-0">
+                             <span className="text-yellow-500 mr-3 md:mr-4 opacity-80">//</span> 
+                             Building The Exceptional.
+                         </p>
+                     </div>
+                     
+                     {/* Skills highlight under header */}
+                     <p 
+                         style={{ 
+                            opacity: pageLoaded ? 1 : 0, transform: `translateY(${pageLoaded ? 0 : '10px'})`,
+                            transition: 'all 0.8s ease 1s' 
+                        }}
+                         className="text-base md:text-xl text-neutral-400 max-w-3xl mx-auto font-light tracking-tight leading-relaxed px-4 md:px-0 pt-4"
+                     >
+                          Mobile & Web Applications. Expert-level <span className="text-white font-medium text-green-400 border-b border-green-400/30 pb-0.5 hover:text-green-300 transition-colors">Data Engineering</span>. Highly scalable <span className="text-white font-medium text-yellow-400 border-b border-yellow-400/30 pb-0.5 hover:text-yellow-300 transition-colors">Cloud Architecture</span> & AI Integrations.
+                     </p>
+                     
+                     <div 
+                         style={{ opacity: pageLoaded ? 1 : 0, transition: 'all 0.5s ease 1.2s' }}
+                         className="pt-6"
+                     >
+                         <InfiniteTechMarquee />
+                     </div>
+                 </div>
 
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 1, delay: 1.5 }}
-                        className="absolute bottom-10"
-                    >
-                        <ChevronDown size={32} className="text-yellow-400 animate-bounce" />
-                    </motion.div>
-                </section>
+                 {/* Bouncing scroll arrow */}
+                 <div className="absolute bottom-8 md:bottom-12 left-1/2 transform -translate-x-1/2 z-10">
+                    <ChevronDown size={32} strokeWidth={1} className="text-neutral-500 animate-bounce"/>
+                 </div>
+            </section>
 
-                {/* Frontend Showcase Section */}
-                <section ref={showcaseRef} className="min-h-screen grid-background-frontend py-20 px-8">
-                    <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
-                        <motion.div
-                            initial={{ opacity: 0, x: -40 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.8 }}
-                            className="space-y-8"
-                        >
-                            <h2 className="text-5xl font-bold tracking-tight text-white leading-tight">
-                                We Craft. We Engineer.
-                            </h2>
-                            <p className="text-xl text-neutral-400 leading-relaxed">
-                                We specialize in creating bespoke, high-performance web applications.
-                                From interactive UIs to complex data-driven platforms, we transform
-                                ambitious ideas into flawless digital realities.
-                            </p>
-                            <TechStackCarousel />
-                        </motion.div>
+            <StatsSection />
 
-                        <motion.div
-                            initial={{ opacity: 0, x: 40 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.8, delay: 0.2 }}
-                            className="flex justify-center"
-                        >
-                            <ShowcaseDemo isVisible={showcaseInView} />
-                        </motion.div>
+            <ProductsShowcase />
+
+            <CoreExpertise />
+
+            <section className="py-24 px-6 bg-gradient-to-b from-transparent to-[#0a0a0a] flex items-center justify-center relative z-10">
+                <ContactFormBlock />
+            </section>
+
+            <footer className="relative border-t border-neutral-900 bg-[#000] pt-16 pb-8 px-6 text-sm z-10">
+                <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 text-neutral-500">
+                    <div className="md:col-span-2">
+                            <DiellLogo size={60}  />
+              
                     </div>
-                </section>
-
-                {/* Design Philosophy Section */}
-                <section className="min-h-screen grid-background-frontend py-20 px-8 flex items-center">
-                    <div className="max-w-4xl mx-auto text-center">
-                        <motion.div
-                            initial={{ opacity: 0, y: 40 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8 }}
-                            className="space-y-8"
-                        >
-                            <h2 className="text-5xl font-bold text-white mb-6">
-                                Design-Driven Engineering.
-                            </h2>
-                            <p className="text-xl text-neutral-400 leading-relaxed max-w-3xl mx-auto">
-                                Our process lives at the intersection of creative design and technical precision.
-                                We build interfaces that are not only beautiful and intuitive but also robust,
-                                scalable, and a pleasure to use.
-                            </p>
-                        </motion.div>
+                    <div>
+                         <h5 className="text-white font-bold mb-4 uppercase tracking-widest text-xs">Reach Control Unit</h5>
+                         <ul className="space-y-3 font-mono">
+                             <li><a href="mailto:info@diell.pro" className="hover:text-yellow-400 transition-colors block">E: info@diell.pro</a></li>
+                             <li><a href="tel:+38343877724" className="hover:text-yellow-400 transition-colors block">T: +383 43 877 724</a></li>
+                             <li className="pt-2"><a href="https://instagram.com/diell.pro" target="_blank" rel="noopener noreferrer" className="hover:text-green-400 transition-colors flex items-center gap-2"><ExternalLink size={12}/> Network Instalog</a></li>
+                         </ul>
                     </div>
-                </section>
-
-
-                {/* NEW: Client Logos Section */}
-                <ClientLogos />
-
-                <section className="min-h-screen grid-background-backend py-20 px-8 flex items-center">
-                    <div className="max-w-4xl mx-auto w-full">
-                        <ContactSection />
+                    <div>
+                         <h5 className="text-white font-bold mb-4 uppercase tracking-widest text-xs">Global Location Area</h5>
+                         <address className="font-mono space-y-3 not-italic">
+                            PRISHTINË 10000<br/>
+                            REPUBLIC OF KOSOVO<br/>
+                            SYSTEM RUN STATUS: <span className="text-green-500 font-bold ml-2">OK.</span>
+                         </address>
                     </div>
-                </section>
-
-                {/* Footer */}
-           {/* Footer */}
-                <footer className="relative bg-black border-t border-neutral-800 py-16 px-8 overflow-hidden">
-                    {/* Gradient background effects */}
-                    <div className="absolute inset-0 opacity-20">
-                        <div className="absolute top-0 left-1/4 w-96 h-96 bg-green-500 rounded-full blur-3xl"></div>
-                        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-yellow-400 rounded-full blur-3xl"></div>
-                    </div>
-                    
-                    <div className="max-w-6xl mx-auto relative z-10">
-                        {/* Logo and Tagline */}
-                        <div className="text-center mb-12">
-                            <div className="mb-6 inline-block hover:scale-105 transition-transform duration-300">
-                                <DiellLogo size={180} primaryColor="#fbbf24" halfColor='#22c55e' />
-                            </div>
-                            <p className="text-neutral-400 text-lg max-w-2xl mx-auto">
-                                Building exceptional digital experiences, one project at a time.
-                            </p>
-                        </div>
-                        
-                        {/* Contact Cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
-                            {/* Email Card */}
-                            <div className="group relative bg-neutral-900 border border-neutral-800 rounded-xl p-6 hover:border-green-500 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/20">
-                                <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                <div className="relative">
-                                    <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-green-500/20 transition-colors">
-                                        <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                        </svg>
-                                    </div>
-                                    <h4 className="text-green-500 font-semibold mb-2 text-sm uppercase tracking-wider">Email</h4>
-                                    <a href="mailto:info@diell.pro" className="text-neutral-300 hover:text-green-400 transition-colors text-sm break-all">
-                                        info@diell.pro
-                                    </a>
-                                </div>
-                            </div>
-
-                            {/* Phone Card */}
-                            <div className="group relative bg-neutral-900 border border-neutral-800 rounded-xl p-6 hover:border-yellow-400 transition-all duration-300 hover:shadow-lg hover:shadow-yellow-400/20">
-                                <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                <div className="relative">
-                                    <div className="w-12 h-12 bg-yellow-400/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-yellow-400/20 transition-colors">
-                                        <svg className="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                        </svg>
-                                    </div>
-                                    <h4 className="text-yellow-400 font-semibold mb-2 text-sm uppercase tracking-wider">Phone</h4>
-                                    <a href="tel:+38343877724" className="text-neutral-300 hover:text-yellow-300 transition-colors text-sm">
-                                        +383 43 877 724
-                                    </a>
-                                </div>
-                            </div>
-
-                            {/* Social Card */}
-                            <div className="group relative bg-neutral-900 border border-neutral-800 rounded-xl p-6 hover:border-green-500 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/20">
-                                <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                <div className="relative">
-                                    <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-green-500/20 transition-colors">
-                                        <svg className="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                                        </svg>
-                                    </div>
-                                    <h4 className="text-green-500 font-semibold mb-2 text-sm uppercase tracking-wider">Social</h4>
-                                    <a href="https://www.instagram.com/diell.pro/" target="_blank" rel="noopener noreferrer" className="text-neutral-300 hover:text-green-400 transition-colors text-sm">
-                                        @diell.pro
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        {/* Bottom Bar */}
-                        <div className="text-center pt-8 border-t border-neutral-800">
-                            <p className="text-neutral-500 text-sm">
-                                © 2024 <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-yellow-400 font-semibold">Diell</span>. All rights reserved.
-                            </p>
-                        </div>
-                    </div>
-                </footer>
-            </div>
-        </>
+                </div>
+                <div className="mt-16 text-center font-mono tracking-widest text-[10px] md:text-xs border-t border-neutral-900/50 pt-8 text-neutral-600 uppercase">
+                    © 2024 Diell Infrastructure Network & Data Groups. All Rights Strictly Reserved.
+                </div>
+            </footer>
+        </div>
     );
 };
 
