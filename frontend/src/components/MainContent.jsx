@@ -110,55 +110,116 @@ const GlobalStyles = () => (
     /* ---------------------------------
        SMOOTH PURE CSS MOCKUPS
     --------------------------------- */
+/* ---------------------------------
+       HYPER-REALISTIC IPHONE 17 PRO MAX 
+    --------------------------------- */
 
     .iphone-frame {
-        box-shadow: inset 0 0 0 4px #e5e5e5, inset 0 0 10px rgba(0,0,0,0.1), 0 20px 50px rgba(0,0,0,0.5);
+        width: 320px;
+        height: 660px;
+        border-radius: 55px;
+        background: #000; /* Ultra-thin black bezel */
+        position: relative;
+        /* Titanium outer casing */
+        box-shadow: 
+            0 0 0 2px #52525b, /* Inner metallic rim */
+            0 0 0 6px #d4d4d8, /* Outer brushed titanium rim */
+            0 40px 80px -20px rgba(0, 0, 0, 0.7); /* Deep drop shadow */
     }
 
+    /* Screen Glare Effect */
+    .iphone-frame::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 55px;
+        background: linear-gradient(110deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 35%);
+        pointer-events: none;
+        z-index: 100;
+    }
+
+    /* Hardware Buttons */
+    .iphone-btn-action { position: absolute; top: 110px; left: -8px; width: 3px; height: 26px; background: #d4d4d8; border-radius: 4px 0 0 4px; box-shadow: inset -1px 0 2px rgba(0,0,0,0.3); }
+    .iphone-btn-vol-up { position: absolute; top: 160px; left: -8px; width: 3px; height: 60px; background: #d4d4d8; border-radius: 4px 0 0 4px; box-shadow: inset -1px 0 2px rgba(0,0,0,0.3); }
+    .iphone-btn-vol-down { position: absolute; top: 235px; left: -8px; width: 3px; height: 60px; background: #d4d4d8; border-radius: 4px 0 0 4px; box-shadow: inset -1px 0 2px rgba(0,0,0,0.3); }
+    .iphone-btn-power { position: absolute; top: 190px; right: -8px; width: 3px; height: 90px; background: #d4d4d8; border-radius: 0 4px 4px 0; box-shadow: inset 1px 0 2px rgba(0,0,0,0.3); }
+
+    /* Inner Screen Wrapper */
+    .iphone-screen {
+        position: absolute;
+        inset: 6px; /* Exactly 6px bezel thickness */
+        background: #fafafa;
+        border-radius: 49px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Upgraded Dynamic Island */
     .dynamic-island {
         position: absolute;
-        top: 14px;
+        top: 12px;
         left: 50%;
         transform: translateX(-50%);
-        width: 100px;
-        height: 32px;
+        width: 120px;
+        height: 35px;
         background-color: #000;
         border-radius: 20px;
         z-index: 50;
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        padding-right: 12px;
+        box-shadow: inset 0 0 2px rgba(255,255,255,0.1);
     }
-    .island-cam {
-        width: 12px; height: 12px;
-        background: #111; border-radius: 50%;
-        box-shadow: inset 0 0 3px rgba(255,255,255,0.1);
+    /* Island Sensors */
+    .dynamic-island::before {
+        content: ''; position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+        width: 12px; height: 12px; background: #0a0a0a; border-radius: 50%;
+        box-shadow: inset 0 0 4px rgba(255,255,255,0.2), 0 0 1px 1px #050505;
     }
-
-    /* CSS iPhone Interactive Notification Pill Animation */
-    @keyframes slideDropNotif {
-        0% { transform: translate(-50%, -150%) scale(0.9); opacity: 0; }
-        8% { transform: translate(-50%, 0) scale(1); opacity: 1; }
-        15% { transform: translate(-50%, 0) scale(1); opacity: 1; }
-        85% { transform: translate(-50%, 0) scale(1); opacity: 1; }
-        92% { transform: translate(-50%, -150%) scale(0.9); opacity: 0; }
-        100% { transform: translate(-50%, -150%) scale(0.9); opacity: 0; }
+    .dynamic-island::after {
+        content: ''; position: absolute; right: 30px; top: 50%; transform: translateY(-50%);
+        width: 10px; height: 10px; background: #050505; border-radius: 50%;
     }
 
+/* Faster Island Notification Animation */
+@keyframes islandNotificationSpring {
+    0% {
+        transform: translate(-50%, -40px) scale(0.5);
+        opacity: 0;
+    }
+    5% {
+        transform: translate(-50%, 0) scale(1.05);
+        opacity: 1;
+    }
+    10% {
+        transform: translate(-50%, 0) scale(1);
+        opacity: 1;
+    }
+    75% {
+        transform: translate(-50%, 0) scale(1);
+        opacity: 1;
+    }
+    85% {
+        transform: translate(-50%, -15px) scale(0.92);
+        opacity: 0;
+    }
+    100% {
+        transform: translate(-50%, -40px) scale(0.5);
+        opacity: 0;
+    }
+}
     .cool-notification {
         position: absolute;
-        top: 55px; /* Sits exactly below island */
+        top: 60px; /* Expands smoothly from right under the island */
         left: 50%;
-        width: 250px;
-        border-radius: 18px;
-        background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        padding: 12px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.15), 0 0 1px rgba(0,0,0,0.1);
+        width: 285px;
+        border-radius: 24px;
+        background: rgba(30, 30, 30, 0.85); /* iOS Dark Mode aesthetic */
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 14px 18px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15);
         z-index: 45;
-        animation: slideDropNotif 7s cubic-bezier(0.3, 0.8, 0.1, 1.2) infinite;
+        animation: islandNotificationSpring 8s cubic-bezier(0.3, 0.8, 0.1, 1.2) infinite;
         will-change: transform, opacity;
     }
 
@@ -310,13 +371,17 @@ const StatsSection = () => {
 // 2. MOCKUP SECTION (REVOLUTIONIZED DEVICE ACCURACY USING HTML/CSS)
 const ProductsShowcase = () => {
     return (
-        <section className="py-24 px-6 relative bg-neutral-950 overflow-hidden">
-            <div className="max-w-7xl mx-auto text-center mb-16 relative z-10">
-                <RevealOnScroll>
-                    <h2 className="text-3xl md:text-5xl font-bold mb-6 tracking-tight">Omnichannel Architecture.</h2>
-              
-                </RevealOnScroll>
-            </div>
+<section className="py-24 px-6 relative bg-neutral-950 overflow-hidden">
+    <div className="max-w-7xl mx-auto text-center mb-16 relative z-10">
+        <RevealOnScroll>
+            <h2 className="text-3xl md:text-5xl font-bold mb-6 tracking-tight">
+                We design and build scalable web & mobile platforms.
+            </h2>
+            <p className="text-neutral-400 text-lg md:text-xl max-w-2xl mx-auto">
+                From high-performance web applications to seamless mobile experiences, we create products that work everywhere your users are.
+            </p>
+        </RevealOnScroll>
+    </div>
 
             <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-12 items-center justify-center relative z-10">
                 
@@ -418,39 +483,62 @@ const ProductsShowcase = () => {
 
 
                 {/* 2. REALISTIC IPHONE 14 PRO MAX PURE CSS DEVICE BODY AND UI */}
+      {/* 2. HYPER-REALISTIC IPHONE 17 PRO MAX MOCKUP */}
                 <RevealOnScroll startClass="start-scale-90" className="relative">
-                    <div className="iphone-frame relative w-[280px] h-[580px] rounded-[45px] bg-[#f9fafb] border-[14px] border-[#252525] flex flex-col overflow-hidden ring-2 ring-gray-600 shadow-2xl flex-shrink-0 relative">
+                    <div className="iphone-frame flex-shrink-0 z-10 mx-auto">
                         
-                        {/* Iconic Hardware - Dynamic Island Block */}
-                        <div className="dynamic-island">
-                            <div className="island-cam"></div>
-                        </div>
-                        
-                        {/* Inner Software CSS Mock Notification */}
-                        <div className="cool-notification flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-xl bg-yellow-400 flex items-center justify-center flex-shrink-0 text-white shadow-inner">
-                                <Bell size={18} fill="currentColor"/>
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="text-[13px] font-bold text-gray-800 leading-tight">Infrastructure Alert</span>
-                                <span className="text-[11px] text-gray-500 font-medium">Auto-scaling Node activated successfully.</span>
-                            </div>
-                        </div>
+                        {/* Hardware Titanium Buttons */}
+                        <div className="iphone-btn-action"></div>
+                        <div className="iphone-btn-vol-up"></div>
+                        <div className="iphone-btn-vol-down"></div>
+                        <div className="iphone-btn-power"></div>
 
-                        {/* Interactive Mobile Device Application State Background Center */}
-                        <div className="flex-1 w-full h-full flex items-center justify-center relative flex-col pb-10">
+                        {/* Inner Screen Area */}
+                        <div className="iphone-screen relative">
                             
-                            {/* Precise Mobile Native Logo Injection with Dark Mode override color fix inside white mobile env */}
-                            <div className="mb-4 drop-shadow-[0_20px_20px_rgba(251,191,36,0.1)] hover:scale-105 transition-transform cursor-default">
-                                {/* Adjusted primary color for visibility against the very clean white device mock! */}
-                                <DiellLogo size={140} primaryColor="#000" halfColor="var(--color-secondary)" />
+                            {/* Iconic Dynamic Island */}
+                            <div className="dynamic-island"></div>
+                            
+                            {/* Custom Native App Push Notification */}
+                            <div className="cool-notification flex flex-col gap-1">
+                                <div className="flex items-center gap-3">
+                                    <div className="h-10 w-10 rounded-[10px] bg-gradient-to-br from-black to-zinc-800 border border-zinc-700 flex items-center justify-center flex-shrink-0 text-yellow-400 shadow-md">
+                                        <Code2 size={20} strokeWidth={2.5}/>
+                                    </div>
+                                    <div className="flex flex-col w-full">
+                                        <div className="flex justify-between items-center w-full">
+                                            <span className="text-[14px] font-bold text-white tracking-tight">App Development</span>
+                                            <span className="text-[10px] text-zinc-400">now</span>
+                                        </div>
+                                        <span className="text-[12px] text-zinc-300 font-medium leading-snug mt-0.5">Custom apps based on your needs</span>
+                                    </div>
+                                </div>
                             </div>
+
+                            {/* Mobile App UI State */}
+                            <div className="flex-1 w-full h-full flex items-center justify-center relative flex-col pb-10 bg-[#fafafa]">
+                                
+                                {/* Background app mesh glow to look "custom" */}
+                                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-yellow-500/10 via-transparent to-transparent opacity-70"></div>
+                                
+                                {/* Centered App Logo */}
+                                <div className="mb-4 drop-shadow-[0_20px_20px_rgba(251,191,36,0.15)] hover:scale-105 transition-transform cursor-default relative z-10">
+                                    <DiellLogo size={140} primaryColor="#000" halfColor="var(--color-secondary)" />
+                                </div>
 
                             <p className="text-gray-800 text-lg font-bold mt-1 tracking-tight">Diell  Mobile App</p>
+                                
+                                <div className="mt-4 px-4 py-1.5 bg-black rounded-full z-10 shadow-lg shadow-black/20">
+                                    <span className="text-[10px] font-bold text-yellow-400 uppercase tracking-widest flex items-center gap-2">
+                                        <Smartphone size={12} />
+                                        Custom iOS / Android
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            {/* iOS Home Indicator Bar */}
+                            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-[130px] h-[5px] bg-black/80 rounded-full z-20"></div>
                         </div>
-                        
-                        {/* Device App Environment Indicator Line - Very Real Mobile Element*/}
-                        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-1/3 h-1 bg-black rounded-full"></div>
                     </div>
                 </RevealOnScroll>
             </div>
