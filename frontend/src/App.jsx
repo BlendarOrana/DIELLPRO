@@ -27,9 +27,8 @@ const LoadingSpinner = () => (
 
 // It's cleaner to group your original app logic into a "Home" component.
 const HomePage = () => {
-    const isUnlocked = true;
-
-  const isUnlocked = useAppStore((state) => state.isUnlocked);
+  
+  const isUnlocked = true;
   
 
   return (
