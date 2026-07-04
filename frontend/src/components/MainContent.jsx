@@ -523,7 +523,7 @@ const ProductsShowcase = () => {
                                 
                                 {/* Centered App Logo */}
                                 <div className="mb-4 drop-shadow-[0_20px_20px_rgba(251,191,36,0.15)] hover:scale-105 transition-transform cursor-default relative z-10">
-                                    <DiellLogo size={140} primaryColor="#000" halfColor="var(--color-secondary)" />
+                                    <DiellLogo size={140} primaryColor="#0f172a" halfColor="var(--color-secondary)" />
                                 </div>
 
                             <p className="text-gray-800 text-lg font-bold mt-1 tracking-tight">Diell  Mobile App</p>
